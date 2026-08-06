@@ -1,0 +1,18 @@
+# Referencia al repo de código que este meta-repo orquesta (patrón meta-repo/repos.yaml).
+# main/ es su clon canónico (solo pull); worktrees/NNN-slug/ sus copias de trabajo por unidad.
+
+codigo:
+  nombre: sania
+  remoto: PENDIENTE  # crear el remoto del repo de código y poner aquí su URL
+  rama_principal: main
+  ruta_local: main/
+  # baseline_sha: <sha>   # solo en repos ADOPTADOS: el detector de drift solo
+  #                         cuenta commits POSTERIORES a este (lo escribe la adopción).
+
+# Re-crear este workspace en otra máquina:
+#   git clone <remoto-del-meta>
+#   python3 setup.py
+# Crear worktree de una unidad (desde main/):
+#   git -C main worktree add ../worktrees/NNN-slug -b NNN-slug origin/main
+# Borrarlo en el cierre:
+#   git -C main worktree remove ../worktrees/NNN-slug && git -C main branch -d NNN-slug

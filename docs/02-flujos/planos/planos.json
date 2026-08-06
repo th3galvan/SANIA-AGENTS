@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "proyecto": "sania",
+  "titulo": "SANIA",
+  "descripcion": "Borrador inicial; todavía no se ha completado la ingeniería de requisitos.",
+  "definicion": {
+    "estado": "borrador",
+    "modo": "entrevista",
+    "bloques_no_aplican": [],
+    "supuestos": []
+  },
+  "cobertura": {
+    "estado": "no implementado",
+    "evidencias": [],
+    "pruebas": []
+  },
+  "contrato": {
+    "frase": "",
+    "exito": []
+  },
+  "actores": [],
+  "flujos": [],
+  "episodios": [],
+  "recorridos": [],
+  "reglas": [],
+  "estados": [],
+  "datos": [],
+  "volumen": [],
+  "integraciones": [],
+  "superficie": {},
+  "calidad": [],
+  "fuera": [],
+  "preguntas": []
+}

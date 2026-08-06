@@ -1,0 +1,209 @@
+{
+  "version": 2,
+  "proyecto": "sania-cerrar-venta-entregada",
+  "titulo": "Cerrar una venta entregada",
+  "descripcion": "El cierre se resolverá por plataforma. Vinted se cerrará idempotentemente con el correo final TX-COMPLETE y su número de transacción. Wallapop permanecerá abierto después del correo de entrega y bloqueado para cierre mientras no se defina cómo recibe SANIA la evidencia del movimiento de venta en el monedero.",
+  "definicion": {
+    "estado": "borrador",
+    "modo": "mixto"
+  },
+  "cobertura": {
+    "estado": "no verificado",
+    "evidencias": [],
+    "pruebas": []
+  },
+  "contrato": {
+    "frase": "Cuando el comprador recibió el paquete, Víctor necesitó distinguir la entrega logística del cierre económico real y evitar que SANIA cerrara Wallapop sin una fuente final observable.",
+    "exito": [
+      "Vinted se cerró una sola vez por número de transacción al reconocer TX-COMPLETE.",
+      "El cierre de Vinted conservó número, fecha, título, precio del artículo, precio del envío y transferencia al saldo.",
+      "El correo de entrega de Wallapop mantuvo la venta abierta y produjo un bloqueo explícito, no un cierre inferido.",
+      "Cerrar una venta no convirtió el beneficio en definitivo mientras faltaran costes completos."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias"
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-12",
+      "nombre": "Vinted cierra con TX-COMPLETE",
+      "texto": "El correo final cierra la venta una sola vez por número de transacción y conserva fecha, título e importes. [Migración: identificador histórico G-LIVE-011; referencias históricas: D-LIVE-004, T06-Q01]"
+    },
+    {
+      "id": "G-13",
+      "nombre": "Wallapop entregado no cierra",
+      "texto": "El correo de entrega solo prueba entrega logística; la venta queda abierta hasta un hecho final que SANIA pueda recibir de una fuente todavía no definida. [Migración: identificador histórico G-LIVE-012; referencias históricas: D-LIVE-005, X-LIVE-005, T06-Q02]"
+    },
+    {
+      "id": "G-14",
+      "nombre": "Cerrar la plataforma no completa el beneficio",
+      "texto": "El importe de venta se registra, pero el beneficio no se considera definitivo sin costes reales completos. [Migración: identificador histórico D-LIVE-030]"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "cerrar-venta-vinted",
+      "titulo": "SANIA cerró Vinted con TX-COMPLETE",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "Vinted envió el correo La transacción se ha completado con el código TX-COMPLETE."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿El correo aportaba un número de transacción y los campos necesarios y pudo relacionarse con una venta?",
+          "sigue": "sí, SANIA continuó",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó el correo, mantuvo la venta abierta y dejó el hecho sin aplicar ni completar datos por inferencia; T02-Q08 decidirá si además abre un ticket."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Ese número de transacción ya había cerrado la venta?",
+          "sigue": "no, era un cierre nuevo",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA no duplicó el cierre ni la transferencia económica."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA guardó número de transacción, fecha, título, precio del artículo, precio del envío y transferencia al saldo, y marcó la venta de Vinted como cerrada."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El ingreso dejó de estar pendiente de cierre de plataforma, pero el beneficio siguió sin ser definitivo mientras faltaran costes completos."
+        }
+      ]
+    },
+    {
+      "id": "mantener-wallapop-bloqueada",
+      "titulo": "La entrega de Wallapop no cerró la venta",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "Wallapop envió el correo que confirma la entrega del paquete al comprador."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA registró la entrega y mantuvo la venta abierta porque el propio correo indica que el dinero estará disponible cuando el comprador confirme."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA dejó el cierre bloqueado por fuente no definida: el hecho final aparece en el monedero de Wallapop, pero no existe correo final ni un mecanismo autorizado para incorporarlo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mantuvo visible el bloqueo de cierre Wallapop sin dar por decidido que fuera un ticket, pedir un OK periódico ni aplicar una confirmación manual no acordada."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "EP-6",
+      "texto": "Tres correos reales de Vinted mostraron TX-COMPLETE, número de transacción, fecha, título, precio del artículo, precio del envío y transferencia al saldo. Fixtures: Ventilador anti vaho — artículo 17,00 €, envío 2,65 €, transferencia 17,00 €; Airsoft face rack + balaclava — artículo 25,00 €, envío 3,85 €, transferencia 25,00 €; otra venta con el mismo título — artículo 24,95 €, envío 4,99 €, transferencia 24,95 €. [Migración: referencias históricas: E-LIVE-007, T06-Q01]"
+    },
+    {
+      "id": "EP-7",
+      "texto": "El correo real de Wallapop para «gafas balísticas + máscara airsoft» registró una compra del 23/7/26 por 50,00 € y confirmó que el paquete fue entregado; dejó el dinero pendiente del OK del comprador y no constituyó cierre. [Migración: referencias históricas: E-LIVE-008, T06-Q02]"
+    },
+    {
+      "id": "EP-8",
+      "texto": "La captura del monedero mostró ventas, retiradas, recargas y reembolsos por anuncio, pero SANIA todavía no dispone de una fuente definida para recibir esos movimientos. [Migración: referencias históricas: E-LIVE-009, T06-Q02, X-LIVE-005]"
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "venta Vinted",
+      "estados": [
+        {
+          "nombre": "entregada y abierta",
+          "acciones": [
+            {
+              "accion": "recibir y validar TX-COMPLETE",
+              "pasa_a": "cerrada"
+            }
+          ]
+        },
+        {
+          "nombre": "cerrada",
+          "acciones": [
+            "registrar los importes sin duplicarlos y mantener el beneficio provisional si faltan costes"
+          ]
+        }
+      ]
+    },
+    {
+      "entidad": "venta Wallapop",
+      "estados": [
+        {
+          "nombre": "entregada y abierta",
+          "acciones": [
+            {
+              "accion": "detectar que falta una fuente final observable",
+              "pasa_a": "bloqueada para cierre"
+            }
+          ]
+        },
+        {
+          "nombre": "bloqueada para cierre",
+          "acciones": [
+            "mantener visible el bloqueo hasta decidir la fuente del movimiento del monedero y si se representa como ticket"
+          ]
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Gmail",
+      "para": "reconocer el correo TX-COMPLETE de Vinted y el correo de entrega no final de Wallapop"
+    },
+    {
+      "con": "Telegram",
+      "para": "avisar del bloqueo o de un ticket, sin inventar una confirmación periódica de cierre"
+    },
+    {
+      "con": "monedero de Wallapop",
+      "para": "fuente final necesaria pero todavía no autorizada ni conectada"
+    }
+  ],
+  "fuera": [
+    "Cerrar Wallapop únicamente porque el paquete figuró como entregado.",
+    "Pedir a Víctor un OK cada 48 horas: ni la confirmación ni la cadencia fueron acordadas.",
+    "Inferir un movimiento del monedero a partir del precio del correo inicial.",
+    "Convertir automáticamente el cierre de plataforma en beneficio definitivo.",
+    "Automatizar devoluciones o extravíos sin un caso real verificado."
+  ],
+  "preguntas": [
+    "[T06-Q01] ¿Existen variantes de idioma o plantilla de TX-COMPLETE y qué campos serán obligatorios?",
+    "[T06-Q02, X-LIVE-005] ¿Cómo llegará a SANIA el movimiento final del monedero de Wallapop: confirmación manual o fuente de lectura autorizada?",
+    "[T06-Q03] ¿Qué se hace y tras cuánto tiempo si falta la señal final de plataforma?",
+    "[T06-Q04] ¿Qué incidencias concretas bloquean el cierre y qué evidencia las desbloquea?",
+    "[T06-Q05, T06-Q06, T06-Q10] ¿Qué costes y reglas faltan para convertir el resultado de una venta cerrada en beneficio definitivo?"
+  ]
+}

@@ -1,0 +1,127 @@
+# Preguntas pendientes de SANIA
+
+**Fecha de consolidación:** 04/08/2026  
+**Fuente:** informe de entrevista, planos actuales y respuestas posteriores de Víctor.  
+**Propósito:** reunir en un único documento las preguntas que todavía requieren una decisión, un caso real o una investigación.
+
+Este documento es un índice de trabajo, no sustituye los planos. Las preguntas que ya se respondieron durante la conversación se han excluido aunque todavía aparezcan en algunos `planos.json` antiguos. Antes de construir, habrá que trasladar las respuestas confirmadas a los planos.
+
+## Preguntas ya cerradas y excluidas
+
+Ya se decidió lo siguiente: diferencia entre revisión pendiente e incidencia; estados básicos de una incidencia; asignación inicial a Víctor; recordatorios configurables; comportamiento de incidencias parciales y totales; unidades defectuosas; devoluciones; extravíos; comprobación pública condicionada a investigación; tratamiento de CAPTCHA y bloqueos; datos mínimos públicos de los anuncios; y dependencia explícita entre optimizaciones relacionadas.
+
+## 1. Ventas, cancelaciones y stock
+
+- `T01-Q02` — ¿Qué debe hacer SANIA si el sufijo de referencia falta, está cortado o ha sido alterado?
+- `T01-Q03` — ¿Los parámetros `b`, `i` y `r` de Wallapop aportan información estable o deben descartarse?
+- `T01-Q04 / T01-Q09` — ¿Qué correo o hecho demuestra una cancelación real y qué ocurre con la reserva, la unidad y los anuncios antes o después del envío?
+- `T01-Q05` — ¿Qué dato mínimo del comprador se conserva, para qué, quién puede verlo y durante cuánto tiempo?
+- `T01-Q06` — ¿Cómo representa SANIA una venta real con varias unidades o productos y cómo reparte importes y costes?
+- `T01-Q08 / T04-Q04` — Si dos ventas intentan reservar la última unidad casi simultáneamente, ¿qué evidencia temporal neutral decide cuál gana?
+- `T01-Q10` — ¿Qué hecho inicia la medición del tiempo hasta la venta: anuncio creado, publicación efectiva u otro?
+- `T01-Q11` — Si la unidad registrada no está disponible pero existe otra idéntica, ¿qué sustitución está autorizada y quién la confirma?
+- `T04-Q01` — ¿Cuál fue el último ajuste real de stock, con cantidad anterior, posterior, motivo y efecto económico?
+- `T04-Q03` — ¿Cómo se separan en la práctica el ajuste físico de stock y el movimiento de dinero?
+- `T04-Q06` — Cuando llegan varias unidades iguales, ¿las tareas de publicación se crean por unidad o agrupadas?
+- `T03-Q08` — ¿Cuál es el alfabeto y orden definitivo de las referencias y cómo se gestionan colisiones, reutilización y agotamiento?
+
+## 2. AliExpress y reconocimiento de correos
+
+- `T02-Q01` — ¿Qué remitentes, asuntos y campos aparecen en los correos reales de compra, envío, entrega, admisión y cancelación?
+- `T02-Q02` — ¿Qué identificador estable distingue una línea de AliExpress aunque cambie su nombre visible?
+- `T02-Q03` — ¿Cómo expresan los correos que un pedido fue dividido, consolidado o entregado parcialmente?
+- `T02-Q04` — ¿Qué correos o hechos demuestran admisión, tránsito, intento fallido e incidencia para cada transportista?
+- `T02-Q05` — Ante un correo duplicado, tardío, desordenado o contradictorio, ¿qué hecho prevalece y cómo se conserva la discrepancia?
+- `T02-Q06` — ¿Qué campos son obligatorios para reconocer cada plantilla y sus variantes con seguridad?
+- `T02-Q07` — ¿En qué plantillas puede SANIA proponer una interpretación y qué datos nunca puede aplicar sin confirmación?
+- `T02-Q09` — Durante una recepción parcial, ¿qué debe mostrarse como esperado, recibido, pendiente, dudoso o no identificable?
+- `T03-Q02` — ¿Qué campos permiten distinguir físicamente líneas o variantes muy parecidas?
+- `D-LIVE-023` — Si se corrige una clasificación aprendida, ¿afecta solo a pedidos futuros o también a pedidos existentes?
+
+## 3. Recepción e incidencias
+
+- `T03-Q01` — Falta documentar un caso real de producto defectuoso, incompleto o equivocado y su desenlace físico y económico.
+- `T03-Q03` — ¿Qué cadencia y efecto tiene silenciar cada recordatorio de recepción? La cadencia general de incidencias ya está definida, pero no la de recepción.
+- `T03-Q04` — Si se pulsa «Todo correcto» por error, ¿cómo se revierten unidades, tareas, anuncios y ventas sin borrar el historial?
+- `T03-Q07` — ¿Qué plazos externos debe vigilar una disputa y cuándo deja de recordarse?
+- `T03-Q09` — Faltan casos reales de reembolso total o parcial, sustitución, devolución y pérdida.
+- `T08-Q03` — ¿Qué hechos hacen subir automáticamente una prioridad, independientemente de la frecuencia de aviso elegida por el usuario?
+- `T08-Q04` — Falta completar el bloqueo para excepciones todavía no tratadas, como disputas, reembolsos y contradicciones entre persona y correo.
+- `D-LIVE-018` — ¿El botón debe llamarse «No OK», «Abrir incidencia» o mostrar ambas acciones?
+- `Futuro` — Cuando exista suficiente historial, ¿qué tipos de incidencia se asignarán por defecto a cada rol?
+
+## 4. Preparación y transporte
+
+- `T05-Q01` — ¿Qué datos mínimos necesita Víctor para localizar y preparar exactamente una unidad?
+- `T05-Q02` — Falta un ejemplo real de envío con varios productos o unidades y cómo se embaló.
+- `T05-Q03` — ¿Qué errores de preparación deben bloquear la entrega y abrir una incidencia?
+- `T05-Q04` — ¿Cómo se relacionan QR, transportista, tracking y envío, y quién puede verlos y durante cuánto tiempo?
+- `T05-Q05` — ¿En qué casos se acepta una confirmación manual de admisión?
+- `T05-Q06` — Si una confirmación humana contradice un correo posterior, ¿qué prevalece?
+- `T05-Q07` — ¿Cuánto se espera antes de recordar una admisión que todavía no tiene evidencia?
+- `T05-Q08` — ¿Existe alguna actuación concreta a las 48 horas o se descarta ese plazo?
+- `T05-Q09` — ¿Cuánto tiempo sin cambios en el tracking provoca aviso, contacto con el transportista o incidencia?
+- `G-LIVE-014` — ¿En qué formato y cuántas imágenes debe entregar la acción «Enviar imágenes»?
+
+## 5. Cierre de ventas, devoluciones y extravíos
+
+- `T06-Q01` — Ya conocemos los campos de la plantilla española de cierre de Vinted; faltan posibles variantes de idioma o formato.
+- `T06-Q02` — ¿Cómo recibirá SANIA el cierre económico final de Wallapop? Los correos entregados no contienen esa señal.
+- `T06-Q03` — Si no llega la señal final de una plataforma, ¿cuánto se espera y qué acciones se realizan?
+- `T06-Q04` — ¿Qué otras incidencias bloquean el cierre y qué evidencia concreta las desbloquea?
+- `T11-Q01` — Falta la primera devolución real, con correos, estado físico de la unidad y resultado económico.
+- `T11-Q02` — Falta el primer extravío real y el procedimiento seguido por la plataforma o transportista.
+- `T11-Q03` — Hasta disponer de esos casos, ¿qué actuaciones deben mantenerse completamente manuales?
+
+## 6. Costes, precios y beneficio
+
+- `T03-Q05` — ¿Con qué moneda, precisión y redondeo se guardan y muestran los costes?
+- `T03-Q06 / T09-Q06` — ¿Cuál es la fórmula completa del precio y puede variar por plataforma?
+- `T06-Q05` — ¿Qué comisiones, portes, embalajes, impuestos y otros gastos intervienen y de qué fuente sale cada uno?
+- `T06-Q06` — ¿Cómo se reparte un gasto entre varias unidades o ventas?
+- `T06-Q07` — ¿Cómo se importa y valida `costes_aliexpress.xlsx` y qué campos contiene?
+- `T06-Q08` — ¿Qué cambios económicos requieren una segunda confirmación y quién debe realizarla?
+- `T06-Q09` — ¿Cómo se corrige un importe guardando valor anterior, nuevo, persona, fecha, hora y motivo?
+- `T06-Q10` — Falta una venta normal y otra atípica con todos sus costes y resultado final.
+
+## 7. Telegram, botones y autonomía
+
+- `T07-Q01` — ¿Qué mecanismo reconocerá a Víctor como usuario inicial autorizado del bot?
+- `T07-Q02` — ¿Qué excepciones faltan a la regla general «SANIA prepara y registra; Víctor confirma hechos físicos y actúa en las plataformas»?
+- `T07-Q03` — ¿Qué acciones sensibles requieren siempre una segunda confirmación?
+- `T07-Q04` — ¿Cómo se corrigen botones pulsados por error y respuestas tardías, duplicadas o contradictorias?
+- `T07-Q05` — La frecuencia de incidencias ya está definida; falta decidir la cadencia de los demás avisos y tareas.
+- `T07-Q06` — ¿Qué hora y zona horaria se usan para cada tipo de aviso?
+- `X-LIVE-008` — Además de aportar contexto o abrir una incidencia, ¿qué acciones debe admitir el texto libre?
+
+## 8. Comprobación pública de anuncios: investigación
+
+Las reglas de negocio ya están decididas. Durante la investigación quedan estas comprobaciones:
+
+- ¿Se pueden consultar periódicamente los enlaces públicos de cada plataforma de forma sencilla, fiable y permitida?
+- ¿La página permite distinguir con seguridad entre **Vendido**, **Retirado** y un fallo temporal?
+- ¿Qué número de CAPTCHA o bloqueos repetidos debe pausar automáticamente la función?
+- ¿La pausa se aplica a un anuncio, una plataforma o toda la comprobación?
+- ¿Qué tamaño alcanzará el historial mínimo de comprobaciones e incidencias y necesita archivo o retención limitada?
+
+## 9. Escala, seguridad y continuidad
+
+- `T10-Q01` — ¿Cuántos pedidos, paquetes, unidades, ventas, correos y avisos existen en una semana normal y en momentos de máxima actividad?
+- `T10-Q02` — ¿Cuál es el orden general cuando varios hechos ocurren simultáneamente o llegan desordenados?
+- `T10-Q03` — ¿Quién puede acceder a comprador, QR, tracking, costes y resultados, y cuánto tiempo se conservan?
+- `T10-Q04` — Si SANIA deja de funcionar durante medio día, ¿qué hace Víctor manualmente y qué debe recuperar SANIA después?
+- `T10-Q05` — ¿Qué esperas máximas son tolerables para correo, Telegram, reserva, stock y cierre?
+- `T10-Q06` — ¿Qué dispositivos, idiomas y dificultades reales condicionan el uso?
+
+## 10. Gobierno y mejoras futuras
+
+- ¿Cada cuánto debe aparecer el resumen de optimizaciones no urgentes?
+- Cuando haya suficientes incidencias reales, ¿cómo se analizarán sus tipos y se aprobará la relación entre tipos y roles?
+
+## Documentos relacionados
+
+- [Catálogo de correos transaccionales de Wallapop y Vinted](evidencias/correos-transaccionales-wallapop-vinted.md).
+- [Planos generales de SANIA](planos.json).
+- [Informe de continuidad de la entrevista](GPT%20live/PAQUETE-GPT-LIVE-ENTREVISTA-EN-COCHE-2026-07-31.md).
+
+Este documento debe actualizarse cuando una pregunta se responda y después deben trasladarse las decisiones confirmadas a los planos correspondientes.

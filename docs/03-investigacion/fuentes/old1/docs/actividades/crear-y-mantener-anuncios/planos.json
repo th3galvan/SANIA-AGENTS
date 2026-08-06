@@ -1,0 +1,372 @@
+{
+  "version": 2,
+  "proyecto": "sania-crear-y-mantener-anuncios",
+  "titulo": "Crear y mantener anuncios",
+  "descripcion": "En la primera versión, SANIA prepara tareas de publicación independientes para Wallapop y Vinted y Víctor ejecuta manualmente toda creación o modificación en la plataforma. Cada anuncio representa una unidad física y su título termina con la referencia pública alfanumérica de tres caracteres de esa unidad; el enlace puede guardarse si se aporta, pero no es obligatorio para identificarla.",
+  "contrato": {
+    "frase": "Cuando el stock quedó disponible para venta, Víctor necesitó recibir secuencialmente el par de plataformas de cada objetivo de publicación, disponer del texto listo para copiar y pegar, pedir las imágenes solo cuando las necesitó y confirmar de forma persistente la unidad y plataforma concretas sobre las que actuó.",
+    "exito": [
+      "Cada acción de publicación o confirmación quedó resuelta a una unidad y una plataforma concretas; la granularidad con que nacen o se agrupan las tareas en una entrada múltiple siguió pendiente.",
+      "El título preparado terminó con la referencia pública de tres caracteres de la unidad.",
+      "Confirmar Anuncio creado persistió la plataforma y la unidad sin pedir un enlace obligatorio.",
+      "SANIA no creó, editó, eliminó, reactivó ni publicó anuncios dentro de Wallapop o Vinted."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "creó, modificó, retiró, reactivó y publicó manualmente los anuncios en Wallapop y Vinted"
+    },
+    {
+      "nombre": "SANIA",
+      "rol": "preparó contenido, generó tareas, entregó imágenes bajo demanda y registró las confirmaciones humanas"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "referencia de unidad",
+      "significado": "código alfanumérico de tres caracteres, único por unidad y visible como sufijo del título; el alfabeto, las colisiones, la reutilización y el agotamiento siguen pendientes"
+    },
+    {
+      "termino": "anuncio",
+      "significado": "publicación de una plataforma que representa una sola unidad física"
+    },
+    {
+      "termino": "tarea de publicación",
+      "significado": "mensaje o acción de Telegram que debe resolver una unidad y una plataforma antes de poder confirmarse, con contenido y botonera propios; puede formar parte de una generación agrupada cuya granularidad todavía no se decidió"
+    },
+    {
+      "termino": "Anuncio creado",
+      "significado": "confirmación humana que persiste que la unidad quedó publicada en la plataforma de la tarea concreta"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "publicar-objetivo-con-acciones-por-plataforma",
+      "titulo": "Víctor publicó manualmente un objetivo mediante acciones independientes por plataforma",
+      "momento": "primera versión",
+      "descripcion": "Las tareas nacen después de que la unidad entre correctamente en stock para venta. La decisión de procesar una entrada grande de forma secuencial está confirmada, pero la granularidad final producto/unidad todavía debe aclararse.",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "Para la acción concreta, SANIA resolvió la unidad que representaría el anuncio y preparó un título cuyo último elemento era su referencia alfanumérica de tres caracteres, una descripción veraz y los demás datos necesarios para copiar y pegar en la plataforma."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA presentó dos acciones independientes, Wallapop y Vinted, para el mismo objetivo producto/unidad y no pasó al siguiente objetivo hasta presentar ambas. Cada acción confirmable quedó ligada a una unidad y plataforma concretas; X-LIVE-011 mantiene pendiente si la tarea generadora se crea por producto o por unidad."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Telegram entregó por defecto el texto listo para copiar y pegar y la botonera Enviar imágenes, Anuncio creado, Recordar más tarde y Cancelar sugerencia; no adjuntó las imágenes automáticamente."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Cómo continuó Víctor desde la tarea concreta?",
+          "ramas": [
+            {
+              "etiqueta": "Enviar imágenes",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA envió las imágenes asociadas sin cerrar ni completar la tarea, que siguió disponible para una acción posterior."
+                }
+              ]
+            },
+            {
+              "etiqueta": "Víctor publicó manualmente y pulsó Anuncio creado",
+              "pasos": [
+                {
+                  "tipo": "humano",
+                  "quien": "Víctor",
+                  "texto": "Víctor copió el contenido, creó el anuncio dentro de Wallapop o Vinted y volvió a la tarea."
+                },
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA persistió que esa unidad estaba publicada en la plataforma deducida del mensaje y conservó la confirmación en el historial."
+                }
+              ],
+              "termina": true
+            },
+            {
+              "etiqueta": "Recordar más tarde",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA registró el aplazamiento sin inferir una publicación ni cambiar el stock; la cadencia y el momento del nuevo aviso siguen pendientes."
+                }
+              ]
+            },
+            {
+              "etiqueta": "Cancelar sugerencia",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA descartó la tarea de publicación sin inferir que existiera un anuncio ni cambiar el stock; queda pendiente decidir si produce algún efecto adicional sobre la intención de anunciar."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mejorar-anuncio-con-dudas-reales",
+      "titulo": "Víctor mejoró manualmente un anuncio",
+      "momento": "proceso actual asistido",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor revisó dudas repetidas de compradores o la falta de interés y decidió añadir respuestas frecuentes o cambiar fotos y descripción."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA pudo preparar una propuesta y conservar la versión y el motivo si Víctor los registró, pero no midió rendimiento con un umbral no definido ni aplicó el cambio en la plataforma."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor comprobó que el contenido siguiera siendo veraz, mantuvo la referencia al final del título y editó el anuncio manualmente."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "E-LIVE-006",
+      "texto": "Víctor analizó conversaciones, convirtió preguntas repetidas en información de la descripción y cambió fotos o texto cuando un anuncio tenía poco interés; no se definieron métricas ni umbrales objetivos.",
+      "refs": ["E-LIVE-006", "D-LIVE-029", "T09-Q02"]
+    },
+    {
+      "id": "E-LIVE-002",
+      "texto": "Cuando se acordó un extra o lote, Víctor elevó la oferta y modificó manualmente el anuncio para que la descripción final reflejara exactamente lo vendido.",
+      "refs": ["D-LIVE-002", "G-LIVE-010", "T01-Q06", "T01-Q07"]
+    },
+    {
+      "id": "E-LIVE-003",
+      "texto": "Una última unidad pudo estar anunciada en ambas plataformas; esta excepción no convirtió los dos anuncios en dos unidades distintas.",
+      "refs": ["D-LIVE-008", "D-LIVE-009", "G-LIVE-008"]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "D-LIVE-020",
+      "nombre": "Las tareas nacieron después de la recepción correcta",
+      "texto": "Al pulsar Todo correcto se registró el stock y se generaron inmediatamente las tareas de anuncio, pero solo para unidades clasificadas como stock para venta."
+    },
+    {
+      "id": "G-LIVE-016",
+      "nombre": "Las compras personales no generaron anuncios",
+      "texto": "D-LIVE-022 separó Stock para venta de Compra personal; únicamente la primera clasificación alimentó este flujo."
+    },
+    {
+      "id": "D-LIVE-021",
+      "nombre": "Las publicaciones de entradas grandes se presentaron secuencialmente",
+      "texto": "Se presentan los dos mensajes de plataforma de un producto/unidad antes de continuar con el siguiente. X-LIVE-011 mantiene abierta la granularidad exacta producto/unidad."
+    },
+    {
+      "id": "D-LIVE-011",
+      "nombre": "El texto llegó listo para copiar y pegar",
+      "texto": "Cada mensaje incluyó título con referencia, descripción y datos necesarios adaptados a su plataforma."
+    },
+    {
+      "id": "G-LIVE-005",
+      "nombre": "Un anuncio representó una unidad",
+      "texto": "D-LIVE-007 y T04-Q06 fijaron una vinculación anuncio-unidad uno a uno; varias unidades del mismo producto necesitaron anuncios distintos. Esta regla aplica al anuncio, mientras la granularidad de generación masiva de tareas sigue abierta en X-LIVE-011."
+    },
+    {
+      "id": "G-LIVE-006",
+      "nombre": "La referencia fue un sufijo público de tres caracteres",
+      "texto": "El título terminó con la referencia alfanumérica de la unidad. D-LIVE-006 y X-LIVE-001 sustituyeron la antigua referencia privada; X-LIVE-010 resolvió la repetición del título base mediante el sufijo, pendiente de validarlo en correos y movimientos reales."
+    },
+    {
+      "id": "G-LIVE-009",
+      "nombre": "Toda escritura en las plataformas fue humana",
+      "texto": "Según D-LIVE-010 y X-LIVE-003, SANIA solo preparó información y avisos; Víctor creó, editó, eliminó, reactivó y publicó manualmente."
+    },
+    {
+      "id": "G-LIVE-010",
+      "nombre": "El contenido enviado coincidió con la descripción final",
+      "texto": "Los extras acordados se incorporaron manualmente al anuncio antes de cerrar la oferta; una conversación por sí sola no sustituyó la descripción final."
+    },
+    {
+      "id": "G-LIVE-013",
+      "nombre": "Las tareas fueron independientes por plataforma",
+      "texto": "D-LIVE-013 y D-LIVE-016 dispusieron un mensaje para Wallapop y otro para Vinted, cada uno con Enviar imágenes, Anuncio creado, Recordar más tarde y Cancelar sugerencia y con estado separado."
+    },
+    {
+      "id": "G-LIVE-014",
+      "nombre": "Las imágenes se enviaron bajo demanda",
+      "texto": "D-LIVE-012 dispuso que Telegram no enviara imágenes por defecto y que Enviar imágenes las aportara cuando Víctor las solicitara."
+    },
+    {
+      "id": "G-LIVE-015",
+      "nombre": "Anuncio creado produjo una confirmación persistente",
+      "texto": "Según D-LIVE-014 y T07-Q01, la tarea concreta ya identificó unidad y plataforma para el único usuario inicial; pulsar Anuncio creado actualizó ese estado sin volver a identificar la unidad."
+    },
+    {
+      "id": "D-LIVE-015",
+      "nombre": "El enlace no fue requisito de identidad",
+      "texto": "La referencia del título permitió vincular la venta. Por X-LIVE-002, una URL solo puede conservarse como dato opcional para una finalidad futura de navegación o auditoría, nunca como requisito confirmado."
+    },
+    {
+      "id": "D-LIVE-024",
+      "nombre": "Variantes reutilizables fuera del MVP",
+      "texto": "En evolución se propuso generar 10 variantes, usar cada una hasta 3 veces y, al agotarse las 10, generar otro lote de 10. Ambos valores son configurables; antes deben normalizarse la ficha y la variante y revisarse las normas de plataforma.",
+      "estado": "evolución, no MVP",
+      "refs": ["X-LIVE-009"]
+    },
+    {
+      "id": "G-LIVE-020",
+      "nombre": "La configurabilidad se decide caso a caso",
+      "texto": "D-LIVE-025 exige preguntar a Víctor antes de fijar como configurable una función cuando tenga sentido; X-LIVE-012 descarta convertir todo en configuración obligatoria.",
+      "estado": "principio de diseño",
+      "refs": ["D-LIVE-025", "X-LIVE-012"]
+    },
+    {
+      "id": "D-LIVE-027",
+      "nombre": "Negociación y contraofertas aplazadas",
+      "texto": "La ayuda para negociar o proponer contraofertas queda fuera del MVP y no se incorpora hasta disponer de una vía permitida y reglas verificadas.",
+      "estado": "evolución aplazada"
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "anuncio",
+      "guarda": [
+        "plataforma",
+        "unidad física y referencia alfanumérica de tres caracteres",
+        "título exacto publicado con la referencia al final",
+        "descripción y versión de contenido",
+        "producto y variante",
+        "estado por plataforma: pendiente, publicado, pendiente de retirada o retirado cuando exista confirmación",
+        "fecha de creación de la tarea",
+        "fecha y evidencia de la confirmación humana disponible",
+        "URL solo si Víctor la aporta y sin convertirla en obligatoria",
+        "fecha inicial para medir tiempo hasta la venta solo cuando se defina su origen"
+      ],
+      "origen": "ficha de producto, unidad, tarea por plataforma y confirmaciones de Víctor"
+    },
+    {
+      "cosa": "tarea de publicación",
+      "guarda": [
+        "unidad y plataforma ligadas",
+        "texto preparado",
+        "estado independiente",
+        "peticiones de imágenes",
+        "acciones de la botonera",
+        "historial y fechas"
+      ],
+      "origen": "SANIA después de la entrada correcta en stock para venta"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "entregar por plataforma el texto listo, enviar imágenes bajo demanda y recoger acciones de la tarea"
+    },
+    {
+      "con": "Wallapop y Vinted",
+      "para": "servir como destino de la actuación manual de Víctor; SANIA no inició sesión ni escribió en ellas"
+    }
+  ],
+  "evolucion": [
+    {
+      "refs": ["D-LIVE-024", "X-LIVE-009"],
+      "tema": "Variantes reutilizables",
+      "estado": "futuro",
+      "texto": "La idea aceptada es generar 10 variantes, usar cada una hasta 3 veces y, cuando las 10 queden agotadas, generar otro lote de 10; ambos valores son configurables y no forman parte del MVP. Antes exige normalizar qué es una variante, verificar la ficha maestra que Víctor afirma que ya existe y revisar las normas de cada plataforma."
+    },
+    {
+      "refs": ["D-LIVE-026", "G-LIVE-019", "T03-Q06", "T09-Q06", "X-LIVE-009"],
+      "tema": "Precio por coste y dos márgenes",
+      "estado": "futuro",
+      "texto": "El margen mínimo del 25 % fue solo un ejemplo. Faltan fórmula, costes completos, redondeo y posible diferencia por plataforma."
+    },
+    {
+      "refs": ["D-LIVE-027", "X-LIVE-009"],
+      "tema": "Negociación y contraofertas",
+      "estado": "aplazado",
+      "texto": "No se incorporan hasta contar con una forma permitida de asistir el canal."
+    },
+    {
+      "refs": ["D-LIVE-025", "G-LIVE-020", "X-LIVE-012"],
+      "tema": "Configurabilidad",
+      "estado": "principio de diseño",
+      "texto": "No todo se vuelve configurable: se consulta a Víctor cuando resulte razonable antes de fijar un valor."
+    },
+    {
+      "refs": ["X-LIVE-009"],
+      "tema": "Generación para eludir detección",
+      "estado": "no aprobada",
+      "texto": "No se implementan imágenes sin huella ni variaciones destinadas a eludir controles; cualquier evolución debe ser veraz y revisarse frente a las normas de plataforma."
+    }
+  ],
+  "fuera": [
+    "Crear, editar, retirar, reactivar o republicar automáticamente un anuncio.",
+    "Responder o negociar con compradores en el MVP.",
+    "Exigir una URL o inferir que los parámetros b, i y r son identificadores estables.",
+    "Leer perfiles públicos, iniciar sesión o usar navegador automatizado como parte de este flujo.",
+    "Promover al MVP la generación avanzada de variantes, el pricing completo o la negociación.",
+    "Generar o variar imágenes, títulos o descripciones con la finalidad de eludir detección o controles de Wallapop o Vinted.",
+    "Fijar una cadencia de Recordar más tarde o un efecto de Cancelar sugerencia más allá de descartar la tarea sin decisión adicional."
+  ],
+  "contradicciones": [
+    {
+      "id": "X-LIVE-001",
+      "resolucion": "sustituida",
+      "texto": "La referencia dejó de ser privada y pasó a ser pública al final del título."
+    },
+    {
+      "id": "X-LIVE-002",
+      "resolucion": "enlace no obligatorio; finalidad opcional pendiente",
+      "texto": "Se eliminó la dependencia de pegar una URL, sin afirmar que nunca pueda conservarse para navegación o auditoría."
+    },
+    {
+      "id": "X-LIVE-003",
+      "resolucion": "sustituida",
+      "texto": "Toda escritura en Wallapop/Vinted corresponde a Víctor."
+    },
+    {
+      "id": "X-LIVE-007",
+      "resolucion": "bloqueada en el MVP",
+      "texto": "La mención de Playwright no autorizó lectura web; prevalece el alcance de correo y acción humana."
+    },
+    {
+      "id": "X-LIVE-008",
+      "resolucion": "pendiente sin prohibición global",
+      "texto": "Las botoneras concretas no eliminaron el texto libre de Telegram; este plano conserva el texto listo para copiar y no impone una interfaz solo de botones."
+    },
+    {
+      "id": "X-LIVE-009",
+      "resolucion": "separada como evolución",
+      "texto": "Variantes, pricing y negociación no se promovieron a la primera versión."
+    },
+    {
+      "id": "X-LIVE-010",
+      "resolucion": "resuelta por el sufijo, pendiente de validación real",
+      "texto": "El título base puede repetirse; la referencia final identifica la unidad."
+    },
+    {
+      "id": "X-LIVE-011",
+      "resolucion": "pendiente",
+      "texto": "Un anuncio es de una unidad, pero falta aclarar la granularidad con que se generan tareas para entradas múltiples."
+    },
+    {
+      "id": "X-LIVE-012",
+      "resolucion": "sustituida",
+      "texto": "La configurabilidad se decide caso a caso y no es una obligación universal."
+    }
+  ],
+  "preguntas": [
+    "T03-Q08 — ¿Qué alfabeto usa la referencia de tres caracteres y cómo se gestionan colisiones, reutilización y agotamiento?",
+    "T04-Q02 / T04-Q05 / X-LIVE-004 — ¿Cómo identifica físicamente Víctor la unidad referenciada cuando varias unidades idénticas no llevan etiqueta ni rasgo diferenciador?",
+    "T04-Q06 / D-LIVE-021 / X-LIVE-011 — ¿Las tareas de una entrada múltiple se generan por unidad o por producto, manteniendo en todo caso un anuncio por unidad?",
+    "T07-Q04 / T07-Q05 / G-LIVE-015 — ¿Cuándo reaparece Recordar más tarde, qué efecto adicional tiene Cancelar sugerencia después de descartar la tarea y cómo se corrige Anuncio creado pulsado por error o una respuesta duplicada?",
+    "G-LIVE-014 — ¿Qué formato y cuántas imágenes entrega Enviar imágenes?",
+    "T09-Q05 / X-LIVE-002 — Si la URL se conserva opcionalmente, ¿para qué finalidad y qué ocurre cuando cambia o falla?",
+    "T09-Q06 — ¿Wallapop y Vinted pueden llevar precios distintos y qué regla de redondeo se aplica?",
+    "T01-Q10 — ¿Desde qué hecho empieza a medirse el tiempo hasta la venta?"
+  ]
+}

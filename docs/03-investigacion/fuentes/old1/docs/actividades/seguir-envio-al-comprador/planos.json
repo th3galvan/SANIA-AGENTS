@@ -1,0 +1,213 @@
+{
+  "version": 2,
+  "proyecto": "sania-seguir-envio-al-comprador",
+  "titulo": "Seguir el envío al comprador",
+  "descripcion": "SANIA relacionará con la venta correcta únicamente correos pertenecientes a plantillas reales aportadas y validadas, conservará la evidencia y aplicará cada hecho una sola vez. LIVE aportó un correo de entrega de Wallapop, pero no plantillas reales de admisión, tránsito, intento fallido o incidencia por transportista. Un estado logístico de entregado no cerrará por sí solo la venta, y no se usará el umbral de 48 horas porque la entrevista no fijó ninguna cadencia.",
+  "contrato": {
+    "frase": "Cuando llegó una evidencia logística, Víctor necesitó que SANIA actualizara solo el envío demostrado, mantuviera aparte el cierre de la venta y dejara visible cualquier lectura dudosa.",
+    "exito": [
+      "Cada correo reconocido actualizó como máximo una vez el envío relacionado.",
+      "Un correo desconocido, contradictorio o imposible de relacionar no inventó una transición y quedó sin aplicar; T02-Q08 decidirá cuándo además abre un ticket.",
+      "La entrega logística no se confundió con el OK final del comprador ni con la disponibilidad del dinero."
+    ]
+  },
+  "alcance": {
+    "mvp": [
+      "Registrar por evidencia reconocida los estados logísticos disponibles en correo.",
+      "Conservar el evento original, su fecha y su relación con la venta.",
+      "Avisar a Víctor cuando exista una incidencia o una acción humana concreta."
+    ],
+    "evolucion": [
+      "Definir patrones y campos obligatorios por transportista y plantilla.",
+      "Definir cadencias, umbrales de paquete parado y procedimiento real de extravío.",
+      "Decidir si se autoriza alguna fuente de tracking distinta del correo."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó manualmente el tracking, esperó cuando había una incidencia y, si no cambiaba, contactó al transportista e informó al comprador"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "seguir-envio-por-evidencia",
+      "titulo": "SANIA actualizó el trayecto demostrado por correos reconocidos",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "SANIA recibió un correo perteneciente a una plantilla logística real previamente aportada y validada. En LIVE solo se examinó una plantilla de entrega de Wallapop; admisión, tránsito, intento fallido e incidencia siguen sin corpus real."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿La plantilla y sus identificadores eran reconocidos y permitían relacionar el hecho con un solo envío?",
+          "sigue": "sí, SANIA continuó",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó el correo y no aplicó la transición. T02-Q08 dejó pendiente si el caso abre un ticket o permanece solo sin aplicar."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿El mismo hecho externo ya se había aplicado?",
+          "sigue": "no, se registró el nuevo evento",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó el envío sin repetir el evento ni sus efectos."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA actualizó el estado logístico demostrado y conservó el correo y su fecha como evidencia."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿El hecho era una entrega al comprador?",
+          "sigue": "no, el seguimiento continuó según los eventos disponibles",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA dejó el envío como entregado, pero mantuvo la venta abierta hasta la señal final específica de la plataforma."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "atender-seguimiento-parado",
+      "titulo": "Víctor atendió manualmente un tracking sin cambios",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor consultó manualmente el tracking en la app o web cuando faltaban confirmaciones."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Si había una incidencia, esperó; si el estado no cambiaba, contactó al transportista e informó al comprador."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mantuvo el caso pendiente porque no se definió cuántos días esperar ni cuándo convertirlo en extravío."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "texto": "Después de la entrega al transportista, Víctor suele avisar al comprador, espera las evidencias y consulta manualmente el tracking cuando falta una confirmación; en Wallapop el tracking puede ser difícil de identificar.",
+      "refs": ["E-LIVE-001", "T05-Q04", "T06-Q03"]
+    },
+    {
+      "texto": "El correo real de Wallapop informó de que el paquete fue entregado, pero el dinero seguía pendiente del OK del comprador.",
+      "refs": ["E-LIVE-008", "T06-Q02"]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-LIVE-001",
+      "nombre": "Cada hecho logístico se aplica una sola vez",
+      "texto": "Un correo repetido o reprocesado no duplica estados, movimientos ni avisos.",
+      "refs": ["T02-Q05"]
+    },
+    {
+      "id": "G-LIVE-012",
+      "nombre": "Entregado en Wallapop no significa cerrado",
+      "texto": "El correo de paquete entregado prueba la entrega logística, pero la venta y el ingreso continúan abiertos.",
+      "refs": ["D-LIVE-005", "T06-Q02"]
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "envío",
+      "estados": [
+        {
+          "nombre": "pendiente de evidencia de admisión",
+          "acciones": [
+            {
+              "accion": "recibir un correo reconocido de admisión",
+              "pasa_a": "admitido"
+            },
+            "dejar sin aplicar una evidencia desconocida o contradictoria; decidir después si requiere ticket"
+          ]
+        },
+        {
+          "nombre": "admitido",
+          "acciones": [
+            {
+              "accion": "recibir evidencias posteriores",
+              "pasa_a": "en tránsito o entregado"
+            }
+          ]
+        },
+        {
+          "nombre": "entregado",
+          "acciones": [
+            "continuar en la actividad de cierre específica de la plataforma; no cerrar la venta aquí"
+          ]
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "envío",
+      "guarda": [
+        "venta",
+        "tracking cuando exista",
+        "transportista cuando la evidencia lo aporte",
+        "estado logístico demostrado",
+        "eventos y correos originales",
+        "fechas",
+        "tickets abiertos"
+      ],
+      "origen": "correos reconocidos de la plataforma o del transportista; no se definió cómo SANIA recibe o documenta las actuaciones manuales de Víctor"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Gmail",
+      "para": "recibir y conservar evidencias logísticas reconocidas"
+    },
+    {
+      "con": "Telegram",
+      "para": "avisar de incidencias, tickets y acciones humanas concretas sin imponer una cadencia no acordada"
+    }
+  ],
+  "fuera": [
+    "Actualizar un estado desde un correo que no pudo reconocerse o relacionarse con seguridad.",
+    "Pedir confirmaciones manuales genéricas para suplir cualquier evidencia ausente.",
+    "Avisar automáticamente a las 48 horas: ese umbral no fue acordado.",
+    "Cerrar la venta porque el envío figure como entregado.",
+    "Declarar extravío o automatizar su resolución antes de disponer de un procedimiento real."
+  ],
+  "preguntas": [
+    "[T02-Q04, T05-Q04] ¿Qué plantillas reales cubren admisión, tránsito, intento fallido, incidencia y entrega por plataforma y transportista?",
+    "[T02-Q05, T05-Q06] ¿Qué prioridad y ticket se aplican cuando un correo llega tarde, duplicado o contradice una confirmación anterior?",
+    "[T02-Q06] ¿Qué patrones y campos obligatorios hacen determinista cada plantilla logística?",
+    "[T05-Q08] ¿Existe alguna acción concreta a las 48 horas? La entrevista no fijó ninguna.",
+    "[T05-Q09, T06-Q03] ¿Cuánto se espera ante un tracking sin cambios antes de contactar al transportista y avisar al comprador?",
+    "[T06-Q04, T11-Q02] ¿Qué incidencia bloquea el cierre y cuándo se abre un ticket de extravío?"
+  ]
+}

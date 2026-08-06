@@ -1,0 +1,245 @@
+{
+  "version": 2,
+  "proyecto": "sania-seguir-pedidos-aliexpress",
+  "titulo": "Seguir pedidos de AliExpress",
+  "descripcion": "Esta actividad convertirá en pedidos, líneas, paquetes y eventos trazables únicamente los correos de AliExpress cuyas plantillas reales se aporten y validen. LIVE no incluyó correos de AliExpress. La división, consolidación y recepción parcial sí se confirmaron como comportamiento operativo observado, pero todavía no como campos de una plantilla; ningún estado logístico crea stock por sí solo.",
+  "definicion": {
+    "estado": "borrador",
+    "modo": "mixto"
+  },
+  "cobertura": {
+    "estado": "no verificado",
+    "evidencias": [],
+    "pruebas": []
+  },
+  "contrato": {
+    "frase": "Cuando AliExpress comunicó una compra o un cambio de seguimiento, Víctor necesitó que SANIA actualizara una sola vez el pedido y el paquete correctos, mantuviera visibles las partes pendientes y separara la entrega logística de la comprobación física."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "pedido",
+      "significado": "compra de AliExpress que puede contener varias líneas y permanecer abierta mientras existan paquetes pendientes de comprobación física"
+    },
+    {
+      "termino": "línea de compra",
+      "significado": "parte concreta de un pedido de AliExpress asociada a un producto o variante. tradeOrderLineId es su identificador principal cuando está disponible; orderId u o_ids identifican el pedido o subpedido, pero no sustituyen a tradeOrderLineId para distinguir una línea"
+    },
+    {
+      "termino": "paquete",
+      "significado": "unidad logística con seguimiento propio cuando esté disponible; puede contener partes de una o varias líneas por división o consolidación"
+    },
+    {
+      "termino": "entregado",
+      "significado": "estado logístico que abre una comprobación física y nunca equivale por sí solo a recibido correcto ni a stock disponible"
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-88",
+      "nombre": "Idempotencia de hechos externos",
+      "texto": "Un correo o hecho externo reconocido se aplica una sola vez; no se duplican pedidos, paquetes, líneas ni cambios de estado. [Migración: identificador histórico G-LIVE-001; estado histórico: confirmada por contexto; faltan casos reales de duplicados o desorden; referencias históricas: T02-Q05]"
+    },
+    {
+      "id": "G-89",
+      "nombre": "Entrega logística separada del stock",
+      "texto": "El tracking entregado solo deja el paquete pendiente de comprobación física; nunca crea stock. [Migración: identificador histórico G-LIVE-002; estado histórico: confirmada; referencias históricas: D-LIVE-017]"
+    },
+    {
+      "id": "G-90",
+      "nombre": "Compra personal fuera del stock de venta",
+      "texto": "Solo los productos clasificados como Stock para venta pueden continuar hacia inventario y tareas de anuncio. [Migración: identificador histórico G-LIVE-016; estado histórico: confirmada; referencias históricas: D-LIVE-022]"
+    },
+    {
+      "id": "G-91",
+      "nombre": "Clasificación aprendida corregible",
+      "texto": "La clasificación se recuerda por producto y Víctor puede cambiarla manualmente. [Migración: identificador histórico G-LIVE-017; estado histórico: confirmada; el efecto sobre pedidos ya existentes está pendiente; referencias históricas: D-LIVE-023]"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "seguir-pedido-desde-correo",
+      "titulo": "SANIA actualizó un pedido desde un correo reconocido",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "SANIA recibió un correo de AliExpress perteneciente a una plantilla real previamente aportada y validada. LIVE no aportó ninguna plantilla que demuestre los tipos o campos exactos de compra, envío, división, consolidación, seguimiento o entrega."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿El remitente, el tipo de correo y sus campos coincidieron con un patrón probado?",
+          "sigue": "sí, SANIA extrajo únicamente los datos sustentados por el patrón",
+          "rama": {
+            "etiqueta": "no, el formato fue desconocido, ambiguo o contradictorio",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó el correo, dejó sus datos sin aplicar y abrió una revisión; el uso de IA para proponer extracciones sigue pendiente de límites y aprobación humana."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó el evento original y comprobó su idempotencia antes de modificar el pedido."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Los identificadores disponibles permitieron relacionar con seguridad pedido, línea y paquete?",
+          "sigue": "sí, SANIA mantuvo las relaciones observadas",
+          "rama": {
+            "etiqueta": "no, faltó un identificador estable o una relación",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA dejó la relación pendiente y pidió a Víctor la comprobación necesaria sin inventar pedido, línea, producto, variante ni paquete."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA representó por separado cada paquete observado y permitió que un pedido tuviera paquetes divididos, consolidados o recibidos a cuentagotas."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿El evento indicó que un paquete fue entregado?",
+          "sigue": "no, SANIA actualizó únicamente el seguimiento",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA cambió el paquete a pendiente de comprobación física y creó la tarea de recepción; no creó unidades ni aumentó el stock."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El pedido permaneció abierto mientras existieran paquetes pendientes, aunque las unidades de un paquete ya comprobado pudieran continuar su propio flujo."
+        }
+      ]
+    },
+    {
+      "id": "clasificar-destino-del-producto",
+      "titulo": "SANIA aplicó la clasificación del producto comprado",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Existía una clasificación recordada para ese producto?",
+          "sigue": "sí, SANIA aplicó Stock para venta o Compra personal",
+          "rama": {
+            "etiqueta": "no, era la primera vez",
+            "pasos": [
+              {
+                "tipo": "humano",
+                "texto": "Víctor eligió Stock para venta o Compra personal.",
+                "quien": "Víctor"
+              },
+              {
+                "tipo": "estatico",
+                "texto": "SANIA recordó la elección para compras futuras del mismo producto."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Víctor pudo cambiar manualmente la clasificación aprendida; SANIA conservó el cambio de forma auditable. El efecto sobre pedidos ya existentes y los pedidos mixtos sigue pendiente."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "EP-38",
+      "texto": "Un pedido de AliExpress con productos de distintos vendedores puede llegar separado, consolidarse en un centro logístico y recibirse a cuentagotas. Solo lo físicamente comprobado continúa hacia stock y el pedido parcial permanece abierto. [Migración: identificador histórico E-LIVE-004; referencias históricas: T02-Q03, T02-Q09, T03-Q01, D-LIVE-017]",
+      "refs": [
+        "G-89"
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "pedido de AliExpress",
+      "guarda": [
+        "identificador externo cuando sea observable",
+        "líneas y relaciones pendientes",
+        "paquetes divididos o consolidados",
+        "estado operativo observado y partes pendientes, con catálogo final de datos y estados todavía por definir",
+        "eventos originales",
+        "correos de origen"
+      ],
+      "origen": "futuro corpus real de correos de AliExpress, todavía no aportado en LIVE"
+    },
+    {
+      "cosa": "paquete",
+      "guarda": [
+        "pedido relacionado",
+        "tracking cuando exista",
+        "líneas o partes relacionadas cuando puedan demostrarse",
+        "estado logístico",
+        "estado de comprobación física",
+        "correo de origen"
+      ],
+      "origen": "futuras plantillas y eventos reales de seguimiento, todavía no aportados en LIVE"
+    },
+    {
+      "cosa": "clasificación del producto",
+      "guarda": [
+        "Stock para venta o Compra personal",
+        "producto al que aplica",
+        "origen manual o aprendido",
+        "valor anterior y nuevo",
+        "actor, fecha y motivo del cambio"
+      ],
+      "origen": "respuesta o corrección de Víctor"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Gmail de solo lectura",
+      "para": "recibir y conservar los correos de AliExpress sin ejecutar acciones en la plataforma"
+    },
+    {
+      "con": "Telegram",
+      "para": "pedir a Víctor clasificaciones, relaciones o comprobaciones que faltaron"
+    },
+    {
+      "con": "Confirmar la recepción de pedidos",
+      "para": "abrir una comprobación física cuando el seguimiento indique entrega"
+    }
+  ],
+  "fuera": [
+    "Realizar la compra o actuar dentro de AliExpress.",
+    "Inventar un producto, variante, identificador o relación entre línea y paquete.",
+    "Tratar un estado de tracking como confirmación física o como entrada de stock.",
+    "Cerrar un pedido parcial mientras queden paquetes sin comprobar.",
+    "Fijar una cadencia de recordatorios no confirmada."
+  ],
+  "preguntas": [
+    "[T02-Q02] ¿Qué identificador estable distingue una línea de AliExpress cuando cambia el texto visible?",
+    "[T02-Q03] ¿Qué plantillas reales demuestran compra, envío, división, consolidación y entrega, y cómo expresan las relaciones entre pedido, línea y paquete?",
+    "[T02-Q05] ¿Qué ocurrió la última vez que un correo llegó repetido, tarde o fuera de orden?",
+    "[T02-Q06] ¿Qué patrones, remitentes y campos son obligatorios en cada variante real de correo de AliExpress?",
+    "[T02-Q07] ¿Cuándo puede una IA proponer una extracción y qué revisión humana exige?",
+    "[T02-Q08] ¿Cómo se clasifica y revisa un correo desconocido, dudoso o contradictorio sin aplicar datos al pedido o al stock?",
+    "[T02-Q09] ¿Qué datos y estados debe mostrar SANIA mientras un pedido esté parcialmente recibido?",
+    "[D-LIVE-023 / G-LIVE-017] ¿Qué efecto tiene cambiar una clasificación aprendida sobre pedidos ya existentes o mixtos?"
+  ]
+}

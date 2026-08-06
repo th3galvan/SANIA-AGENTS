@@ -1,0 +1,77 @@
+{
+  "version": 2,
+  "proyecto": "sania-controlar-stock-y-trazabilidad",
+  "titulo": "Controlar el stock y la trazabilidad",
+  "descripcion": "Esta actividad mantendrá la historia de cada unidad desde su línea y lote de compra hasta su anuncio, reserva, venta, incidencia o ajuste. El plano recoge las reglas vigentes y deja abiertas sus fronteras con ventas y correcciones.",
+  "contrato": {
+    "frase": "Cuando una unidad cambió de situación, Víctor necesitó que SANIA supiera de dónde vino, dónde estaba comprometida y por qué dejó o volvió a estar disponible."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó el stock y explicó las correcciones excepcionales"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "mantener-trazabilidad-unidad",
+      "titulo": "SANIA mantuvo la historia de una unidad",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó en la unidad su pedido, línea, lote, producto, variante y coste."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA relacionó la unidad con sus anuncios, reservas, ventas, incidencias y sustituciones."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿La unidad estaba físicamente disponible y no estaba reservada?",
+          "sigue": "sí, contó como disponible",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA excluyó la unidad del recuento disponible sin crear stock negativo."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA añadió cada cambio al historial sin sobrescribir el evento anterior."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "unidad de inventario",
+      "guarda": [
+        "referencia",
+        "producto y variante",
+        "línea y lote",
+        "situación física",
+        "costes",
+        "anuncios, reserva y venta",
+        "historial"
+      ],
+      "origen": "entrada al almacén y actividades posteriores"
+    }
+  ],
+  "fuera": [
+    "Usar stock negativo o referencias ficticias para cerrar una venta.",
+    "Colocar etiquetas físicas o registrar ubicaciones exactas en la primera versión.",
+    "Borrar silenciosamente movimientos anteriores."
+  ],
+  "preguntas": [
+    "¿Qué correcciones de stock hace hoy Víctor y qué ocurrió la última vez que el recuento no coincidió?",
+    "¿Qué dato debe ver para distinguir unidades idénticas sin etiquetas físicas?",
+    "¿Qué cambios pertenecen aquí y cuáles pertenecen a ajustar existencias o registrar movimientos económicos?",
+    "¿Qué pasa si dos ventas intentan reservar la última unidad al mismo tiempo?"
+  ]
+}

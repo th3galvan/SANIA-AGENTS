@@ -1,0 +1,72 @@
+{
+  "version": 2,
+  "proyecto": "sania-cerrar-venta-entregada",
+  "titulo": "Cerrar una venta entregada",
+  "descripcion": "Una entrega física no convertirá por sí sola el ingreso en definitivo. SANIA esperará la señal final prevista para cada plataforma o la confirmación estructurada de Víctor.",
+  "contrato": {
+    "frase": "Cuando el comprador recibió el paquete, Víctor necesitó saber cuándo la operación había terminado de verdad para convertir el ingreso provisional en beneficio definitivo."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "confirmó el cierre o abrió una incidencia cuando la plataforma no aportó una señal suficiente"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "cerrar-venta-por-plataforma",
+      "titulo": "SANIA cerró una venta después de la entrega",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mantuvo la venta como Entregada, pendiente de aceptación y conservó el ingreso como provisional."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿La plataforma comunicó una confirmación final verificable?",
+          "sigue": "sí, la operación pudo cerrarse",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA pidió a Víctor por Telegram el OK cada 48 horas."
+              },
+              {
+                "tipo": "humano",
+                "quien": "Víctor",
+                "texto": "Víctor confirmó el cierre o abrió una incidencia."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA marcó la venta como cerrada y permitió que finanzas calculase el beneficio definitivo."
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "correos de Wallapop y Vinted",
+      "para": "reconocer la entrega y el cierre final cuando exista una plantilla verificable"
+    },
+    {
+      "con": "Telegram",
+      "para": "pedir el OK de Víctor o abrir una incidencia"
+    }
+  ],
+  "fuera": [
+    "Cerrar una venta únicamente porque el paquete figuró como entregado.",
+    "Automatizar una devolución o un extravío sin un caso real verificado."
+  ],
+  "preguntas": [
+    "¿Qué plantilla exacta usa Vinted para confirmar que la transacción terminó?",
+    "¿Qué hecho exacto permite cerrar una venta de Wallapop?",
+    "¿Qué debe ocurrir si Víctor no responde al OK durante varios días?",
+    "¿Qué incidencias impiden que el beneficio pase a definitivo?"
+  ]
+}

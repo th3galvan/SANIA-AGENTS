@@ -1,0 +1,613 @@
+{
+  "version": 2,
+  "proyecto": "sania-dar-entrada-al-almacen",
+  "titulo": "Dar entrada a las unidades recibidas",
+  "descripcion": "Esta actividad crea inventario únicamente después de la comprobación física Todo correcto y solo para productos clasificados como Stock para venta. Cada unidad creada recibe una referencia pública alfanumérica de tres caracteres; la entrada no asigna ubicaciones y lanza inmediatamente las tareas de anuncio. Pricing detallado, disputas, sustituciones y reembolsos permanecen como evolución o hipótesis.",
+  "definicion": {
+    "estado": "borrador",
+    "modo": "mixto"
+  },
+  "cobertura": {
+    "estado": "no verificado",
+    "evidencias": [],
+    "pruebas": []
+  },
+  "contrato": {
+    "frase": "Cuando Víctor tuvo un paquete en las manos, comprobó productos y cantidades y pulsó Todo correcto, necesitó que SANIA creara exactamente las unidades de venta confirmadas, conservara su origen y preparara su publicación sin convertir el tracking en stock.",
+    "exito": [
+      "Ninguna unidad existió por un correo o tracking entregado sin Todo correcto.",
+      "Cada unidad de Stock para venta físicamente confirmada recibió una referencia alfanumérica única de tres caracteres destinada a aparecer al final del título del anuncio.",
+      "Las compras personales no entraron en inventario de venta ni generaron tareas de anuncio.",
+      "Cada corrección conservó antes, después, actor, fecha y hora y motivo sin borrar el hecho original."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "Todo correcto",
+      "significado": "confirmación humana de que Víctor tuvo el contenido en las manos y que productos y cantidades concordaron; no es una confirmación del tracking"
+    },
+    {
+      "termino": "Stock para venta",
+      "significado": "clasificación de producto que permite crear unidades de inventario y tareas de anuncio"
+    },
+    {
+      "termino": "Compra personal",
+      "significado": "clasificación de producto que excluye la compra del inventario y de las tareas de anuncio"
+    },
+    {
+      "termino": "unidad física",
+      "significado": "ejemplar concreto creado en inventario después de Todo correcto; un anuncio representa una sola unidad"
+    },
+    {
+      "termino": "referencia de unidad",
+      "significado": "identificador lógico único que empieza con tres letras y también aparece como sufijo público del anuncio. Usa el alfabeto explícito Z, Y, ..., A, z, y, ..., a; comienza en ZZZ, no se reutiliza nunca y, al agotarse una longitud, añade una letra y reinicia desde el valor máximo, por ejemplo ZZZZ. Antes del etiquetado físico individual, la referencia puede satisfacerse con cualquiera de las unidades idénticas disponibles; después del etiquetado identifica una unidad física concreta"
+    },
+    {
+      "termino": "identidad física de unidades idénticas",
+      "significado": "problema abierto: unidades visualmente idénticas, sin etiqueta ni rasgo diferenciador, no permiten demostrar todavía qué ejemplar material corresponde a cada referencia lógica"
+    },
+    {
+      "termino": "corrección auditable",
+      "significado": "nuevo evento que conserva valor anterior, valor nuevo, actor, fecha y hora y motivo sin sobrescribir el historial"
+    },
+    {
+      "termino": "pricing",
+      "significado": "evolución futura basada conceptualmente en coste, margen mínimo y margen o precio de publicación; no existe fórmula exacta, redondeo ni valor fijo aprobados para el MVP"
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-49",
+      "nombre": "Idempotencia",
+      "texto": "Un hecho externo o una confirmación se aplica una sola vez; no crea unidades ni tareas duplicadas. [Migración: identificador histórico G-LIVE-001; estado histórico: protección conservada; faltan casos reales de duplicado]"
+    },
+    {
+      "id": "G-50",
+      "nombre": "Tracking entregado no crea stock",
+      "texto": "El tracking entregado deja el paquete pendiente de comprobación física. [Migración: identificador histórico G-LIVE-002; referencias históricas: D-LIVE-017]"
+    },
+    {
+      "id": "G-51",
+      "nombre": "Todo correcto crea unidades y tareas",
+      "texto": "Todo correcto significa producto y cantidades comprobados. Para Stock para venta, SANIA registra las unidades y lanza inmediatamente las tareas de anuncio. [Migración: identificador histórico G-LIVE-003; referencias históricas: D-LIVE-017, D-LIVE-020]"
+    },
+    {
+      "id": "G-52",
+      "nombre": "No OK bloquea la entrada",
+      "texto": "No OK o Abrir disputa crea una incidencia y no crea ni inventa unidades. [Migración: identificador histórico G-LIVE-004; estado histórico: flujo interno de disputa pendiente; referencias históricas: D-LIVE-018, T03-Q01, T03-Q09]"
+    },
+    {
+      "id": "G-53",
+      "nombre": "Referencia pública de tres caracteres",
+      "texto": "Cada unidad creada recibe una referencia alfanumérica única de tres caracteres visible al final del título del anuncio. [Migración: identificador histórico G-LIVE-006; estado histórico: alfabeto, colisiones, reutilización y agotamiento pendientes; referencias históricas: D-LIVE-006, X-LIVE-001, T03-Q08]"
+    },
+    {
+      "id": "G-54",
+      "nombre": "Compra personal fuera del inventario",
+      "texto": "Solo Stock para venta entra en inventario y genera anuncios. [Migración: identificador histórico G-LIVE-016; referencias históricas: D-LIVE-022]"
+    },
+    {
+      "id": "G-55",
+      "nombre": "Clasificación recordada y corregible",
+      "texto": "SANIA recuerda por producto Stock para venta o Compra personal y Víctor puede cambiar la elección manualmente. [Migración: identificador histórico G-LIVE-017; estado histórico: efecto sobre pedidos existentes pendiente; referencias históricas: D-LIVE-022, D-LIVE-023]"
+    },
+    {
+      "id": "G-56",
+      "nombre": "Sin ubicaciones",
+      "texto": "La primera versión no registra estantería, caja ni posición física exacta. [Migración: identificador histórico G-LIVE-018; referencias históricas: D-LIVE-028]"
+    },
+    {
+      "id": "G-57",
+      "nombre": "Sin ubicación detallada en la primera versión",
+      "texto": "Tras Todo correcto se crea stock y se pasa a publicación sin introducir estantería, caja ni posición física exacta. [Migración: identificador histórico D-LIVE-028]"
+    },
+    {
+      "id": "G-58",
+      "nombre": "Correcciones sin sobrescritura",
+      "texto": "Cada corrección conserva valor anterior, valor nuevo, actor, fecha y hora y motivo; el flujo concreto de deshacer una confirmación está pendiente. [Migración: identificador histórico CORRECCION-AUDITABLE; referencias históricas: T03-Q04, T04-Q01, E-LIVE-005]"
+    }
+  ],
+  "recorridos": [
+    {
+      "id": "REC-1",
+      "nombre": "Crear unidades de venta después de la comprobación física",
+      "objetivo": "Convertir únicamente contenido físicamente correcto y clasificado para venta en unidades trazables y tareas de publicación.",
+      "estado": "pendiente",
+      "requisitos": [
+        {
+          "id": "R-1",
+          "texto": "Reprocesar el mismo correo o la misma confirmación no crea paquetes, unidades ni tareas duplicadas.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-49"
+        },
+        {
+          "id": "R-2",
+          "texto": "Sin Todo correcto no existe ninguna unidad de inventario derivada del paquete.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-50"
+        },
+        {
+          "id": "R-3",
+          "texto": "Todo correcto crea una unidad por ejemplar de Stock para venta confirmado y lanza inmediatamente las tareas de anuncio.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-51"
+        },
+        {
+          "id": "R-4",
+          "texto": "Cada unidad creada recibe una referencia pública alfanumérica única de tres caracteres y no una referencia privada.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-53"
+        }
+      ],
+      "criterios": [
+        {
+          "id": "C-1",
+          "dado": "un tracking entregado sin respuesta de Víctor",
+          "cuando": "SANIA procesó el evento",
+          "entonces": "el paquete quedó pendiente de comprobación y no se creó ninguna unidad",
+          "cubre": "R-2"
+        },
+        {
+          "id": "C-2",
+          "dado": "un paquete con N ejemplares de Stock para venta comprobados físicamente",
+          "cuando": "Víctor pulsó Todo correcto",
+          "entonces": "SANIA creó N unidades una sola vez, con N referencias de tres caracteres, y lanzó sus tareas de publicación",
+          "cubre": "R-1"
+        },
+        {
+          "id": "C-3",
+          "dado": "un paquete con N ejemplares de Stock para venta comprobados físicamente",
+          "cuando": "Víctor pulsó Todo correcto",
+          "entonces": "SANIA creó N unidades una sola vez, con N referencias de tres caracteres, y lanzó sus tareas de publicación",
+          "cubre": "R-3"
+        },
+        {
+          "id": "C-4",
+          "dado": "un paquete con N ejemplares de Stock para venta comprobados físicamente",
+          "cuando": "Víctor pulsó Todo correcto",
+          "entonces": "SANIA creó N unidades una sola vez, con N referencias de tres caracteres, y lanzó sus tareas de publicación",
+          "cubre": "R-4"
+        },
+        {
+          "id": "C-5",
+          "dado": "un paquete correcto clasificado como Compra personal",
+          "cuando": "Víctor pulsó Todo correcto",
+          "entonces": "SANIA no creó inventario de venta ni tareas de anuncio"
+        }
+      ]
+    },
+    {
+      "id": "REC-2",
+      "nombre": "Corregir una entrada o clasificación",
+      "objetivo": "Rectificar datos sin perder el hecho original ni ocultar quién cambió qué.",
+      "estado": "pendiente",
+      "requisitos": [
+        {
+          "id": "R-5",
+          "texto": "Toda corrección añade valor anterior, valor nuevo, actor, fecha y hora y motivo.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-58"
+        },
+        {
+          "id": "R-6",
+          "texto": "La clasificación aprendida por producto puede corregirse manualmente.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-55"
+        }
+      ],
+      "criterios": [
+        {
+          "id": "C-6",
+          "dado": "una regla de clasificación aprendida o una cantidad de stock registrada de forma equivocada",
+          "cuando": "Víctor la corrigió y explicó el motivo",
+          "entonces": "SANIA conservó el evento original y añadió el cambio con antes, después, actor, fecha y motivo",
+          "cubre": "R-5"
+        },
+        {
+          "id": "C-7",
+          "dado": "una regla de clasificación aprendida o una cantidad de stock registrada de forma equivocada",
+          "cuando": "Víctor la corrigió y explicó el motivo",
+          "entonces": "SANIA conservó el evento original y añadió el cambio con antes, después, actor, fecha y motivo",
+          "cubre": "R-6"
+        }
+      ]
+    }
+  ],
+  "flujos": [
+    {
+      "id": "aplicar-clasificacion-de-producto",
+      "titulo": "SANIA determinó si el producto era para venta o uso personal",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿SANIA tenía una clasificación recordada para ese producto?",
+          "sigue": "sí, aplicó automáticamente Stock para venta o Compra personal",
+          "rama": {
+            "etiqueta": "no, era la primera vez",
+            "pasos": [
+              {
+                "tipo": "humano",
+                "texto": "Víctor eligió Stock para venta o Compra personal.",
+                "quien": "Víctor"
+              },
+              {
+                "tipo": "estatico",
+                "texto": "SANIA recordó la elección por producto para compras futuras."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Víctor pudo cambiar manualmente la clasificación aprendida. SANIA registró el antes, el después, el actor, la fecha y hora y el motivo; el efecto sobre pedidos ya existentes o mixtos sigue pendiente."
+        }
+      ]
+    },
+    {
+      "id": "entrada-normal-tras-todo-correcto",
+      "titulo": "SANIA procesó un paquete físicamente correcto",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "La actividad recibió un paquete para el que Víctor ya había pulsado Todo correcto después de contar e identificar productos y cantidades."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿El producto estaba clasificado como Stock para venta?",
+          "sigue": "sí, continuó hacia inventario",
+          "rama": {
+            "etiqueta": "no, era Compra personal",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA registró la compra como personal sin crear unidades de inventario ni tareas de anuncio."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA creó una unidad por cada ejemplar físicamente confirmado y vinculó cada unidad con el pedido, el paquete, el producto y la variante que pudieron demostrarse."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA asignó a cada unidad una referencia alfanumérica única de tres caracteres destinada a ser visible al final del título del anuncio; la política concreta de generación y colisiones quedó pendiente."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA dejó las unidades disponibles sin registrar estantería, caja ni posición exacta."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó la evidencia de coste disponible, pero no aplicó una fórmula de reparto, margen o redondeo que no hubiera sido definida."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Inmediatamente después de la entrada, SANIA inició la publicación asistida. En entradas grandes presentó primero las dos acciones de plataforma de un objetivo producto/unidad y después las dos del siguiente; cada acción confirmable se resolvió a una unidad y plataforma, pero X-LIVE-011 mantiene pendiente la granularidad de generación por producto o por unidad."
+        }
+      ]
+    },
+    {
+      "id": "rechazar-entrada-sin-ok",
+      "titulo": "SANIA bloqueó una entrada no confirmada",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Faltó Todo correcto o Víctor pulsó No OK o Abrir disputa?",
+          "sigue": "sí, SANIA no creó unidades ni referencias",
+          "rama": {
+            "etiqueta": "no, existía Todo correcto",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA continuó por el flujo normal y comprobó idempotencia antes de crear cada unidad."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "La incidencia quedó separada del stock. No se dio por decidido si Víctor abrirá o gestionará una disputa en AliExpress ni cuál será su flujo: A-018 fue hipotético y A-048 no recuperó el detalle; resolución, recordatorios, reembolsos y sustituciones siguen pendientes."
+        }
+      ]
+    },
+    {
+      "id": "correccion-manual-en-sania",
+      "titulo": "Víctor corrigió la clasificación aprendida o un dato de stock sin perder la historia",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "texto": "Víctor solicitó corregir la clasificación aprendida para compras futuras o ajustar una cantidad o estado de stock detectados mediante recuento, y explicó el motivo.",
+          "quien": "Víctor"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA añadió un evento con fecha y hora, actor, origen manual, campo, valor anterior, valor nuevo y motivo sin borrar ni sobrescribir el evento previo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Este flujo genérico no autorizó corregir costes, dinero ni otros campos sensibles; su procedimiento y una posible segunda confirmación siguen pendientes en T06-Q08 y T06-Q09."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El procedimiento concreto para deshacer una confirmación física y revertir unidades o tareas ya creadas sigue pendiente."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "EP-18",
+      "texto": "Un pedido AliExpress puede dividirse, consolidarse y llegar a cuentagotas. Solo los productos y cantidades que Víctor tiene en las manos y confirma físicamente pueden continuar hacia la entrada. [Migración: identificador histórico E-LIVE-004; referencias históricas: T02-Q03, T02-Q09, T03-Q01, D-LIVE-017]",
+      "refs": [
+        "G-50"
+      ]
+    },
+    {
+      "id": "EP-19",
+      "texto": "Hoy, cuando Víctor detecta un fallo de stock, cambia manualmente el Excel. SANIA debe sustituir ese gesto por una corrección con antes, después, actor, fecha y motivo. [Migración: identificador histórico E-LIVE-005; referencias históricas: T03-Q04, T04-Q01]"
+    },
+    {
+      "id": "EP-20",
+      "texto": "El plano v2 documentó el pedido 3074442296049454, variante BLACK, cantidad 7 y total 80,72 €, además de un cálculo de 15,95 € basado en 25 % y terminación ,95. LIVE solo confirma el concepto futuro de coste y dos márgenes; no confirma esa fórmula ni ese redondeo como regla general. [Migración: identificador histórico ANTERIOR-V2-001; estado histórico: antecedente conservado; no define una regla vigente; referencias históricas: D-LIVE-026, G-LIVE-019, T03-Q05, T03-Q06, X-LIVE-009]"
+    },
+    {
+      "id": "EP-21",
+      "texto": "El plano v2 recogió una fila de Excel «x2 9 mm» con precio 7,00 €, coste 6,76 € y una fórmula de margen. Se conserva como ejemplo histórico del plano anterior, no como fórmula aprobada por LIVE. [Migración: identificador histórico ANTERIOR-V2-002; estado histórico: antecedente conservado; no define una regla vigente; referencias históricas: D-LIVE-026, T03-Q06, X-LIVE-009]"
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "clasificación aprendida del producto para compras futuras",
+      "estados": [
+        {
+          "nombre": "sin regla aprendida",
+          "acciones": [
+            {
+              "accion": "Víctor eligió Stock para venta para futuras compras del producto",
+              "quien": "Víctor",
+              "pasa_a": "Stock para venta"
+            },
+            {
+              "accion": "Víctor eligió Compra personal para futuras compras del producto",
+              "quien": "Víctor",
+              "pasa_a": "Compra personal"
+            }
+          ]
+        },
+        {
+          "nombre": "Stock para venta",
+          "acciones": [
+            {
+              "accion": "Víctor actualizó la regla para futuras compras",
+              "quien": "Víctor",
+              "pasa_a": "Compra personal"
+            }
+          ]
+        },
+        {
+          "nombre": "Compra personal",
+          "acciones": [
+            {
+              "accion": "Víctor actualizó la regla para futuras compras",
+              "quien": "Víctor",
+              "pasa_a": "Stock para venta"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entidad": "paquete",
+      "estados": [
+        {
+          "nombre": "entregado pendiente de comprobación",
+          "acciones": [
+            {
+              "accion": "Víctor pulsó Todo correcto",
+              "quien": "Víctor",
+              "pasa_a": "recibido correcto"
+            },
+            {
+              "accion": "Víctor pulsó No OK o Abrir disputa",
+              "quien": "Víctor",
+              "pasa_a": "incidencia"
+            }
+          ]
+        },
+        {
+          "nombre": "recibido correcto",
+          "acciones": []
+        },
+        {
+          "nombre": "incidencia",
+          "acciones": []
+        }
+      ]
+    },
+    {
+      "entidad": "unidad de inventario",
+      "estados": [
+        {
+          "nombre": "disponible",
+          "acciones": []
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "clasificación del producto",
+      "guarda": [
+        "producto",
+        "Stock para venta o Compra personal",
+        "origen manual o aplicación de regla aprendida",
+        "valor anterior y nuevo en correcciones",
+        "actor, fecha y motivo"
+      ],
+      "origen": "respuesta o corrección de Víctor"
+    },
+    {
+      "cosa": "unidad",
+      "guarda": [
+        "referencia alfanumérica pública de tres caracteres",
+        "producto y variante confirmados",
+        "pedido, paquete y línea cuando sean identificables",
+        "estado de disponibilidad",
+        "evidencia de coste sin fórmula de reparto asumida",
+        "tareas de anuncio relacionadas",
+        "historial"
+      ],
+      "origen": "Todo correcto sobre contenido clasificado como Stock para venta"
+    },
+    {
+      "cosa": "evento del historial",
+      "guarda": [
+        "entidad afectada",
+        "fecha y hora",
+        "actor",
+        "origen automático o manual",
+        "campo",
+        "valor anterior",
+        "valor nuevo",
+        "motivo"
+      ],
+      "origen": "cada creación o corrección realizada por SANIA o Víctor"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Confirmar la recepción de pedidos",
+      "para": "recibir exclusivamente paquetes con Todo correcto o mantener bloqueadas sus incidencias"
+    },
+    {
+      "con": "Telegram",
+      "para": "clasificar productos, confirmar acciones y comunicar tareas de publicación; sin cadencias inventadas"
+    },
+    {
+      "con": "Creación asistida de anuncios",
+      "para": "lanzar tareas inmediatamente después de crear unidades de Stock para venta"
+    },
+    {
+      "con": "Excel de costes",
+      "para": "conservarlo como fuente histórica actual, no como autorización de fórmulas de pricing no confirmadas"
+    }
+  ],
+  "superficie": {
+    "puntos": [
+      {
+        "id": "SUP-1",
+        "nombre": "Inventario de Víctor",
+        "quien": [
+          "Víctor"
+        ],
+        "puede": [
+          "cambiar la clasificación aprendida",
+          "consultar unidades y tareas derivadas",
+          "solicitar una corrección explicando el motivo"
+        ],
+        "nunca": [
+          "crear una unidad por el tracking",
+          "asignar una ubicación detallada",
+          "borrar el historial",
+          "aplicar automáticamente una fórmula de pricing, disputa, sustitución o reembolso no confirmada"
+        ],
+        "cuando": "quiso revisar una entrada, unidad, clasificación o corrección",
+        "ve": "origen del pedido y paquete, producto, variante, referencia pública, estado, evidencia de coste e historial"
+      }
+    ]
+  },
+  "calidad": [
+    {
+      "id": "Q-22",
+      "criterio": "Cero unidades creadas desde un tracking entregado sin Todo correcto."
+    },
+    {
+      "id": "Q-23",
+      "criterio": "Para N ejemplares físicamente confirmados y clasificados como Stock para venta existen exactamente N unidades y N referencias alfanuméricas de tres caracteres, incluso tras reprocesar el hecho."
+    },
+    {
+      "id": "Q-24",
+      "criterio": "Cero compras personales incorporadas al inventario de venta o a tareas de anuncio."
+    },
+    {
+      "id": "Q-25",
+      "criterio": "El 100 % de las correcciones admitidas por este flujo conserva antes, después, actor, fecha y hora y motivo."
+    },
+    {
+      "id": "Q-26",
+      "criterio": "Cero ubicaciones físicas detalladas registradas en la primera versión."
+    }
+  ],
+  "fuera": [
+    "Crear unidades antes de Todo correcto o para Compra personal.",
+    "Crear referencias para unidades ausentes, defectuosas o no comprobadas.",
+    "Dar por resuelta la identidad física suponiendo que habrá o que no habrá etiquetas; la solución permanece abierta. Registrar ubicaciones físicas detalladas sí queda fuera de la primera versión.",
+    "Resolver automáticamente la identidad exacta entre unidades físicamente idénticas.",
+    "Aplicar un margen fijo del 25 %, un redondeo a ,95 o cualquier fórmula exacta de pricing en el MVP.",
+    "Abrir, negociar o cerrar automáticamente disputas en AliExpress.",
+    "Aplicar reglas operativas de reembolso, sustitución, devolución o traslado de costes sin un caso real y una decisión posterior.",
+    "Fijar recordatorios semanales u otra cadencia no confirmada.",
+    "Automatizar negociaciones de precio con compradores de Wallapop o Vinted."
+  ],
+  "preguntas": [
+    "[T02-Q02] ¿Qué identificador estable de AliExpress distingue una línea y cómo se relaciona con paquetes divididos o consolidados?",
+    "[T03-Q01 / T03-Q09] ¿Cuál es el flujo real cuando el primer paquete llegue incompleto, defectuoso o con variante errónea, y qué resultado económico produce?",
+    "[T03-Q04] ¿Cómo se deshace Todo correcto si ya creó unidades y tareas de anuncio?",
+    "[T03-Q05] ¿Con qué precisión se guarda y muestra el coste unitario?",
+    "[T03-Q06 / D-LIVE-026] ¿Cuál será la fórmula de pricing, qué costes incluye y difiere por plataforma?",
+    "[T03-Q07] ¿Debe existir un recordatorio de disputa y, en su caso, con qué cadencia confirmada?",
+    "[T03-Q08 / G-LIVE-006] ¿Qué alfabeto, política de colisiones, reutilización y agotamiento usa la referencia de tres caracteres?",
+    "[T04-Q02 / T04-Q05 / X-LIVE-004] ¿Cómo se mantiene identidad exacta entre referencia lógica y unidades físicamente idénticas sin etiquetas?",
+    "[T04-Q06 / X-LIVE-011] ¿Las tareas para varias unidades iguales se secuencian por unidad o de otro modo?",
+    "[D-LIVE-023 / G-LIVE-017] ¿Qué efecto tiene corregir la clasificación aprendida sobre pedidos ya existentes o mixtos?"
+  ]
+}

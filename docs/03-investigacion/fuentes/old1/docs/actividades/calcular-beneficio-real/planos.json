@@ -1,0 +1,175 @@
+{
+  "version": 2,
+  "proyecto": "sania-calcular-beneficio-real",
+  "titulo": "Calcular el beneficio real",
+  "descripcion": "En el MVP SANIA no presentará un beneficio como definitivo porque el informe no define todos los costes, su reparto ni la fórmula completa. Podrá mostrar que el resultado está pendiente y qué datos faltan; el cálculo definitivo queda condicionado a una venta realmente cerrada y a un modelo financiero acordado.",
+  "contrato": {
+    "frase": "Cuando una plataforma terminó una venta, Víctor necesitó distinguir el importe recibido del beneficio real y ver por qué el resultado seguía provisional si faltaban costes o reglas.",
+    "exito": [
+      "Ninguna venta abierta o bloqueada produjo un beneficio definitivo.",
+      "Una venta cerrada siguió provisional cuando faltaban comisiones, portes, embalajes, impuestos, reparto o fórmula.",
+      "SANIA mostró los datos ausentes en lugar de sustituirlos por cero o inventarlos.",
+      "El pricing por márgenes se mantuvo en evolución y no alteró el cálculo real del MVP."
+    ]
+  },
+  "alcance": {
+    "mvp": [
+      "Mostrar el resultado como no calculable o provisional y enumerar los importes pendientes.",
+      "Relacionar la venta con los costes e importes que sí tengan evidencia.",
+      "Mantener bloqueado el beneficio de Wallapop mientras la venta no pueda cerrarse."
+    ],
+    "evolucion": [
+      "Definir fórmula, precisión, redondeo, moneda y reparto de gastos.",
+      "Validar el cálculo con una venta normal y una rara que incluyan todos los costes.",
+      "Calcular precio de publicación y precio mínimo desde coste y dos márgenes; el 25 % fue solo un ejemplo de margen mínimo, no una regla fija."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultará qué datos faltan; el flujo para aportar o corregir costes y ajustes, su evidencia y una posible segunda confirmación siguen pendientes"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "evaluar-beneficio-venta",
+      "titulo": "SANIA determinó si el beneficio podía considerarse definitivo",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿La venta estaba cerrada por una señal final válida de su plataforma?",
+          "sigue": "sí, SANIA revisó los importes",
+          "rama": {
+            "etiqueta": "no o Wallapop seguía bloqueada",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA mantuvo el resultado como provisional y mostró que faltaba el cierre de plataforma."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Estaban definidos y respaldados todos los costes, su reparto y la fórmula de beneficio?",
+          "sigue": "sí, el cálculo definitivo será posible cuando se acuerde el modelo",
+          "rama": {
+            "etiqueta": "no, situación actual",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA mantuvo el resultado como provisional o no calculable, enumeró los datos ausentes y no los sustituyó por cero."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "En evolución, SANIA calculará y conservará el beneficio y el margen con cada importe y regla de origen una vez validados con casos reales completos."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "texto": "Los cierres Vinted aportaron precio del artículo, envío y transferencia al saldo, pero no comisiones, embalaje, impuestos ni el resto de costes necesarios para validar un beneficio real.",
+      "refs": ["E-LIVE-007", "T06-Q07", "T06-Q10", "D-LIVE-030"]
+    },
+    {
+      "texto": "La entrega de Wallapop por 50,00 € no cerró la venta; por ello tampoco pudo convertir el ingreso provisional en beneficio definitivo.",
+      "refs": ["E-LIVE-008", "T06-Q02", "X-LIVE-005"]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "D-LIVE-030",
+      "nombre": "El precio guardado no es beneficio",
+      "texto": "El importe de venta se conserva y las finanzas lo usarán después; no se cierra el beneficio hasta disponer de costes reales."
+    },
+    {
+      "id": "D-LIVE-026",
+      "nombre": "Pricing por dos márgenes queda en evolución",
+      "texto": "Precio de publicación y mínimo se derivarán del coste y dos márgenes cuando se defina la fórmula; el 25 % fue un ejemplo, no un valor fijado para el MVP.",
+      "refs": ["G-LIVE-019", "X-LIVE-009", "T03-Q06"]
+    },
+    {
+      "id": "X-LIVE-005",
+      "nombre": "Wallapop bloquea su beneficio mientras no cierre",
+      "texto": "Sin una fuente final del monedero, SANIA no puede cerrar la venta ni declarar definitivo su resultado."
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "resultado de venta",
+      "estados": [
+        {
+          "nombre": "pendiente de cierre",
+          "acciones": [
+            {
+              "accion": "recibir una señal final válida de plataforma",
+              "pasa_a": "pendiente de costes completos"
+            }
+          ]
+        },
+        {
+          "nombre": "pendiente de costes completos",
+          "acciones": [
+            "mostrar importes y reglas ausentes sin calcular un resultado definitivo"
+          ]
+        },
+        {
+          "nombre": "definitivo",
+          "acciones": [
+            "estado futuro disponible solo cuando estén acordados y validados todos los costes, reparto y fórmula"
+          ]
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "resultado de venta",
+      "guarda": [
+        "venta y plataforma",
+        "estado del cierre",
+        "ingresos con su fuente",
+        "costes y gastos conocidos con su fuente",
+        "datos pendientes",
+        "regla y versión de cálculo cuando exista",
+        "beneficio y margen solo si pueden calcularse",
+        "estado provisional, no calculable o definitivo",
+        "clasificación de sensibilidad, visibilidad y retención pendientes de T10-Q03"
+      ],
+      "origen": "venta, movimientos económicos relacionados y Excel costes_aliexpress.xlsx como referencia actual pendiente de importación y validación"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Excel costes_aliexpress.xlsx",
+      "para": "servir como referencia actual de costes sin asumir todavía su importación, estructura ni fórmula"
+    }
+  ],
+  "fuera": [
+    "Dar por definitivo un resultado mientras la venta o una incidencia siguió abierta.",
+    "Tratar la entrega logística de Wallapop como cierre económico.",
+    "Inventar comisiones, portes, embalajes, impuestos, reparto o importes ausentes.",
+    "Usar cero como valor por defecto para un coste desconocido.",
+    "Fijar el 25 % como margen obligatorio o implementar pricing avanzado en el MVP.",
+    "Calcular aquí negociación, contraofertas o precios dinámicos."
+  ],
+  "preguntas": [
+    "[T06-Q02, X-LIVE-005] ¿Qué hecho observable volverá definitivo el ingreso de Wallapop?",
+    "[T06-Q05] ¿Qué comisiones, portes, embalajes, impuestos y otros gastos se restarán y de qué fuente procederán?",
+    "[T06-Q06] ¿Cómo se repartirá un gasto entre varias unidades o ventas?",
+    "[T06-Q10] ¿Qué venta real normal y qué venta rara con todos los costes validarán el cálculo?",
+    "[T03-Q05] ¿Qué precisión, redondeo y formato visible se usarán en costes y resultados?",
+    "[T03-Q06, T09-Q06, X-LIVE-009] ¿Cuál será la fórmula futura de los dos márgenes y variará por plataforma?",
+    "[T06-Q07] ¿Cómo se importará y validará Excel costes_aliexpress.xlsx como referencia actual de costes?",
+    "[T10-Q03] ¿Qué costes, resultados y evidencias son datos delicados, quién puede verlos y cuánto tiempo se conservan?"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "proyecto": "sania-preparar-paquete-vendido",
+  "titulo": "Preparar el paquete vendido",
+  "descripcion": "SANIA organizará la tarea y Víctor realizará todo el trabajo físico. Antes de cerrar el paquete, Víctor revisará manualmente el anuncio y la conversación por si se acordó algún producto extra.",
+  "contrato": {
+    "frase": "Cuando una venta quedó reservada, Víctor necesitó tener juntos la referencia, el producto y el material de envío para preparar el paquete correcto sin buscar la información."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "revisó la conversación, reunió los artículos, los embaló y cerró el paquete"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "preparar-paquete-manualmente",
+      "titulo": "Víctor preparó un paquete con la ayuda de SANIA",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA entregó por Telegram la plataforma, la venta, la referencia, el producto y el QR, etiqueta o enlace disponible."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor revisó manualmente el anuncio y la conversación por si se había acordado algún producto extra."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor reunió los artículos, los metió en una caja y cerró el paquete con cinta."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mantuvo la tarea pendiente hasta que existió una admisión verificable o la confirmación prevista."
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "entregar la referencia, el producto y el material de envío"
+    }
+  ],
+  "fuera": [
+    "Leer automáticamente las conversaciones de Wallapop o Vinted.",
+    "Embalar físicamente el producto.",
+    "Dar por enviado un paquete únicamente porque se preparó."
+  ],
+  "preguntas": [
+    "¿Cómo se añadirá a la venta un producto extra acordado en una conversación que SANIA no puede leer?",
+    "¿Qué ocurrió la última vez que una venta incluyó varios productos o varias unidades?",
+    "¿Qué datos necesita ver Víctor para encontrar la unidad correcta bajo su escritorio?",
+    "¿Qué errores de preparación deben abrir una incidencia antes de entregar el paquete?"
+  ]
+}

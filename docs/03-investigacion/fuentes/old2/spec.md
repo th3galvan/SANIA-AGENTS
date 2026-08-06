@@ -2,10 +2,6 @@
 
 Proyecto `sania`. Generado desde `planos.json` (la fuente de verdad): no editar a mano.
 
-**Estado del diseño:** borrador · **modo:** mixto.
-
-**Cobertura observada en el código actual:** no verificado.
-
 ## 1. Propósito
 
 SANIA es la aplicación personal de Víctor para automatizar el registro y el seguimiento de su negocio de comprar productos en AliExpress y venderlos en Wallapop y Vinted. La primera versión observará los correos transaccionales, pedirá por Telegram las confirmaciones físicas necesarias y mantendrá al día pedidos, almacén, ventas, envíos, incidencias e importes; el beneficio permanecerá provisional hasta completar y validar el modelo de costes. Víctor seguirá gestionando manualmente los anuncios, las conversaciones y el trabajo físico. Más adelante SANIA podrá ayudar en la selección y compra de productos, los anuncios, las devoluciones y el análisis comercial mediante vías verificadas, y crecer con empleados y nuevas líneas de ingresos basadas en contenidos y formación.
@@ -103,33 +99,6 @@ Catálogo completo de actividades por zona del negocio. Cada actividad tiene (o 
 - "FIFO": criterio anterior para elegir la unidad compatible más antigua; SANIA no lo usa para sustituir automáticamente una referencia física etiquetada ni para decidir qué venta gana un conflicto
 - "pendiente de conciliación": situación en la que SANIA no puede relacionar un hecho con una operación concreta; no inventa ni altera datos y lo mantiene como revisión pendiente hasta aclararlo
 - "evento auditable": registro cronológico que conserva el hecho de origen, el antes, el después, quién actuó y el resultado
-- "botón ligado a tarea": acción que identifica la tarea concreta y, cuando corresponde a un anuncio, la unidad y plataforma resueltas; Víctor no debe volver a introducir esa identidad, aunque la granularidad de generación de tareas siga pendiente
-- "No volver a recordar": botón que silencia los recordatorios de recepción; sigue pendiente decidir si además pausa, mantiene visible o cierra la tarea y nunca equivale a Todo correcto
-- "texto libre": entrada permitida para contexto, dudas o tickets; la entrevista no derogó su uso global
-- "publicado declarado": estado persistido al pulsar Anuncio creado para una tarea ligada a una unidad y plataforma; no prueba por sí solo que el anuncio continúe visible
-- "visibilidad real no verificable": estado actual del anuncio en la plataforma que SANIA no puede acreditar con las fuentes autorizadas; T08-Q05 deja pendientes tanto la evidencia como el mecanismo de comunicación
-- "lectura pública": consulta automática de un perfil o anuncio sin iniciar sesión; está bloqueada y no autorizada en el MVP
-- "Todo correcto": confirmación humana de que Víctor tuvo el contenido en las manos y que productos y cantidades concordaron; no es una confirmación del tracking
-- "No OK / Abrir disputa": respuesta que bloquea la creación de unidades y abre una incidencia; el nombre definitivo del botón y el flujo interno de disputa siguen pendientes
-- "unidad disponible": unidad de Stock para venta creada después de Todo correcto y no reservada, vendida ni bloqueada
-- "ubicación": estantería, caja o posición física exacta; no se registra en la primera versión porque el stock actual se guarda en una caja bajo el escritorio
-- "identidad física exacta": correspondencia entre una referencia lógica y un ejemplar material concreto; no está resuelta para unidades idénticas sin etiquetas ni diferencias visibles
-- "Anuncio creado": confirmación humana que persiste que la unidad quedó publicada en la plataforma de la tarea concreta
-- "Stock para venta": clasificación de producto que permite crear unidades de inventario y tareas de anuncio
-- "Compra personal": clasificación de producto que excluye la compra del inventario y de las tareas de anuncio
-- "unidad física": ejemplar concreto creado en inventario después de Todo correcto; un anuncio representa una sola unidad
-- "identidad física de unidades idénticas": problema abierto: unidades visualmente idénticas, sin etiqueta ni rasgo diferenciador, no permiten demostrar todavía qué ejemplar material corresponde a cada referencia lógica
-- "corrección auditable": nuevo evento que conserva valor anterior, valor nuevo, actor, fecha y hora y motivo sin sobrescribir el historial
-- "pricing": evolución futura basada conceptualmente en coste, margen mínimo y margen o precio de publicación; no existe fórmula exacta, redondeo ni valor fijo aprobados para el MVP
-- "descripción final del anuncio": versión pública del anuncio que debe reflejar exactamente el contenido vendido, incluidos los extras acordados
-- "entregada": estado logístico que no implica por sí solo cierre económico
-- "cerrada": Vinted: correo final TX-COMPLETE; Wallapop: hecho económico del monedero cuya entrada en SANIA sigue bloqueada
-- "anuncio alternativo": anuncio de la otra plataforma que apunta a la misma unidad física ya reservada
-- "pendiente de retirada": estado interno que indica que Víctor todavía debe retirar o confirmar manualmente el anuncio; no prueba su visibilidad real
-- "retirada pendiente de acreditar": situación posterior a la acción manual en la que SANIA aún no puede cerrar la tarea porque T08-Q05 no definió mecanismo ni evidencia
-- "pedido": compra de AliExpress que puede contener varias líneas y permanecer abierta mientras existan paquetes pendientes de comprobación física
-- "paquete": unidad logística con seguimiento propio cuando esté disponible; puede contener partes de una o varias líneas por división o consolidación
-- "entregado": estado logístico que abre una comprobación física y nunca equivale por sí solo a recibido correcto ni a stock disponible
 
 ## 3. El proceso (flujos)
 

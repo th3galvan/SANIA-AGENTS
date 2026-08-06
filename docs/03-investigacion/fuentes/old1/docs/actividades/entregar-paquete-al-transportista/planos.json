@@ -1,0 +1,133 @@
+{
+  "version": 2,
+  "proyecto": "sania-entregar-paquete-al-transportista",
+  "titulo": "Entregar el paquete al transportista",
+  "descripcion": "Víctor consultará manualmente en el correo, la conversación o las instrucciones de la plataforma qué transportista corresponde y obtendrá el QR para presentarlo en el punto de entrega. SANIA solo registrará la admisión cuando exista evidencia reconocida; no se ha acordado una confirmación manual sustitutiva ni un tiempo de espera.",
+  "contrato": {
+    "frase": "Cuando el paquete estuvo preparado, Víctor necesitó consultar el transportista y el QR, llevarlo al punto indicado y distinguir la entrega física de una admisión demostrada.",
+    "exito": [
+      "Víctor obtuvo manualmente el transportista y el QR desde la plataforma.",
+      "SANIA no marcó el envío como admitido solo por estar preparado o porque Víctor hubiera salido a entregarlo.",
+      "Una evidencia ausente, desconocida o contradictoria quedó pendiente o en ticket, sin una confirmación manual inventada."
+    ]
+  },
+  "alcance": {
+    "mvp": [
+      "Registrar una evidencia de admisión reconocida recibida por correo.",
+      "Conservar el correo y aplicar el mismo hecho una sola vez.",
+      "Dejar sin aplicar una evidencia que no pueda reconocerse o relacionarse; T02-Q08 decidirá si además abre un ticket."
+    ],
+    "evolucion": [
+      "Definir si se aceptará alguna confirmación manual de admisión y en qué casos.",
+      "Definir tiempos y recordatorios solo después de acordar una cadencia.",
+      "Incorporar plantillas reales de Correos, InPost y otros transportistas."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó las instrucciones, obtuvo el transportista y el QR, llevó el paquete y presentó el código en el punto de entrega"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "entregar-paquete-y-reconocer-admision",
+      "titulo": "Víctor entregó el paquete y SANIA esperó una evidencia de admisión",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor entró manualmente desde el correo o la conversación en las instrucciones de envío, identificó el transportista y obtuvo el QR."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor llevó el paquete al punto indicado y presentó el QR que identifica el paquete."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Llegó un correo reconocido que demostraba la admisión y pudo relacionarse con este envío?",
+          "sigue": "sí, SANIA registró la admisión y conservó la evidencia",
+          "rama": {
+            "etiqueta": "no o la lectura fue dudosa",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA mantuvo el envío pendiente de evidencia y dejó sin aplicar el correo desconocido, incompleto o contradictorio; T02-Q08 decidirá si además abre un ticket. No pidió ni aplicó un OK manual no acordado."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA aplicó el hecho de admisión una sola vez y separó su estado del seguimiento y de la entrega posterior al comprador."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "texto": "En el caso ordinario, Víctor abrió las instrucciones desde el correo o la conversación, vio la empresa y el QR, preparó el paquete y presentó ese QR en el punto de entrega.",
+      "refs": ["E-LIVE-001", "T01-Q01", "T05-Q04"]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "D-LIVE-003",
+      "nombre": "Transportista y QR se obtienen manualmente",
+      "texto": "Víctor consulta las instrucciones en la plataforma y presenta el QR; SANIA no actúa dentro de Wallapop o Vinted ni presupone el transportista."
+    },
+    {
+      "id": "G-LIVE-001",
+      "nombre": "Una admisión se aplica una sola vez",
+      "texto": "Reprocesar la misma evidencia externa no duplica el evento ni hace avanzar dos veces el envío.",
+      "refs": ["T02-Q05"]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "instrucciones de entrega y QR",
+      "guarda": [
+        "venta y paquete relacionados cuando puedan demostrarse",
+        "transportista",
+        "origen consultado manualmente",
+        "QR o referencia de entrega cuando se aporte; todavía no se ha definido si SANIA conserva el valor ni durante cuánto tiempo",
+        "clasificación explícita del QR como dato sensible y temporal",
+        "retención, eliminación y permisos todavía pendientes"
+      ],
+      "origen": "app, web, correo o conversación consultados manualmente por Víctor; SANIA no tiene autorizada su lectura automática"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Gmail",
+      "para": "recibir y conservar correos reconocidos de admisión"
+    },
+    {
+      "con": "Telegram",
+      "para": "avisar a Víctor de un ticket o una evidencia pendiente, sin sustituirla por una confirmación no acordada"
+    },
+    {
+      "con": "Wallapop, Vinted y transportistas",
+      "para": "ser consultados manualmente por Víctor para obtener instrucciones, transportista y QR"
+    }
+  ],
+  "fuera": [
+    "Transportar físicamente el paquete.",
+    "Leer automáticamente instrucciones o QR dentro de Wallapop o Vinted.",
+    "Marcar el paquete como admitido solo porque estaba preparado o Víctor indicó que lo había llevado.",
+    "Pedir una confirmación manual de admisión mientras no se definan sus casos y prioridad frente al correo.",
+    "Crear recordatorios con un umbral temporal no acordado."
+  ],
+  "preguntas": [
+    "[T02-Q04, T05-Q04] ¿Qué plantilla y qué identificadores demuestran la admisión en Correos, InPost y cada transportista real?",
+    "[T05-Q05] ¿En qué casos exactos se aceptará una confirmación manual de admisión, si se acepta alguno?",
+    "[T05-Q06] ¿Qué prioridad tendrá una confirmación manual si después llega un correo contradictorio?",
+    "[T05-Q07] ¿Cuánto tiempo se espera antes de recordar una admisión todavía sin evidencia?",
+    "[T02-Q08] ¿Qué estado y ticket se aplican a un correo de admisión desconocido o imposible de relacionar?",
+    "[T05-Q04] El QR es sensible y temporal: ¿cuánto tiempo se conserva, cuándo se elimina y quién puede verlo?"
+  ]
+}

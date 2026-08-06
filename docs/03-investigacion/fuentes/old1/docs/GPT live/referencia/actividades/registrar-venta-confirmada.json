@@ -1,0 +1,512 @@
+{
+  "version": 2,
+  "proyecto": "sania-registrar-venta-confirmada",
+  "titulo": "Registrar una venta confirmada",
+  "descripcion": "Esta actividad convirtió los correos de venta de Wallapop y Vinted en una reserva trazable de una unidad física. SANIA relacionó la operación con el anuncio, aplicó FIFO solo cuando la referencia exacta no estaba disponible y dejó preparada la acción de envío sin duplicar ventas ni inventar stock.",
+  "contrato": {
+    "frase": "Cuando Wallapop o Vinted comunicó una venta, Víctor necesitó que SANIA la relacionara con el anuncio y una unidad física, la reservara y dejara preparada la acción de envío para evitar vender dos veces la misma unidad y no copiar datos a mano.",
+    "exito": [
+      "Cada correo de venta reconocido creó una sola operación y reservó como máximo una unidad física.",
+      "Ninguna venta sin una unidad compatible produjo stock negativo ni una referencia inventada.",
+      "Víctor recibió por Telegram la referencia, el producto y la acción de envío sin tener que buscarlos manualmente."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó la venta, preparó el envío y resolvió las excepciones que SANIA no pudo conciliar"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "venta detectada",
+      "significado": "operación comunicada por un correo de Wallapop o Vinted que todavía debía relacionarse con una unidad física"
+    },
+    {
+      "termino": "unidad exacta",
+      "significado": "referencia física que ya estaba vinculada al anuncio vendido"
+    },
+    {
+      "termino": "unidad compatible",
+      "significado": "otra referencia disponible del mismo producto y variante que podía sustituir a la exacta"
+    },
+    {
+      "termino": "FIFO",
+      "significado": "criterio que eligió primero la unidad compatible recibida antes"
+    },
+    {
+      "termino": "pendiente de conciliación",
+      "significado": "venta que SANIA no pudo asignar con seguridad porque no encontró una unidad exacta ni compatible"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "registrar-venta-vinted",
+      "titulo": "Una venta de Vinted quedó reservada y lista para preparar",
+      "momento": "futuro",
+      "descripcion": "El correo de venta y etiqueta aportó la identificación de la operación y el material necesario para preparar el envío.",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "Vinted envió el correo de venta y etiqueta con el producto, el número de transacción, el seguimiento, la fecha límite de envío y el QR adjunto"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA guardó el correo original y extrajo los identificadores y datos disponibles"
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿el mismo hecho de venta ya estaba registrado?",
+          "rama": {
+            "etiqueta": "sí, ya estaba registrado",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó la operación existente sin reservar otra unidad ni repetir el movimiento"
+              }
+            ],
+            "termina": true
+          },
+          "sigue": "no estaba registrado"
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿qué unidad física se podía reservar?",
+          "ramas": [
+            {
+              "etiqueta": "la referencia vinculada al anuncio estaba disponible",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA reservó la referencia exacta vinculada al anuncio"
+                }
+              ]
+            },
+            {
+              "etiqueta": "la referencia exacta no estaba disponible, pero había unidades compatibles",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA eligió por FIFO la unidad disponible más antigua del mismo producto y variante y la reservó"
+                }
+              ]
+            },
+            {
+              "etiqueta": "no había ninguna unidad compatible",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA dejó la venta pendiente de conciliación, abrió un ticket y avisó a Víctor por Telegram sin modificar el stock"
+                }
+              ],
+              "termina": true
+            }
+          ]
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA dejó la venta como reservada, pendiente de envío, y excluyó la unidad del stock disponible"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Telegram entregó a Víctor el producto, la referencia, la fecha límite y el QR o etiqueta para preparar el paquete"
+        }
+      ]
+    },
+    {
+      "id": "registrar-venta-wallapop",
+      "titulo": "Una venta de Wallapop avanzó desde la elección del envío hasta su confirmación",
+      "momento": "futuro",
+      "descripcion": "SANIA correlacionó las dos etapas de Wallapop con los identificadores estables de sus enlaces y guardó el precio final cuando apareció.",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "Wallapop envió el correo ¡Has hecho una venta! con el enlace para seleccionar el método de envío y sin el importe final"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA decodificó del enlace la tupla estable de operación b, i y r, guardó el correo original y comprobó que el hecho no estuviera repetido"
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿qué unidad física se podía reservar?",
+          "ramas": [
+            {
+              "etiqueta": "la referencia vinculada al anuncio estaba disponible",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA reservó la referencia exacta vinculada al anuncio"
+                }
+              ]
+            },
+            {
+              "etiqueta": "la referencia exacta no estaba disponible, pero había unidades compatibles",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA eligió por FIFO la unidad disponible más antigua del mismo producto y variante y la reservó"
+                }
+              ]
+            },
+            {
+              "etiqueta": "no había ninguna unidad compatible",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA dejó la venta pendiente de conciliación, abrió un ticket y avisó a Víctor por Telegram sin modificar el stock"
+                }
+              ],
+              "termina": true
+            }
+          ]
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA dejó la venta como reservada, pendiente de configurar el envío, y excluyó la unidad del stock disponible"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Telegram entregó a Víctor la referencia, el producto, el enlace directo para seleccionar el envío y el botón Envío configurado, y dejó preparado el recordatorio diario"
+        },
+        {
+          "tipo": "externo",
+          "texto": "Wallapop envió después el correo ¡Venta confirmada! con el precio final y las instrucciones de envío"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA relacionó el segundo correo mediante b, i y r, guardó el precio final como ingreso provisional y actualizó la tarea de envío"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Telegram entregó a Víctor la referencia, el producto, el precio final y el enlace directo a las instrucciones de envío"
+        }
+      ]
+    },
+    {
+      "id": "cancelar-venta-antes-del-envio",
+      "titulo": "Una cancelación devolvió la misma unidad al stock",
+      "momento": "futuro",
+      "descripcion": "La cancelación anterior a la admisión del paquete deshizo la reserva sin reasignar anuncios automáticamente.",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "Wallapop o Vinted comunicó la cancelación de una venta antes de que el transportista admitiera el paquete"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA relacionó la cancelación con la operación y su referencia reservada"
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿la operación conservaba una referencia reservada coherente?",
+          "ramas": [
+            {
+              "etiqueta": "sí, la referencia reservada era coherente",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA devolvió esa misma referencia al estado disponible, marcó la venta como cancelada y creó por Telegram una tarea manual de publicación"
+                }
+              ]
+            },
+            {
+              "etiqueta": "no había una reserva coherente",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA no alteró el stock, abrió un ticket de conciliación y avisó a Víctor por Telegram"
+                }
+              ],
+              "termina": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "texto": "Un correo real de Vinted para Auriculares Tácticos Earmor SE32 + PTT mostró el seguimiento 16745713, la transacción 21187119090, la fecha límite 03/08/2026 18:36 y una etiqueta o QR adjunto.",
+      "refs": ["G-1", "G-2"]
+    },
+    {
+      "texto": "El informe de correos de Wallapop mostró primero ¡Has hecho una venta! sin importe y después ¡Venta confirmada! con el precio final; ambos se pudieron relacionar mediante los valores b, i y r del enlace de seguimiento.",
+      "refs": ["G-1", "G-7"]
+    },
+    {
+      "texto": "Una última unidad física pudo estar anunciada a la vez en Wallapop y Vinted; al reservarla fue necesario avisar para retirar el anuncio restante, no reasignarlo automáticamente.",
+      "refs": ["G-3", "G-5"]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-1",
+      "nombre": "Cada hecho de plataforma se procesó una sola vez",
+      "texto": "El identificador del mensaje y los identificadores de negocio de la plataforma impidieron que un correo repetido o reprocesado creara otra venta, reserva o movimiento económico."
+    },
+    {
+      "id": "G-2",
+      "nombre": "Orden para elegir la unidad vendida",
+      "tabla": {
+        "columnas": ["¿La referencia vinculada estaba disponible?", "¿Había otra unidad compatible?", "Resultado"],
+        "filas": [
+          ["sí", "*", "se reservó la referencia vinculada"],
+          ["no", "sí", "se reservó por FIFO la unidad compatible más antigua"],
+          ["no", "no", "se abrió una conciliación y no se cambió el stock"]
+        ]
+      }
+    },
+    {
+      "id": "G-3",
+      "nombre": "Una unidad reservada dejó de estar disponible",
+      "texto": "Desde el primer correo de venta reconocido, la unidad reservada quedó fuera del stock disponible aunque la venta todavía no hubiera terminado."
+    },
+    {
+      "id": "G-4",
+      "nombre": "Una falta de stock nunca se ocultó",
+      "texto": "Si no había una unidad exacta ni compatible, SANIA no creó una referencia ficticia ni stock negativo: dejó la venta pendiente de conciliación y abrió un ticket."
+    },
+    {
+      "id": "G-5",
+      "nombre": "El último stock generó una retirada manual de anuncios",
+      "texto": "Cuando la reserva dejó cero unidades compatibles disponibles, SANIA creó la tarea de retirar los demás anuncios y envió sus enlaces por Telegram hasta que Víctor confirmó Ya eliminado."
+    },
+    {
+      "id": "G-6",
+      "nombre": "La cancelación restauró la misma referencia",
+      "texto": "Una cancelación anterior al envío devolvió al estado disponible la referencia que esa venta había reservado y creó una tarea manual de publicación, sin reasignar ni republicar anuncios automáticamente."
+    },
+    {
+      "id": "G-7",
+      "nombre": "El precio final no cerró todavía el beneficio",
+      "texto": "El precio comunicado en la confirmación de venta se guardó como ingreso provisional; el beneficio solo pasó a definitivo en la actividad de cierre de la venta."
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "venta",
+      "estados": [
+        {
+          "nombre": "detectada",
+          "acciones": [
+            {
+              "accion": "reservar una unidad exacta o compatible",
+              "pasa_a": "reservada, pendiente de envío"
+            },
+            {
+              "accion": "abrir conciliación si no había una unidad compatible",
+              "pasa_a": "pendiente de conciliación"
+            }
+          ]
+        },
+        {
+          "nombre": "reservada, pendiente de envío",
+          "acciones": [
+            "continuar con la preparación y el envío",
+            {
+              "accion": "registrar una cancelación anterior al envío",
+              "pasa_a": "cancelada"
+            }
+          ]
+        },
+        {
+          "nombre": "pendiente de conciliación",
+          "acciones": [
+            "investigar por qué no había una unidad compatible y corregir el origen"
+          ]
+        },
+        {
+          "nombre": "cancelada",
+          "acciones": [
+            "consultar el historial"
+          ]
+        }
+      ]
+    },
+    {
+      "entidad": "unidad física",
+      "estados": [
+        {
+          "nombre": "disponible",
+          "acciones": [
+            {
+              "accion": "reservarla para la venta",
+              "pasa_a": "reservada"
+            }
+          ]
+        },
+        {
+          "nombre": "reservada",
+          "acciones": [
+            {
+              "accion": "restaurarla por cancelación anterior al envío",
+              "pasa_a": "disponible"
+            },
+            "continuar con las actividades de envío y cierre"
+          ]
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "venta",
+      "guarda": [
+        "plataforma",
+        "identificadores externos de la operación",
+        "anuncio y enlace vinculados",
+        "producto y variante comunicados",
+        "referencia física reservada",
+        "precio final cuando estuvo disponible",
+        "estado",
+        "fecha y hora de la primera detección de la venta",
+        "fechas de cada transición",
+        "tiempo transcurrido desde el momento inicial acordado del anuncio",
+        "identificador y copia del correo de origen"
+      ],
+      "origen": "se empezó de cero a partir de los correos transaccionales de Wallapop y Vinted"
+    },
+    {
+      "cosa": "unidad física",
+      "guarda": [
+        "referencia única",
+        "producto y variante",
+        "lote y fecha de entrada",
+        "estado",
+        "anuncios vinculados",
+        "venta que la reservó"
+      ],
+      "origen": "la actividad de entrada y control del almacén"
+    },
+    {
+      "cosa": "preparación del envío",
+      "guarda": [
+        "plataforma",
+        "referencia y producto",
+        "número de seguimiento",
+        "número de transacción",
+        "fecha límite",
+        "QR o etiqueta adjunta",
+        "enlaces de configuración o instrucciones"
+      ],
+      "origen": "el correo de venta o confirmación de la plataforma"
+    },
+    {
+      "cosa": "ticket de conciliación",
+      "guarda": [
+        "venta afectada",
+        "motivo",
+        "datos que no coincidieron",
+        "fecha de apertura",
+        "estado y resolución"
+      ],
+      "origen": "lo creó SANIA cuando no pudo asignar una unidad con seguridad"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Gmail",
+      "para": "recibir y conservar los correos transaccionales que dispararon la venta y sus cambios"
+    },
+    {
+      "con": "Telegram",
+      "para": "entregar referencias, productos, QR, enlaces, botones de acción y tickets a Víctor"
+    },
+    {
+      "con": "Wallapop y Vinted",
+      "para": "usar sus correos y enlaces como fuentes externas, sin publicar, editar ni negociar automáticamente dentro de las cuentas"
+    }
+  ],
+  "superficie": {
+    "puntos": [
+      {
+        "nombre": "La venta en Telegram",
+        "quien": ["Víctor"],
+        "llega": "móvil u ordenador mediante Telegram",
+        "cuando": "al detectar una venta, una cancelación o una venta que no pudo conciliarse",
+        "ve": "la plataforma, el producto, la referencia reservada, el precio cuando existió, la fecha límite, el QR o enlace de envío y cualquier incidencia",
+        "puede": [
+          "abrir el QR, la etiqueta o el enlace de envío",
+          "marcar la acción de envío como realizada cuando el aviso lo ofreció",
+          "abrir el ticket de conciliación",
+          "consultar qué unidad quedó reservada"
+        ],
+        "nunca": [
+          "negociar o responder al comprador",
+          "publicar, editar o republicar el anuncio",
+          "elegir una referencia ficticia para ocultar una falta de stock"
+        ]
+      }
+    ],
+    "permisos": {
+      "acciones": [
+        "abrir el QR, la etiqueta o el enlace de envío",
+        "marcar la acción de envío como realizada",
+        "abrir el ticket de conciliación",
+        "consultar la unidad reservada"
+      ],
+      "roles": [
+        {
+          "rol": "Víctor",
+          "permitidas": [
+            "abrir el QR, la etiqueta o el enlace de envío",
+            "marcar la acción de envío como realizada",
+            "abrir el ticket de conciliación",
+            "consultar la unidad reservada"
+          ]
+        }
+      ]
+    },
+    "avisos": [
+      {
+        "quien": "Víctor",
+        "que": "venta preparada con referencia, producto y acción de envío",
+        "canal": "Telegram",
+        "cuando": "inmediatamente después de reservar la unidad"
+      },
+      {
+        "quien": "Víctor",
+        "que": "venta sin una unidad compatible y ticket de conciliación",
+        "canal": "Telegram",
+        "cuando": "en el mismo momento en que falló la asignación"
+      },
+      {
+        "quien": "Víctor",
+        "que": "enlaces de anuncios que debía retirar porque no quedaba stock",
+        "canal": "Telegram",
+        "cuando": "al reservar la última unidad compatible y una vez al día hasta confirmar Ya eliminado"
+      },
+      {
+        "quien": "Víctor",
+        "que": "cancelación, referencia restaurada y tarea manual de publicación",
+        "canal": "Telegram",
+        "cuando": "al reconocer una cancelación anterior al envío"
+      }
+    ],
+    "condiciones": [
+      "La misma venta no reservó dos unidades aunque Gmail entregara o SANIA procesara el correo más de una vez.",
+      "La referencia interna no se escribió ni se ocultó dentro del texto público de los anuncios.",
+      "La consulta y las acciones estuvieron disponibles tanto desde el móvil como desde el ordenador."
+    ]
+  },
+  "fuera": [
+    "Responder consultas, negociar o cerrar la conversación con el comprador.",
+    "Publicar, editar, reasignar o republicar automáticamente anuncios de Wallapop o Vinted.",
+    "Preparar físicamente el paquete, confirmar su admisión, seguir su trayecto o cerrar la venta: pertenecen a las actividades posteriores.",
+    "Resolver devoluciones o extravíos antes de observar sus casos y correos reales.",
+    "Calcular aquí el precio mínimo de negociación, el precio de publicación o el beneficio definitivo."
+  ],
+  "preguntas": [
+    "¿Qué correos e identificadores exactos enviaron Wallapop y Vinted cuando una venta se canceló antes del envío?",
+    "¿Qué campo o enlace de cada plantilla permitió identificar de forma inequívoca el anuncio vendido cuando había varios anuncios del mismo producto?",
+    "¿Qué significó exactamente cada parámetro b, i y r de Wallapop, además de funcionar juntos como clave estable?",
+    "¿Qué dato del comprador necesita conservar SANIA y para qué se usará?",
+    "¿Puede una misma venta incluir varias unidades o varios productos y cómo lo comunica cada plataforma?",
+    "¿Qué momento del anuncio debe compararse con la primera detección de venta para medir cuánto tardó en venderse?"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "version": 2,
+  "proyecto": "sania-comprobar-productos-publicados",
+  "titulo": "Comprobar qué productos están publicados",
+  "descripcion": "SANIA hará una lectura limitada de los perfiles públicos, sin iniciar sesión, después de una recepción y luego semanalmente. La excepción frente a la regla general de no interactuar con las plataformas sigue pendiente de confirmación explícita.",
+  "contrato": {
+    "frase": "Cuando cambió el stock, Víctor necesitó saber qué anuncios seguían visibles para detectar productos disponibles sin publicar o anuncios que debían retirarse."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "reactivó manualmente una comprobación detenida y corrigió los anuncios"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "comprobar-perfil-publico",
+      "titulo": "SANIA comprobó un perfil público con límites",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA consultó el perfil público sin iniciar sesión después de una recepción o en la revisión semanal."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Apareció bloqueo, CAPTCHA, petición de inicio de sesión o una respuesta anómala?",
+          "sigue": "no, la respuesta fue normal",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA detuvo todas las consultas de esa plataforma y avisó a Víctor por Telegram."
+              },
+              {
+                "tipo": "humano",
+                "quien": "Víctor",
+                "texto": "Víctor revisó el riesgo y reactivó manualmente la consulta cuando fue seguro."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA comparó los anuncios visibles con los enlaces vinculados y el stock conocido."
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "perfiles públicos de Wallapop y Vinted",
+      "para": "leer de forma limitada los anuncios visibles sin iniciar sesión"
+    },
+    {
+      "con": "Telegram",
+      "para": "avisar de una parada y recoger la reactivación manual"
+    }
+  ],
+  "fuera": [
+    "Iniciar sesión en Wallapop o Vinted.",
+    "Modificar, republicar o cambiar precios.",
+    "Reanudar automáticamente después de una señal de bloqueo."
+  ],
+  "preguntas": [
+    "¿La lectura pública sin sesión es una excepción consciente a la regla de no interactuar automáticamente con las páginas?",
+    "¿Qué información pública mínima necesita comparar SANIA?",
+    "¿Qué señal concreta permite a Víctor reactivar una plataforma con seguridad?",
+    "¿La revisión semanal debe ejecutarse qué día y a qué hora?"
+  ]
+}

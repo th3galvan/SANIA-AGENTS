@@ -1,0 +1,277 @@
+{
+  "version": 2,
+  "proyecto": "sania-confirmar-recepcion-de-pedidos",
+  "titulo": "Confirmar la recepción de pedidos",
+  "descripcion": "Esta actividad recoge la comprobación física que un tracking entregado no puede demostrar. La confirmación se realiza sobre el paquete y su contenido observado; solo Todo correcto permite crear las unidades correspondientes y No OK o Abrir disputa bloquea la entrada.",
+  "contrato": {
+    "frase": "Cuando el seguimiento indicó que un paquete había llegado, Víctor necesitó comprobar en mano productos y cantidades y responder por Telegram antes de que SANIA creara stock."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "recibió, contó, identificó y revisó físicamente los productos del paquete"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "Todo correcto",
+      "significado": "confirmación humana de que Víctor tuvo el contenido en las manos y que productos y cantidades concordaron; no es una confirmación del tracking"
+    },
+    {
+      "termino": "No OK / Abrir disputa",
+      "significado": "respuesta que bloquea la creación de unidades y abre una incidencia; el nombre definitivo del botón y el flujo interno de disputa siguen pendientes"
+    },
+    {
+      "termino": "No volver a recordar",
+      "significado": "opción que silencia los recordatorios; todavía no se ha decidido si además pausa, cierra o mantiene visible la tarea y nunca equivale a Todo correcto"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "confirmar-recepcion-fisica-de-paquete",
+      "titulo": "Víctor confirmó o rechazó el contenido físico de un paquete",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA reconoció que el seguimiento comunicó la entrega de un paquete y lo dejó pendiente de comprobación física sin crear stock."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mostró por Telegram únicamente los datos comprobados disponibles para ayudar a comparar el paquete, señalando cualquier relación dudosa. Los campos exactos y la forma de representar líneas o paquetes parciales siguen pendientes en T03-Q02 y T02-Q09."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor tuvo el contenido en las manos, contó e identificó los productos y los comparó con el pedido."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Víctor pulsó Todo correcto?",
+          "sigue": "sí, confirmó productos y cantidades",
+          "rama": {
+            "etiqueta": "no, pulsó No OK o Abrir disputa",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA mantuvo bloqueada la entrada del paquete y abrió una incidencia sin crear referencias ni unidades."
+              },
+              {
+                "tipo": "estatico",
+                "texto": "La incidencia quedó abierta y el stock bloqueado. No se asumió que Víctor abriera o gestionara una disputa en AliExpress: A-018 fue hipotético y A-048 dejó sin recuperar el flujo real."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA envió el contenido físicamente confirmado a Dar entrada a las unidades recibidas; allí solo Stock para venta crea unidades de inventario y lanza tareas de anuncio."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Si el pedido tenía más paquetes pendientes, el pedido permaneció abierto aunque este paquete hubiera quedado comprobado."
+        }
+      ]
+    },
+    {
+      "id": "recordar-comprobacion-pendiente",
+      "titulo": "SANIA recordó una comprobación sin respuesta",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿La tarea de comprobación seguía sin respuesta?",
+          "sigue": "sí, SANIA envió un recordatorio con Todo correcto, No OK o Abrir disputa y No volver a recordar",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA no envió otro aviso para una tarea ya resuelta."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "La cadencia, el escalado y el momento del primer recordatorio quedaron sin fijar."
+        },
+        {
+          "tipo": "decision",
+          "clase": "pendiente",
+          "condicion": "¿Víctor pulsó No volver a recordar?",
+          "sigue": "SANIA registró la elección sin interpretarla como recepción correcta",
+          "rama": {
+            "etiqueta": "semántica operativa pendiente",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA silenció nuevos recordatorios, pero no se ha decidido si la tarea queda pausada, cerrada o visible; ninguna opción puede crear stock automáticamente."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "corregir-confirmacion-fisica",
+      "titulo": "Víctor corrigió una confirmación equivocada",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor solicitó corregir una confirmación o un dato físico y explicó el motivo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó valor anterior, valor nuevo, actor, fecha y hora y motivo, sin borrar el evento original."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El procedimiento exacto para deshacer unidades o tareas ya creadas y resolver un correo posterior contradictorio sigue pendiente."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "E-LIVE-004",
+      "texto": "Los productos de distintos vendedores pueden llegar separados o consolidados y a cuentagotas; Víctor solo considera completamente recibido lo que tiene en las manos y concuerda en producto y cantidad.",
+      "refs": [
+        "T02-Q03",
+        "T02-Q09",
+        "T03-Q01",
+        "D-LIVE-017"
+      ]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-LIVE-002",
+      "nombre": "Tracking entregado no crea stock",
+      "texto": "La entrega logística abre una comprobación física y no aumenta existencias.",
+      "refs": [
+        "D-LIVE-017"
+      ]
+    },
+    {
+      "id": "G-LIVE-003",
+      "nombre": "Todo correcto autoriza la entrada",
+      "texto": "Todo correcto confirma producto y cantidades comprobados físicamente y permite registrar las unidades y lanzar las tareas de anuncio que correspondan al stock para venta.",
+      "refs": [
+        "D-LIVE-017",
+        "D-LIVE-020"
+      ]
+    },
+    {
+      "id": "G-LIVE-004",
+      "nombre": "No OK bloquea la entrada",
+      "texto": "No OK o Abrir disputa abre una incidencia y no inventa ni crea unidades.",
+      "estado": "confirmada en intención; el flujo de disputa está pendiente",
+      "refs": [
+        "D-LIVE-018",
+        "T03-Q01",
+        "T03-Q09"
+      ]
+    },
+    {
+      "id": "D-LIVE-019",
+      "nombre": "Recordatorios de recepción sin cadencia fijada",
+      "texto": "SANIA recuerda una comprobación sin respuesta y ofrece No volver a recordar, que silencia nuevos avisos; la frecuencia previa y el efecto del silenciamiento sobre el estado de la tarea no están definidos.",
+      "refs": [
+        "T03-Q03",
+        "T07-Q04",
+        "T07-Q05"
+      ]
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "paquete",
+      "estados": [
+        {
+          "nombre": "entregado pendiente de comprobación",
+          "acciones": [
+            {
+              "accion": "Víctor pulsó Todo correcto tras revisar productos y cantidades",
+              "quien": "Víctor",
+              "pasa_a": "recibido correcto"
+            },
+            {
+              "accion": "Víctor pulsó No OK o Abrir disputa",
+              "quien": "Víctor",
+              "pasa_a": "incidencia"
+            }
+          ]
+        },
+        {
+          "nombre": "recibido correcto",
+          "acciones": []
+        },
+        {
+          "nombre": "incidencia",
+          "acciones": []
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "comprobación física",
+      "guarda": [
+        "pedido y paquete",
+        "contenido esperado sustentado por evidencia",
+        "productos y cantidades confirmados",
+        "respuesta de Víctor",
+        "actor, fecha y hora",
+        "evento original y correcciones"
+      ],
+      "origen": "respuesta de Víctor en Telegram"
+    },
+    {
+      "cosa": "recordatorio de recepción",
+      "guarda": [
+        "tarea concreta",
+        "avisos enviados",
+        "respuesta",
+        "selección No volver a recordar sin semántica inferida"
+      ],
+      "origen": "tarea pendiente y respuestas de Telegram"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "mostrar la comprobación y recoger Todo correcto, No OK o Abrir disputa y No volver a recordar"
+    },
+    {
+      "con": "Seguimiento de pedidos de AliExpress",
+      "para": "recibir el paquete entregado sin convertirlo en stock"
+    },
+    {
+      "con": "Dar entrada a las unidades recibidas",
+      "para": "continuar únicamente después de Todo correcto"
+    }
+  ],
+  "fuera": [
+    "Dar por recibido un paquete únicamente porque lo dijo el seguimiento.",
+    "Crear unidades, referencias o tareas de anuncio antes de Todo correcto.",
+    "Asumir que cada correo o cada línea equivale a un paquete físico.",
+    "Permitir que No OK o Abrir disputa cree parcialmente unidades sin una regla confirmada.",
+    "Automatizar la apertura, negociación o cierre de una disputa dentro de AliExpress.",
+    "Fijar una cadencia o una semántica de No volver a recordar no confirmadas."
+  ],
+  "preguntas": [
+    "[T03-Q01] ¿Qué debe ocurrir en el primer caso real de producto incompleto, defectuoso o con variante errónea?",
+    "[T03-Q02 / T02-Q09] ¿Qué datos necesita ver Víctor para distinguir productos o líneas parecidas y cómo se muestran paquetes o pedidos parcialmente recibidos?",
+    "[T03-Q03 / T07-Q04 / T07-Q05] ¿Cuándo se recuerda, con qué cadencia y qué efecto exacto tiene No volver a recordar?",
+    "[T03-Q04] ¿Cómo se deshace una confirmación equivocada y sus unidades derivadas sin perder la historia?",
+    "[T05-Q06] ¿Qué prioridad tiene una confirmación manual si después llega un correo contradictorio?",
+    "[D-LIVE-018] ¿El botón definitivo se llamará No OK, Abrir disputa o mostrará ambas acciones?"
+  ]
+}

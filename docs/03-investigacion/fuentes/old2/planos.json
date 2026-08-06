@@ -113,114 +113,6 @@
     {
       "termino": "evento auditable",
       "significado": "registro cronológico que conserva el hecho de origen, el antes, el después, quién actuó y el resultado"
-    },
-    {
-      "termino": "botón ligado a tarea",
-      "significado": "acción que identifica la tarea concreta y, cuando corresponde a un anuncio, la unidad y plataforma resueltas; Víctor no debe volver a introducir esa identidad, aunque la granularidad de generación de tareas siga pendiente"
-    },
-    {
-      "termino": "No volver a recordar",
-      "significado": "botón que silencia los recordatorios de recepción; sigue pendiente decidir si además pausa, mantiene visible o cierra la tarea y nunca equivale a Todo correcto"
-    },
-    {
-      "termino": "texto libre",
-      "significado": "entrada permitida para contexto, dudas o tickets; la entrevista no derogó su uso global"
-    },
-    {
-      "termino": "publicado declarado",
-      "significado": "estado persistido al pulsar Anuncio creado para una tarea ligada a una unidad y plataforma; no prueba por sí solo que el anuncio continúe visible"
-    },
-    {
-      "termino": "visibilidad real no verificable",
-      "significado": "estado actual del anuncio en la plataforma que SANIA no puede acreditar con las fuentes autorizadas; T08-Q05 deja pendientes tanto la evidencia como el mecanismo de comunicación"
-    },
-    {
-      "termino": "lectura pública",
-      "significado": "consulta automática de un perfil o anuncio sin iniciar sesión; está bloqueada y no autorizada en el MVP"
-    },
-    {
-      "termino": "Todo correcto",
-      "significado": "confirmación humana de que Víctor tuvo el contenido en las manos y que productos y cantidades concordaron; no es una confirmación del tracking"
-    },
-    {
-      "termino": "No OK / Abrir disputa",
-      "significado": "respuesta que bloquea la creación de unidades y abre una incidencia; el nombre definitivo del botón y el flujo interno de disputa siguen pendientes"
-    },
-    {
-      "termino": "unidad disponible",
-      "significado": "unidad de Stock para venta creada después de Todo correcto y no reservada, vendida ni bloqueada"
-    },
-    {
-      "termino": "ubicación",
-      "significado": "estantería, caja o posición física exacta; no se registra en la primera versión porque el stock actual se guarda en una caja bajo el escritorio"
-    },
-    {
-      "termino": "identidad física exacta",
-      "significado": "correspondencia entre una referencia lógica y un ejemplar material concreto; no está resuelta para unidades idénticas sin etiquetas ni diferencias visibles"
-    },
-    {
-      "termino": "Anuncio creado",
-      "significado": "confirmación humana que persiste que la unidad quedó publicada en la plataforma de la tarea concreta"
-    },
-    {
-      "termino": "Stock para venta",
-      "significado": "clasificación de producto que permite crear unidades de inventario y tareas de anuncio"
-    },
-    {
-      "termino": "Compra personal",
-      "significado": "clasificación de producto que excluye la compra del inventario y de las tareas de anuncio"
-    },
-    {
-      "termino": "unidad física",
-      "significado": "ejemplar concreto creado en inventario después de Todo correcto; un anuncio representa una sola unidad"
-    },
-    {
-      "termino": "identidad física de unidades idénticas",
-      "significado": "problema abierto: unidades visualmente idénticas, sin etiqueta ni rasgo diferenciador, no permiten demostrar todavía qué ejemplar material corresponde a cada referencia lógica"
-    },
-    {
-      "termino": "corrección auditable",
-      "significado": "nuevo evento que conserva valor anterior, valor nuevo, actor, fecha y hora y motivo sin sobrescribir el historial"
-    },
-    {
-      "termino": "pricing",
-      "significado": "evolución futura basada conceptualmente en coste, margen mínimo y margen o precio de publicación; no existe fórmula exacta, redondeo ni valor fijo aprobados para el MVP"
-    },
-    {
-      "termino": "descripción final del anuncio",
-      "significado": "versión pública del anuncio que debe reflejar exactamente el contenido vendido, incluidos los extras acordados"
-    },
-    {
-      "termino": "entregada",
-      "significado": "estado logístico que no implica por sí solo cierre económico"
-    },
-    {
-      "termino": "cerrada",
-      "significado": "Vinted: correo final TX-COMPLETE; Wallapop: hecho económico del monedero cuya entrada en SANIA sigue bloqueada"
-    },
-    {
-      "termino": "anuncio alternativo",
-      "significado": "anuncio de la otra plataforma que apunta a la misma unidad física ya reservada"
-    },
-    {
-      "termino": "pendiente de retirada",
-      "significado": "estado interno que indica que Víctor todavía debe retirar o confirmar manualmente el anuncio; no prueba su visibilidad real"
-    },
-    {
-      "termino": "retirada pendiente de acreditar",
-      "significado": "situación posterior a la acción manual en la que SANIA aún no puede cerrar la tarea porque T08-Q05 no definió mecanismo ni evidencia"
-    },
-    {
-      "termino": "pedido",
-      "significado": "compra de AliExpress que puede contener varias líneas y permanecer abierta mientras existan paquetes pendientes de comprobación física"
-    },
-    {
-      "termino": "paquete",
-      "significado": "unidad logística con seguimiento propio cuando esté disponible; puede contener partes de una o varias líneas por división o consolidación"
-    },
-    {
-      "termino": "entregado",
-      "significado": "estado logístico que abre una comprobación física y nunca equivale por sí solo a recibido correcto ni a stock disponible"
     }
   ],
   "actividades": [
@@ -229,8 +121,7 @@
       "nombre": "seleccionar productos y enlaces de AliExpress",
       "area": "Compra y aprovisionamiento",
       "resumen": "Hoy Víctor elige manualmente qué vender; en una fase posterior SANIA podrá ayudar a descubrir y organizar productos y proveedores.",
-      "estado": "sin empezar",
-      "origen": "usuario"
+      "estado": "sin empezar"
     },
     {
       "id": "vigilar-precios-y-costes",
@@ -238,10 +129,7 @@
       "area": "Compra y aprovisionamiento",
       "resumen": "Fase posterior: comparar cantidades, portes, coste total, coste unitario e histórico de los enlaces seleccionados.",
       "estado": "sin empezar",
-      "depende_de": [
-        "seleccionar-productos-y-enlaces"
-      ],
-      "origen": "usuario"
+      "depende_de": ["seleccionar-productos-y-enlaces"]
     },
     {
       "id": "detectar-oportunidades-de-compra",
@@ -249,10 +137,7 @@
       "area": "Compra y aprovisionamiento",
       "resumen": "Fase posterior: aplicar reglas de stock, precio y margen para avisar de una oportunidad relevante.",
       "estado": "sin empezar",
-      "depende_de": [
-        "vigilar-precios-y-costes"
-      ],
-      "origen": "usuario"
+      "depende_de": ["vigilar-precios-y-costes"]
     },
     {
       "id": "aprobar-y-realizar-compras",
@@ -260,10 +145,7 @@
       "area": "Compra y aprovisionamiento",
       "resumen": "Víctor toma la decisión y compra; una fase posterior podrá prepararle oportunidades y pedir su aprobación antes de actuar.",
       "estado": "sin empezar",
-      "depende_de": [
-        "seleccionar-productos-y-enlaces"
-      ],
-      "origen": "usuario"
+      "depende_de": ["seleccionar-productos-y-enlaces"]
     },
     {
       "id": "seguir-pedidos-aliexpress",
@@ -271,16 +153,8 @@
       "area": "Compra y aprovisionamiento",
       "resumen": "Primera versión: reconocer las familias observadas de compra confirmada, envío, recogida por transportista, entrega y reembolso por cancelación, y mantener pedidos, líneas y paquetes separados. tradeOrderLineId identifica la línea; orderId u o_ids identifican pedido o subpedido. Si falta tradeOrderLineId, SANIA no inventa una relación de línea. Siguen pendientes las variantes obligatorias y cómo expresan división, consolidación y recepción parcial.",
       "estado": "en entrevista",
-      "depende_de": [
-        "aprobar-y-realizar-compras"
-      ],
-      "carpeta": "actividades/seguir-pedidos-aliexpress",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["aprobar-y-realizar-compras"],
+      "carpeta": "actividades/seguir-pedidos-aliexpress"
     },
     {
       "id": "confirmar-recepcion-de-pedidos",
@@ -288,16 +162,8 @@
       "area": "Compra y aprovisionamiento",
       "resumen": "Primera versión: el seguimiento entregado deja el paquete pendiente de comprobación física. Telegram muestra el contenido esperado y ofrece Todo correcto o No OK. Si la incidencia es parcial, las cantidades correctas continúan y solo se bloquea la parte afectada; si todo el pedido está en incidencia, no se crean unidades hasta una resolución positiva con mercancía válida para la venta. La cadencia específica de recepción sigue pendiente.",
       "estado": "en entrevista",
-      "depende_de": [
-        "seguir-pedidos-aliexpress"
-      ],
-      "carpeta": "actividades/confirmar-recepcion-de-pedidos",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["seguir-pedidos-aliexpress"],
+      "carpeta": "actividades/confirmar-recepcion-de-pedidos"
     },
     {
       "id": "dar-entrada-al-almacen",
@@ -305,16 +171,8 @@
       "area": "Almacén",
       "resumen": "Primera versión: crear una unidad y una referencia no reutilizable por cada cantidad físicamente recibida, empezando en ZZZ y ampliando la longitud cuando se agoten las combinaciones. En una incidencia parcial, las unidades correctas continúan y las problemáticas quedan bloqueadas. Las propuestas de publicación se agrupan en una notificación y se confirman por publicación; los costes y los resultados económicos de incidencias siguen pendientes.",
       "estado": "en entrevista",
-      "depende_de": [
-        "confirmar-recepcion-de-pedidos"
-      ],
-      "carpeta": "actividades/dar-entrada-al-almacen",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["confirmar-recepcion-de-pedidos"],
+      "carpeta": "actividades/dar-entrada-al-almacen"
     },
     {
       "id": "controlar-stock-y-trazabilidad",
@@ -322,16 +180,8 @@
       "area": "Almacén",
       "resumen": "Primera versión: conocer el estado y el lote de cada unidad, su referencia visible de longitud inicial tres y sus anuncios y ventas. Sin etiquetas físicas, ejemplares idénticos son intercambiables; con etiquetas, la referencia identifica la unidad exacta y una falta exige que Víctor cambie manualmente el anuncio. Si dos plataformas disputan casi a la vez la última unidad, SANIA no elige ganador, evita stock negativo y avisa por Telegram para que Víctor decida y cancele una venta.",
       "estado": "en entrevista",
-      "depende_de": [
-        "dar-entrada-al-almacen"
-      ],
-      "carpeta": "actividades/controlar-stock-y-trazabilidad",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["dar-entrada-al-almacen"],
+      "carpeta": "actividades/controlar-stock-y-trazabilidad"
     },
     {
       "id": "ajustar-existencias",
@@ -339,10 +189,7 @@
       "area": "Almacén",
       "resumen": "Registrar correcciones físicas justificadas cuando el recuento no coincida con SANIA, sin borrar el historial y separadas de cualquier movimiento económico, aunque ambos puedan vincularse por el mismo hecho. Falta documentar el próximo ajuste real con antes, después, motivo y efecto económico.",
       "estado": "sin empezar",
-      "depende_de": [
-        "controlar-stock-y-trazabilidad"
-      ],
-      "origen": "usuario"
+      "depende_de": ["controlar-stock-y-trazabilidad"]
     },
     {
       "id": "crear-y-mantener-anuncios",
@@ -350,16 +197,8 @@
       "area": "Anuncios y ventas",
       "resumen": "SANIA agrupa las propuestas en una notificación y las desglosa por plataforma o publicación. Cada publicación tiene su botón Ya he publicado; al pulsarlo SANIA solicita el enlace, y también permite cancelar la propuesta. El título y la base de datos conservan todas las referencias incluidas; falta precisar el formato cuando son varias y el alcance de cancelar dentro de la agrupación.",
       "estado": "en entrevista",
-      "depende_de": [
-        "controlar-stock-y-trazabilidad"
-      ],
-      "carpeta": "actividades/crear-y-mantener-anuncios",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["controlar-stock-y-trazabilidad"],
+      "carpeta": "actividades/crear-y-mantener-anuncios"
     },
     {
       "id": "atender-conversaciones-y-negociar",
@@ -367,10 +206,7 @@
       "area": "Anuncios y ventas",
       "resumen": "Víctor seguirá respondiendo y negociando manualmente en Wallapop y Vinted. En una fase futura, y solo mediante una vía autorizada, SANIA podrá aprender de conversaciones reales anonimizadas para proponer respuestas con el tono de Víctor y escalar los casos ambiguos o conflictivos.",
       "estado": "sin empezar",
-      "depende_de": [
-        "crear-y-mantener-anuncios"
-      ],
-      "origen": "usuario"
+      "depende_de": ["crear-y-mantener-anuncios"]
     },
     {
       "id": "comprobar-productos-publicados",
@@ -378,16 +214,8 @@
       "area": "Anuncios y ventas",
       "resumen": "SANIA conservará el enlace de cada anuncio. La investigación decidirá si la primera versión puede consultar públicamente su estado sin sesión de forma sencilla, fiable y permitida; la frecuencia inicial será semanal y configurable. Un CAPTCHA o bloqueo no cambia estados y avisa por Telegram; un aviso explícito de posible baneo pausa automáticamente la función hasta que Víctor la reactive.",
       "estado": "en entrevista",
-      "depende_de": [
-        "crear-y-mantener-anuncios"
-      ],
-      "carpeta": "actividades/comprobar-productos-publicados",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["crear-y-mantener-anuncios"],
+      "carpeta": "actividades/comprobar-productos-publicados"
     },
     {
       "id": "republicar-anuncios",
@@ -395,11 +223,7 @@
       "area": "Anuncios y ventas",
       "resumen": "Fase posterior: recomendar qué anuncios conviene reactivar. SANIA no reasignará ni republicará automáticamente; el comportamiento tras una cancelación permanece pendiente hasta disponer de un caso y un correo reales.",
       "estado": "sin empezar",
-      "depende_de": [
-        "comprobar-productos-publicados",
-        "controlar-stock-y-trazabilidad"
-      ],
-      "origen": "usuario"
+      "depende_de": ["comprobar-productos-publicados", "controlar-stock-y-trazabilidad"]
     },
     {
       "id": "analizar-competencia-y-precios",
@@ -407,10 +231,7 @@
       "area": "Anuncios y ventas",
       "resumen": "Fase posterior: comparar anuncios y recomendar precios; cualquier lectura o cambio directo dependerá de una vía autorizada.",
       "estado": "sin empezar",
-      "depende_de": [
-        "crear-y-mantener-anuncios"
-      ],
-      "origen": "usuario"
+      "depende_de": ["crear-y-mantener-anuncios"]
     },
     {
       "id": "registrar-venta-confirmada",
@@ -418,16 +239,8 @@
       "area": "Anuncios y ventas",
       "resumen": "Primera versión: extraer una o varias referencias del título, contrastarlas con la base de datos y relacionar venta, anuncio y unidades sin depender solo del texto público. En los enlaces de Wallapop, SANIA conserva juntos los valores b, i y r y prueba a usarlos como pista provisional para relacionar correos de una misma venta, sin atribuir significado a cada letra ni unir automáticamente operaciones cuando falten, cambien o se contradigan. Una referencia ausente, cortada o alterada deja la venta sin aplicar al stock, crea un ticket de revisión y avisa por Telegram, sin abrir automáticamente una incidencia. En ventas de varias unidades iguales, todas comparten enlace y el total se divide entre sus referencias. Un conflicto casi simultáneo por la última unidad espera la decisión manual de Víctor.",
       "estado": "en entrevista",
-      "depende_de": [
-        "controlar-stock-y-trazabilidad"
-      ],
-      "carpeta": "actividades/registrar-venta-confirmada",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["controlar-stock-y-trazabilidad"],
+      "carpeta": "actividades/registrar-venta-confirmada"
     },
     {
       "id": "analizar-rendimiento-de-anuncios",
@@ -435,11 +248,7 @@
       "area": "Anuncios y ventas",
       "resumen": "Fase posterior: medir el tiempo de venta desde que el anuncio se añade a la base de datos hasta su cierre y comparar tendencias por producto y plataforma. SANIA conserva ambos instantes y el texto completo del anuncio, sin automatizar acciones dentro de Wallapop o Vinted.",
       "estado": "sin empezar",
-      "depende_de": [
-        "crear-y-mantener-anuncios",
-        "registrar-venta-confirmada"
-      ],
-      "origen": "usuario"
+      "depende_de": ["crear-y-mantener-anuncios", "registrar-venta-confirmada"]
     },
     {
       "id": "retirar-anuncios-sin-stock",
@@ -447,17 +256,8 @@
       "area": "Anuncios y ventas",
       "resumen": "Cuando una venta inequívoca agote las referencias compartidas por otras publicaciones, Telegram pide a Víctor retirar manualmente los anuncios alternativos. Si dos plataformas disputan casi a la vez la última unidad, SANIA no inicia la retirada ni elige ganador hasta que Víctor decida cuál cancelar. La URL guardada podrá servir como comprobación adicional si la investigación autoriza su lectura pública.",
       "estado": "en entrevista",
-      "depende_de": [
-        "registrar-venta-confirmada",
-        "comprobar-productos-publicados"
-      ],
-      "carpeta": "actividades/retirar-anuncios-sin-stock",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["registrar-venta-confirmada", "comprobar-productos-publicados"],
+      "carpeta": "actividades/retirar-anuncios-sin-stock"
     },
     {
       "id": "preparar-paquete-vendido",
@@ -465,16 +265,8 @@
       "area": "Preparación, envío y posventa",
       "resumen": "Trabajo humano: Telegram facilita la venta, la referencia y el contenido final del anuncio; Víctor obtiene manualmente las instrucciones, el transportista y el QR desde la plataforma, comprueba que cualquier extra figure en la descripción final, reúne los artículos y prepara el paquete.",
       "estado": "en entrevista",
-      "depende_de": [
-        "registrar-venta-confirmada"
-      ],
-      "carpeta": "actividades/preparar-paquete-vendido",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["registrar-venta-confirmada"],
+      "carpeta": "actividades/preparar-paquete-vendido"
     },
     {
       "id": "entregar-paquete-al-transportista",
@@ -482,16 +274,8 @@
       "area": "Preparación, envío y posventa",
       "resumen": "Víctor lleva el paquete al punto indicado y presenta manualmente el QR. SANIA solo podrá registrar la admisión desde una plantilla real aportada y validada; LIVE no incluyó correos de admisión de Correos/InPost. La confirmación manual alternativa y la prioridad ante un correo contradictorio siguen pendientes.",
       "estado": "en entrevista",
-      "depende_de": [
-        "preparar-paquete-vendido"
-      ],
-      "carpeta": "actividades/entregar-paquete-al-transportista",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["preparar-paquete-vendido"],
+      "carpeta": "actividades/entregar-paquete-al-transportista"
     },
     {
       "id": "seguir-envio-al-comprador",
@@ -499,16 +283,8 @@
       "area": "Preparación, envío y posventa",
       "resumen": "Primera versión: aplicar solo correos de plantillas reales validadas y mantener separados admisión, tránsito y entrega. LIVE aportó la plantilla de entrega de Wallapop, pero no corpus de admisión, tránsito, intento fallido o incidencia; los umbrales, recordatorios y ticket de extravío siguen pendientes.",
       "estado": "en entrevista",
-      "depende_de": [
-        "entregar-paquete-al-transportista"
-      ],
-      "carpeta": "actividades/seguir-envio-al-comprador",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["entregar-paquete-al-transportista"],
+      "carpeta": "actividades/seguir-envio-al-comprador"
     },
     {
       "id": "cerrar-venta-entregada",
@@ -516,16 +292,8 @@
       "area": "Preparación, envío y posventa",
       "resumen": "Primera versión: mantener separadas entrega y cierre económico. Vinted cierra idempotentemente con el correo TX-COMPLETE y su número de transacción; el correo de entrega de Wallapop mantiene la venta abierta y el cierre queda bloqueado hasta decidir cómo recibe SANIA el movimiento final del monedero.",
       "estado": "en entrevista",
-      "depende_de": [
-        "seguir-envio-al-comprador"
-      ],
-      "carpeta": "actividades/cerrar-venta-entregada",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["seguir-envio-al-comprador"],
+      "carpeta": "actividades/cerrar-venta-entregada"
     },
     {
       "id": "gestionar-devolucion",
@@ -533,11 +301,7 @@
       "area": "Preparación, envío y posventa",
       "resumen": "Fase posterior: mantener inicialmente la incidencia de forma manual y diseñar la detección, el seguimiento de vuelta y la reposición cuando exista un primer caso real con sus correos y estados verificados.",
       "estado": "sin empezar",
-      "depende_de": [
-        "registrar-venta-confirmada",
-        "controlar-stock-y-trazabilidad"
-      ],
-      "origen": "usuario"
+      "depende_de": ["registrar-venta-confirmada", "controlar-stock-y-trazabilidad"]
     },
     {
       "id": "gestionar-paquete-extraviado",
@@ -545,10 +309,7 @@
       "area": "Preparación, envío y posventa",
       "resumen": "Pendiente para una fase posterior: primero hay que conocer y verificar el procedimiento real de Wallapop y Vinted.",
       "estado": "sin empezar",
-      "depende_de": [
-        "seguir-envio-al-comprador"
-      ],
-      "origen": "usuario"
+      "depende_de": ["seguir-envio-al-comprador"]
     },
     {
       "id": "registrar-movimientos-economicos",
@@ -556,17 +317,8 @@
       "area": "Finanzas",
       "resumen": "Primera versión: guardar cada movimiento económico separado de los ajustes físicos de stock, aunque puedan relacionarse mediante el mismo hecho o expediente. En una venta de varias unidades iguales se conserva un único total y su imputación total entre número de referencias, sin fabricar movimientos adicionales. La fuente del monedero de Wallapop, el reparto de costes y el pricing siguen pendientes.",
       "estado": "en entrevista",
-      "depende_de": [
-        "dar-entrada-al-almacen",
-        "registrar-venta-confirmada"
-      ],
-      "carpeta": "actividades/registrar-movimientos-economicos",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["dar-entrada-al-almacen", "registrar-venta-confirmada"],
+      "carpeta": "actividades/registrar-movimientos-economicos"
     },
     {
       "id": "calcular-beneficio-real",
@@ -574,17 +326,8 @@
       "area": "Finanzas",
       "resumen": "Primera versión: no calcular un beneficio definitivo hasta que la venta tenga un cierre verificable y estén relacionados sus costes reales. Vinted puede cerrarse con TX-COMPLETE; Wallapop permanece provisional mientras SANIA no disponga de una fuente de cierre acordada, y comisiones, impuestos y repartos siguen abiertos.",
       "estado": "en entrevista",
-      "depende_de": [
-        "cerrar-venta-entregada",
-        "registrar-movimientos-economicos"
-      ],
-      "carpeta": "actividades/calcular-beneficio-real",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["cerrar-venta-entregada", "registrar-movimientos-economicos"],
+      "carpeta": "actividades/calcular-beneficio-real"
     },
     {
       "id": "consultar-resultados-del-negocio",
@@ -592,10 +335,7 @@
       "area": "Finanzas",
       "resumen": "Actividad sin empezar: consultar ventas, stock, ingresos, gastos y resultados por periodo. El dispositivo, idioma, superficie real y dificultades de uso siguen pendientes en T10-Q06, y el beneficio no será definitivo mientras falten cierre o costes.",
       "estado": "sin empezar",
-      "depende_de": [
-        "calcular-beneficio-real"
-      ],
-      "origen": "usuario"
+      "depende_de": ["calcular-beneficio-real"]
     },
     {
       "id": "importar-historico-financiero",
@@ -603,10 +343,7 @@
       "area": "Finanzas",
       "resumen": "Fase posterior: trasladar el Excel existente cuando el modelo se haya probado con operaciones nuevas.",
       "estado": "sin empezar",
-      "depende_de": [
-        "registrar-movimientos-economicos"
-      ],
-      "origen": "usuario"
+      "depende_de": ["registrar-movimientos-economicos"]
     },
     {
       "id": "atender-alertas-y-confirmaciones",
@@ -614,13 +351,7 @@
       "area": "Dirección y control",
       "resumen": "Primera versión: Telegram muestra decisiones, tareas físicas y excepciones ligadas a su operación. Las incidencias avisan diariamente por defecto y cada una permite fijar otra frecuencia persistente hasta cambiarla o cerrarla. Las cadencias de otros avisos, las respuestas contradictorias y las segundas confirmaciones permanecen pendientes.",
       "estado": "en entrevista",
-      "carpeta": "actividades/atender-alertas-y-confirmaciones",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "carpeta": "actividades/atender-alertas-y-confirmaciones"
     },
     {
       "id": "resolver-excepciones-operativas",
@@ -628,16 +359,8 @@
       "area": "Dirección y control",
       "resumen": "Un hecho dudoso queda como revisión pendiente sin aplicar cambios; un ticket de revisión permite investigar una anomalía sin afirmar que exista una incidencia. Solo un problema operativo confirmado abre una incidencia con estado, prioridad, responsable y bloqueos. Una referencia ausente, cortada o alterada crea ticket y aviso por Telegram, pero no una incidencia automática.",
       "estado": "en entrevista",
-      "depende_de": [
-        "atender-alertas-y-confirmaciones"
-      ],
-      "carpeta": "actividades/resolver-excepciones-operativas",
-      "origen": "usuario",
-      "cobertura": {
-        "estado": "no verificado",
-        "evidencias": [],
-        "pruebas": []
-      }
+      "depende_de": ["atender-alertas-y-confirmaciones"],
+      "carpeta": "actividades/resolver-excepciones-operativas"
     },
     {
       "id": "evaluar-cajas-estandar",
@@ -645,10 +368,7 @@
       "area": "Dirección y control",
       "resumen": "Fase posterior: medir tamaños, coste, espacio y tiempo ahorrado para decidir si conviene comprar cajas ya preparadas.",
       "estado": "sin empezar",
-      "depende_de": [
-        "preparar-paquete-vendido"
-      ],
-      "origen": "usuario"
+      "depende_de": ["preparar-paquete-vendido"]
     },
     {
       "id": "generar-videos-de-afiliacion",
@@ -656,10 +376,7 @@
       "area": "Nuevas líneas de ingresos",
       "resumen": "Fase futura: producir y medir contenido automático que dirija a enlaces de afiliado de AliExpress.",
       "estado": "sin empezar",
-      "depende_de": [
-        "seleccionar-productos-y-enlaces"
-      ],
-      "origen": "usuario"
+      "depende_de": ["seleccionar-productos-y-enlaces"]
     },
     {
       "id": "crear-canal-de-desarrollo-con-ia",
@@ -667,10 +384,7 @@
       "area": "Nuevas líneas de ingresos",
       "resumen": "Fase futura: aplicar la experiencia de producción automática para publicar contenido propio y construir reputación.",
       "estado": "sin empezar",
-      "depende_de": [
-        "generar-videos-de-afiliacion"
-      ],
-      "origen": "usuario"
+      "depende_de": ["generar-videos-de-afiliacion"]
     },
     {
       "id": "vender-formacion-y-metodo",
@@ -678,10 +392,7 @@
       "area": "Nuevas líneas de ingresos",
       "resumen": "Fase futura: convertir la experiencia y la reputación demostradas en un curso de automatización y un método de desarrollo con IA.",
       "estado": "sin empezar",
-      "depende_de": [
-        "crear-canal-de-desarrollo-con-ia"
-      ],
-      "origen": "usuario"
+      "depende_de": ["crear-canal-de-desarrollo-con-ia"]
     }
   ],
   "datos": [
@@ -918,9 +629,7 @@
     "puntos": [
       {
         "nombre": "Telegram de SANIA",
-        "quien": [
-          "Víctor"
-        ],
+        "quien": ["Víctor"],
         "llega": "mediante Telegram; el dispositivo real, el idioma y las dificultades de uso siguen pendientes en T10-Q06",
         "cuando": "SANIA necesitó una confirmación física, una decisión o avisar de una excepción",
         "ve": "el contexto necesario para decidir, la operación afectada, el motivo y las acciones disponibles",
@@ -943,9 +652,7 @@
       },
       {
         "nombre": "Consulta general de SANIA",
-        "quien": [
-          "Víctor"
-        ],
+        "quien": ["Víctor"],
         "llega": "mediante una superficie todavía por definir; móvil, ordenador de casa y ordenador de trabajo son antecedentes no confirmados por LIVE",
         "cuando": "quiso consultar pedidos, stock, ventas, envíos, tickets o resultados",
         "ve": "el estado actual y la historia que explica cada cambio",
@@ -1130,14 +837,5 @@
     "¿Cuántos CAPTCHA o bloqueos repetidos deben pausar la comprobación pública y la pausa afecta a un anuncio, una plataforma o toda la función?",
     "¿Qué política de retención o archivo necesitará el historial mínimo de incidencias y comprobaciones después de medir su volumen real?",
     "¿Cada cuánto debe aparecer el resumen de optimizaciones no urgentes?"
-  ],
-  "definicion": {
-    "estado": "borrador",
-    "modo": "mixto"
-  },
-  "cobertura": {
-    "estado": "no verificado",
-    "evidencias": [],
-    "pruebas": []
-  }
+  ]
 }

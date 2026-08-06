@@ -1,0 +1,73 @@
+{
+  "version": 2,
+  "proyecto": "sania-entregar-paquete-al-transportista",
+  "titulo": "Entregar el paquete al transportista",
+  "descripcion": "Víctor llevará físicamente el paquete a Correos o InPost. SANIA reconocerá la admisión cuando exista un correo verificable y pedirá una confirmación manual cuando no exista.",
+  "contrato": {
+    "frase": "Cuando el paquete estuvo preparado, Víctor necesitó entregarlo al punto correcto y que SANIA distinguiera una preparación de una admisión real."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "llevó el paquete y mostró el QR o código de barras"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "entregar-paquete",
+      "titulo": "El paquete quedó admitido por el transportista",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor llevó el paquete a Correos o InPost y mostró el QR o código de barras."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Existió un correo verificable de admisión?",
+          "sigue": "sí, SANIA lo reconoció",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA pidió a Víctor por Telegram la confirmación manual prevista."
+              },
+              {
+                "tipo": "humano",
+                "quien": "Víctor",
+                "texto": "Víctor confirmó que el transportista había admitido el paquete."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA dejó la venta como entregada al transportista y conservó la prueba de origen."
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Correos e InPost",
+      "para": "recibir la evidencia de admisión cuando estuvo disponible"
+    },
+    {
+      "con": "Telegram",
+      "para": "recoger una confirmación manual cuando faltó el correo"
+    }
+  ],
+  "fuera": [
+    "Transportar físicamente el paquete.",
+    "Marcarlo como admitido solo porque estaba preparado."
+  ],
+  "preguntas": [
+    "¿Qué correo o dato demuestra la admisión en cada plataforma y transportista?",
+    "¿En qué casos exactos se aceptará una confirmación manual?",
+    "¿Qué ocurre si Víctor confirma y después llega un correo contradictorio?",
+    "¿Cuánto tiempo se espera antes de recordar una entrega todavía no confirmada?"
+  ]
+}

@@ -1,0 +1,412 @@
+{
+  "version": 2,
+  "proyecto": "sania-controlar-stock-y-trazabilidad",
+  "titulo": "Controlar el stock y la trazabilidad",
+  "descripcion": "Esta actividad conserva la historia de cada unidad de venta desde el pedido, paquete y comprobación física hasta sus anuncios, reserva, venta, incidencia o ajuste. La referencia de unidad es pública, alfanumérica y de tres caracteres; no se registran ubicaciones físicas detalladas y la identidad exacta de unidades idénticas sigue abierta.",
+  "contrato": {
+    "frase": "Cuando una unidad cambió de situación, Víctor necesitó que SANIA supiera de qué comprobación física procedía, qué referencia pública la representaba, dónde estaba comprometida y quién corrigió cada dato."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó el stock, localizó visualmente los productos, confirmó hechos físicos y explicó las correcciones excepcionales"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "referencia de unidad",
+      "significado": "código alfanumérico único de tres caracteres por unidad, visible al final del título del anuncio y conservado en la historia interna"
+    },
+    {
+      "termino": "unidad disponible",
+      "significado": "unidad de Stock para venta creada después de Todo correcto y no reservada, vendida ni bloqueada"
+    },
+    {
+      "termino": "ubicación",
+      "significado": "estantería, caja o posición física exacta; no se registra en la primera versión porque el stock actual se guarda en una caja bajo el escritorio"
+    },
+    {
+      "termino": "identidad física exacta",
+      "significado": "correspondencia entre una referencia lógica y un ejemplar material concreto; no está resuelta para unidades idénticas sin etiquetas ni diferencias visibles"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "crear-origen-trazable-de-unidad",
+      "titulo": "SANIA incorporó una unidad físicamente confirmada",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "decision",
+          "clase": "proteccion",
+          "condicion": "¿Existió Todo correcto después de la comprobación física?",
+          "sigue": "sí, continuó",
+          "rama": {
+            "etiqueta": "no, solo existió tracking entregado o No OK",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA no creó la unidad ni aumentó el stock."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿El producto estaba clasificado como Stock para venta?",
+          "sigue": "sí, SANIA creó la unidad",
+          "rama": {
+            "etiqueta": "no, era Compra personal",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA excluyó la compra del inventario de venta."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA vinculó la unidad con pedido, paquete, producto, variante y confirmación física, cuando esos datos estuvieron demostrados."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA asignó una referencia alfanumérica única de tres caracteres y la dejó disponible sin ubicación física detallada."
+        }
+      ]
+    },
+    {
+      "id": "mantener-disponibilidad-y-reserva",
+      "titulo": "SANIA mantuvo disponibilidad, anuncios y reserva de una unidad",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA relacionó la unidad con sus anuncios por plataforma; cada anuncio representó una unidad y su título terminó con la referencia pública."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿La unidad estaba físicamente disponible y no reservada?",
+          "sigue": "sí, contó como disponible",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA excluyó la unidad del recuento disponible sin crear stock negativo."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "externo",
+          "texto": "Llegó un correo reconocido de venta con el título del anuncio y, cuando se conserva, los identificadores externos disponibles."
+        },
+        {
+          "tipo": "decision",
+          "clase": "proteccion",
+          "condicion": "¿El mismo correo o hecho externo ya había sido aplicado?",
+          "sigue": "no, SANIA continuó",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó el evento existente y no duplicó la reserva, la venta ni el movimiento de stock."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿El título conservó un sufijo válido de tres caracteres que identificaba una unidad exacta disponible?",
+          "sigue": "sí, SANIA pudo reservar esa referencia",
+          "rama": {
+            "etiqueta": "no: referencia ausente, alterada, desconocida o unidad no disponible",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA abrió una conciliación, no cambió el stock y no eligió otra unidad por FIFO. T01-Q02 y X-LIVE-010 exigen validar el sufijo en correos y movimientos reales."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA reservó la unidad exacta del anuncio. Si la misma última unidad estaba anunciada en la otra plataforma, creó el aviso para que Víctor retirara manualmente el anuncio alternativo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "La concurrencia de dos correos casi simultáneos sobre la última unidad sigue sin regla completa; SANIA nunca puede inventar stock ni dejarlo negativo."
+        }
+      ]
+    },
+    {
+      "id": "corregir-stock-con-auditoria",
+      "titulo": "Víctor corrigió un dato de stock sin borrar la historia",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor indicó el dato erróneo, el valor correcto y el motivo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA añadió un evento con valor anterior, valor nuevo, actor, fecha y hora y motivo, conservando el evento original."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El flujo concreto para deshacer Todo correcto, corregir la clasificación de pedidos existentes o resolver efectos económicos sigue pendiente."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "E-LIVE-004",
+      "texto": "En pedidos divididos o consolidados solo lo físicamente comprobado puede originar unidades; el pedido permanece abierto mientras queden paquetes pendientes.",
+      "refs": [
+        "T02-Q03",
+        "T02-Q09",
+        "D-LIVE-017",
+        "G-LIVE-002"
+      ]
+    },
+    {
+      "id": "E-LIVE-005",
+      "texto": "Cuando Víctor detecta un fallo de stock, hoy ajusta manualmente el Excel; SANIA debe convertir esa corrección en un evento auditable.",
+      "refs": [
+        "T03-Q04",
+        "T04-Q01"
+      ]
+    },
+    {
+      "id": "E-LIVE-003",
+      "texto": "Si la última unidad está anunciada en Wallapop y Vinted, el primer correo la reserva y SANIA pide retirar manualmente el otro anuncio.",
+      "refs": [
+        "T01-Q08",
+        "T04-Q04",
+        "D-LIVE-001",
+        "D-LIVE-009",
+        "G-LIVE-008"
+      ]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-LIVE-001",
+      "nombre": "Idempotencia de hechos de stock",
+      "texto": "Un mismo correo o hecho externo se aplica una sola vez; reprocesarlo no duplica reservas, ventas ni movimientos.",
+      "refs": [
+        "T02-Q05"
+      ]
+    },
+    {
+      "id": "G-LIVE-002",
+      "nombre": "Entrega no equivale a stock",
+      "texto": "El tracking entregado no crea una unidad disponible; se exige Todo correcto.",
+      "refs": [
+        "D-LIVE-017"
+      ]
+    },
+    {
+      "id": "G-LIVE-003",
+      "nombre": "Todo correcto crea unidades",
+      "texto": "Solo después de comprobar producto y cantidades se registran unidades de Stock para venta y se lanzan sus tareas de anuncio.",
+      "refs": [
+        "D-LIVE-017",
+        "D-LIVE-020"
+      ]
+    },
+    {
+      "id": "G-LIVE-005",
+      "nombre": "Un anuncio por unidad",
+      "texto": "Cada anuncio representa una única unidad física.",
+      "refs": [
+        "D-LIVE-007"
+      ]
+    },
+    {
+      "id": "G-LIVE-006",
+      "nombre": "Referencia pública de tres caracteres",
+      "texto": "La referencia alfanumérica de tres caracteres identifica la unidad en SANIA y aparece como sufijo del título.",
+      "estado": "alfabeto y colisiones pendientes",
+      "refs": [
+        "D-LIVE-006",
+        "T03-Q08",
+        "X-LIVE-001"
+      ]
+    },
+    {
+      "id": "G-LIVE-007",
+      "nombre": "Reserva de la unidad exacta",
+      "texto": "El correo de venta reserva la referencia contenida en el anuncio; no se aplica FIFO automático.",
+      "estado": "la identidad material de unidades idénticas sigue pendiente",
+      "refs": [
+        "D-LIVE-001",
+        "T01-Q11",
+        "X-LIVE-004"
+      ]
+    },
+    {
+      "id": "G-LIVE-008",
+      "nombre": "Primer correo sobre una unidad compartida",
+      "texto": "Si una unidad está publicada en dos plataformas, el primer correo la reserva y genera el aviso de retirada manual del otro anuncio.",
+      "estado": "concurrencia simultánea pendiente",
+      "refs": [
+        "D-LIVE-008",
+        "D-LIVE-009",
+        "T04-Q04"
+      ]
+    },
+    {
+      "id": "G-LIVE-016",
+      "nombre": "Compra personal fuera del stock",
+      "texto": "Las compras personales no entran en el inventario de venta.",
+      "refs": [
+        "D-LIVE-022"
+      ]
+    },
+    {
+      "id": "G-LIVE-017",
+      "nombre": "Clasificación corregible",
+      "texto": "La clasificación recordada por producto puede cambiarse manualmente.",
+      "estado": "efecto sobre pedidos existentes pendiente",
+      "refs": [
+        "D-LIVE-023"
+      ]
+    },
+    {
+      "id": "G-LIVE-018",
+      "nombre": "Sin ubicación detallada",
+      "texto": "La primera versión conserva el estado del stock, no la posición física exacta.",
+      "refs": [
+        "D-LIVE-028"
+      ]
+    },
+    {
+      "id": "CORRECCION-AUDITABLE",
+      "nombre": "Correcciones con historia",
+      "texto": "Toda corrección conserva antes, después, actor, fecha y hora y motivo sin sobrescribir el historial.",
+      "refs": [
+        "T03-Q04",
+        "T04-Q01",
+        "E-LIVE-005"
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "unidad de inventario",
+      "guarda": [
+        "referencia alfanumérica pública de tres caracteres",
+        "producto y variante",
+        "pedido, paquete y línea cuando sean identificables",
+        "confirmación física de origen",
+        "situación de disponibilidad",
+        "anuncios por plataforma",
+        "reserva y venta",
+        "incidencias",
+        "historial"
+      ],
+      "origen": "Todo correcto sobre Stock para venta"
+    },
+    {
+      "cosa": "evento de trazabilidad",
+      "guarda": [
+        "unidad o entidad afectada",
+        "tipo de hecho",
+        "fecha y hora",
+        "actor",
+        "origen",
+        "valor anterior",
+        "valor nuevo",
+        "motivo"
+      ],
+      "origen": "hechos de correo, confirmaciones físicas y correcciones"
+    }
+  ],
+  "pendientes": [
+    {
+      "id": "X-LIVE-004",
+      "tema": "Identidad física de unidades idénticas",
+      "texto": "La referencia lógica es única, pero Víctor localiza con ojos y manos unidades iguales sin etiqueta ni diferencia notable; no se ha definido cómo sostener correspondencia material exacta.",
+      "refs": [
+        "T04-Q02",
+        "T04-Q05"
+      ]
+    },
+    {
+      "id": "X-LIVE-011",
+      "tema": "Granularidad de publicación para varias unidades",
+      "texto": "Un anuncio representa una unidad y D-LIVE-021 confirma presentar las dos acciones de plataforma de un objetivo producto/unidad antes de las del siguiente; se habló indistintamente de objetivo por producto o por unidad, por lo que esa granularidad exacta sigue abierta.",
+      "refs": [
+        "T04-Q06",
+        "D-LIVE-021"
+      ]
+    },
+    {
+      "id": "EVOLUCION-STOCK-001",
+      "tema": "Devoluciones, sustituciones y reembolsos",
+      "texto": "No existen casos reales suficientes para definir transiciones de stock o coste. Permanecen fuera del MVP y no pueden devolver una unidad a disponible ni crear sustituciones automáticamente.",
+      "refs": [
+        "T03-Q09",
+        "T11-Q01",
+        "X-LIVE-006"
+      ]
+    },
+    {
+      "id": "EVOLUCION-STOCK-002",
+      "tema": "Pricing",
+      "texto": "Costes, fórmulas de margen, valor fijo del 25 % y redondeo a ,95 no forman parte de las reglas de stock vigentes.",
+      "refs": [
+        "D-LIVE-026",
+        "G-LIVE-019",
+        "T03-Q05",
+        "T03-Q06",
+        "X-LIVE-009"
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Dar entrada a las unidades recibidas",
+      "para": "crear unidades solo tras Todo correcto y la clasificación Stock para venta"
+    },
+    {
+      "con": "Anuncios y ventas",
+      "para": "relacionar una unidad con anuncios, reservas y ventas mediante la referencia pública"
+    },
+    {
+      "con": "Telegram",
+      "para": "recoger confirmaciones y correcciones de Víctor sin acciones automáticas en plataformas"
+    }
+  ],
+  "fuera": [
+    "Usar stock negativo, referencias ficticias o FIFO automático para cerrar una venta.",
+    "Crear stock desde un tracking entregado, un paquete No OK o una compra personal.",
+    "Tratar la referencia como privada u ocultarla del título del anuncio.",
+    "Dar por resuelta la identidad física suponiendo que habrá o que no habrá etiquetas; la solución permanece abierta. Registrar ubicaciones exactas sí queda fuera de la primera versión.",
+    "Afirmar una correspondencia física exacta entre unidades idénticas mientras siga sin resolverse.",
+    "Aplicar automáticamente devoluciones, sustituciones, reembolsos o fórmulas de pricing.",
+    "Borrar o sobrescribir silenciosamente movimientos anteriores."
+  ],
+  "preguntas": [
+    "[T04-Q01 / E-LIVE-005] ¿Cuál fue el último ajuste real de stock, con antes, después, motivo y efecto económico?",
+    "[T04-Q02 / T04-Q05 / X-LIVE-004] ¿Cómo se distingue físicamente una unidad concreta entre ejemplares idénticos sin etiquetas?",
+    "[T04-Q03] ¿Qué cambios pertenecen al stock, cuáles a un ajuste y cuáles a movimientos económicos?",
+    "[T04-Q04] ¿Qué regla resuelve dos correos casi simultáneos sobre la última unidad?",
+    "[T04-Q06 / X-LIVE-011] ¿Cómo se generan y secuencian las tareas para varias unidades iguales?",
+    "[T03-Q08 / G-LIVE-006] ¿Qué alfabeto y política de colisiones, reutilización y agotamiento tendrá la referencia de tres caracteres?",
+    "[T03-Q04] ¿Cómo se revierte una entrada incorrecta y sus efectos derivados sin perder la historia?",
+    "[D-LIVE-023 / G-LIVE-017] ¿Cambiar la clasificación aprendida afecta solo a compras futuras o también a pedidos existentes?"
+  ]
+}

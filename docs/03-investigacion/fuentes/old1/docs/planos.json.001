@@ -1,0 +1,720 @@
+{
+  "version": 2,
+  "proyecto": "sania",
+  "titulo": "SANIA",
+  "descripcion": "SANIA es la aplicación personal de Víctor para automatizar el registro y el seguimiento de su negocio de comprar productos en AliExpress y venderlos en Wallapop y Vinted. La primera versión observará los correos transaccionales, pedirá por Telegram las confirmaciones físicas necesarias y mantendrá al día pedidos, almacén, ventas, envíos, incidencias e importes; el beneficio permanecerá provisional hasta completar y validar el modelo de costes. Víctor seguirá gestionando manualmente los anuncios, las conversaciones y el trabajo físico. Más adelante SANIA podrá ayudar en la selección y compra de productos, los anuncios, las devoluciones y el análisis comercial mediante vías verificadas, y crecer con empleados y nuevas líneas de ingresos basadas en contenidos y formación.",
+  "contrato": {
+    "frase": "Cuando recibe información nueva de AliExpress, Wallapop o Vinted, Víctor necesita que SANIA actualice automáticamente los pedidos, el almacén, las ventas y los importes sustentados por evidencia, pidiéndole las confirmaciones que requieren comprobar algo físicamente y dejando provisional el beneficio mientras falten costes, para reducir las casi dos horas diarias de registro y dedicar su tiempo a consultar, decidir, preparar y enviar los paquetes.",
+    "exito": [
+      "El tiempo dedicado a copiar y registrar manualmente los flujos de correo soportados disminuye de forma medible; llegar a cero registro manual de pedidos, almacén, ventas y beneficios es el objetivo una vez validados todos los modelos y excepciones.",
+      "Todos los cambios reconocidos en plantillas reales quedan registrados una sola vez y cada venta cerrada muestra su evidencia, sus importes y si el resultado económico es provisional o definitivo.",
+      "Ninguna entrada duplicada o fuera de orden crea dos movimientos de almacén, venta o dinero para el mismo hecho."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos y prepara y envía los paquetes"
+    }
+  ],
+  "fuentes": [
+    {
+      "id": "LIVE-2026-07-31",
+      "tipo": "entrevista funcional consolidada con evidencias de correo y monedero",
+      "archivo": "entrevistas/2026-07-31/INFORME-MONOLITICO-ENTREVISTA-SANIA-LIVE-2026-07-31.md",
+      "trazabilidad": "entrevistas/2026-07-31/TRAZABILIDAD-INFORME-LIVE-2026-07-31.md",
+      "estado": "incorporada conservando decisiones, casos, reglas, contradicciones, preguntas, evidencias e hipótesis"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "pedido de compra",
+      "significado": "una compra realizada en AliExpress que puede contener varias unidades y cuyo seguimiento llega por correo"
+    },
+    {
+      "termino": "lote",
+      "significado": "las unidades recibidas juntas en un pedido y que comparten su coste real de compra"
+    },
+    {
+      "termino": "unidad",
+      "significado": "cada artículo físico trazable desde el lote en que se compró hasta su venta, devolución o ajuste"
+    },
+    {
+      "termino": "venta cerrada",
+      "significado": "una venta que la plataforma da por finalizada y cuyo ingreso, coste y beneficio ya pueden quedar asentados"
+    },
+    {
+      "termino": "confirmación física",
+      "significado": "respuesta de Víctor por Telegram que acredita algo que un correo no puede demostrar por sí solo, como haber recibido y revisado un paquete"
+    },
+    {
+      "termino": "producto y variante",
+      "significado": "el tipo de artículo que se vende; cada variante relevante, como color o modelo, se trata como un producto de almacén distinto"
+    },
+    {
+      "termino": "referencia de unidad",
+      "significado": "identificador alfanumérico único de tres caracteres para cada unidad física; es interno y también visible como sufijo al final del título público del anuncio. El alfabeto, las colisiones, la reutilización y la identidad física de unidades idénticas sin etiqueta siguen pendientes"
+    },
+    {
+      "termino": "anuncio",
+      "significado": "publicación manual de Wallapop o Vinted que representa una única unidad física y cuyo título termina con su referencia de tres caracteres; el enlace puede conservarse de forma opcional, pero no es la clave necesaria para identificar la unidad"
+    },
+    {
+      "termino": "tarea de publicación",
+      "significado": "mensaje o acción de Telegram que, al hacerse ejecutable, identifica una unidad y una plataforma, con texto listo para copiar, imágenes bajo demanda y acciones para confirmar, aplazar o cancelar la sugerencia; la granularidad de generación por producto o por unidad en entradas múltiples sigue pendiente"
+    },
+    {
+      "termino": "unidad reservada",
+      "significado": "unidad apartada desde que una plataforma comunica la venta; deja de contar como disponible aunque la operación todavía no haya terminado"
+    },
+    {
+      "termino": "ticket operativo",
+      "significado": "caso visible que SANIA no puede cerrar automáticamente cuando un flujo confirmado decide abrirlo; un correo dudoso también puede quedar simplemente sin aplicar porque T02-Q08 no fijó una regla universal de creación de tickets"
+    },
+    {
+      "termino": "línea de compra",
+      "significado": "parte conceptual de un pedido asociada a un producto o variante; LIVE no aportó correos AliExpress ni confirmó su identificador estable, campos de cantidad o total, que solo podrán usarse cuando aparezcan en plantillas reales validadas"
+    },
+    {
+      "termino": "coste actual de unidad",
+      "significado": "coste atribuido hoy a una unidad para calcular el resultado sin borrar el coste de adquisición original; la precisión, el redondeo y las correcciones económicas siguen pendientes"
+    },
+    {
+      "termino": "situación física",
+      "significado": "condición material de una unidad separada del resultado económico; en el MVP se confirma si entra disponible o queda bloqueada por una incidencia, y los casos de devolución, sustitución o pérdida permanecen aplazados hasta disponer de evidencia real"
+    },
+    {
+      "termino": "resultado económico de compra",
+      "significado": "forma en que termina económicamente una compra o incidencia; el modelo detallado de reembolsos, sustituciones, pérdidas y reparto de costes permanece pendiente"
+    },
+    {
+      "termino": "precio mínimo de negociación",
+      "significado": "concepto futuro calculado desde el coste y un margen mínimo configurable; el 25 % fue solo un ejemplo y la fórmula, el redondeo, los costes incluidos y las diferencias por plataforma no están decididos"
+    },
+    {
+      "termino": "venta detectada",
+      "significado": "operación comunicada por Wallapop o Vinted que SANIA ha reconocido y todavía debe recorrer hasta su cierre"
+    },
+    {
+      "termino": "unidad exacta",
+      "significado": "unidad física identificada por la referencia de tres caracteres incluida en el título del anuncio vendido y que debe reservarse desde el primer correo reconocido"
+    },
+    {
+      "termino": "unidad compatible",
+      "significado": "otra referencia disponible del mismo producto y variante; su uso como sustitución de la unidad exacta no tiene un caso real confirmado y exige conciliación"
+    },
+    {
+      "termino": "FIFO",
+      "significado": "criterio anterior para elegir la unidad compatible más antigua; no se aplica automáticamente en el modelo nuevo de un anuncio por unidad y queda pendiente de validar con un caso real"
+    },
+    {
+      "termino": "pendiente de conciliación",
+      "significado": "situación en la que SANIA no puede relacionar un hecho con seguridad y no inventa ni altera datos; su representación como ticket o como hecho sin aplicar depende de una regla todavía pendiente"
+    },
+    {
+      "termino": "evento auditable",
+      "significado": "registro cronológico que conserva el hecho de origen, el antes, el después, quién actuó y el resultado"
+    }
+  ],
+  "actividades": [
+    {
+      "id": "seleccionar-productos-y-enlaces",
+      "nombre": "seleccionar productos y enlaces de AliExpress",
+      "area": "Compra y aprovisionamiento",
+      "resumen": "Hoy Víctor elige manualmente qué vender; en una fase posterior SANIA podrá ayudar a descubrir y organizar productos y proveedores.",
+      "estado": "sin empezar"
+    },
+    {
+      "id": "vigilar-precios-y-costes",
+      "nombre": "vigilar precios y costes de compra",
+      "area": "Compra y aprovisionamiento",
+      "resumen": "Fase posterior: comparar cantidades, portes, coste total, coste unitario e histórico de los enlaces seleccionados.",
+      "estado": "sin empezar",
+      "depende_de": ["seleccionar-productos-y-enlaces"]
+    },
+    {
+      "id": "detectar-oportunidades-de-compra",
+      "nombre": "detectar oportunidades de compra",
+      "area": "Compra y aprovisionamiento",
+      "resumen": "Fase posterior: aplicar reglas de stock, precio y margen para avisar de una oportunidad relevante.",
+      "estado": "sin empezar",
+      "depende_de": ["vigilar-precios-y-costes"]
+    },
+    {
+      "id": "aprobar-y-realizar-compras",
+      "nombre": "aprobar y realizar compras",
+      "area": "Compra y aprovisionamiento",
+      "resumen": "Víctor toma la decisión y compra; una fase posterior podrá prepararle oportunidades y pedir su aprobación antes de actuar.",
+      "estado": "sin empezar",
+      "depende_de": ["seleccionar-productos-y-enlaces"]
+    },
+    {
+      "id": "seguir-pedidos-aliexpress",
+      "nombre": "seguir pedidos de AliExpress",
+      "area": "Compra y aprovisionamiento",
+      "resumen": "Primera versión: normalizar los correos de pedido y seguimiento y mantener pedidos, líneas y paquetes separados aunque AliExpress divida o consolide envíos. Los identificadores de línea, plantillas y datos que no estén probados quedan pendientes y no se completan por suposición.",
+      "estado": "en entrevista",
+      "depende_de": ["aprobar-y-realizar-compras"],
+      "carpeta": "actividades/seguir-pedidos-aliexpress"
+    },
+    {
+      "id": "confirmar-recepcion-de-pedidos",
+      "nombre": "confirmar la recepción de pedidos",
+      "area": "Compra y aprovisionamiento",
+      "resumen": "Primera versión: el seguimiento entregado deja el paquete pendiente de comprobación física. Telegram muestra el contenido esperado y ofrece Todo correcto o Abrir disputa/No OK; solo la comprobación física correcta autoriza crear stock. La granularidad por paquete o línea y la cadencia de recordatorios siguen pendientes.",
+      "estado": "en entrevista",
+      "depende_de": ["seguir-pedidos-aliexpress"],
+      "carpeta": "actividades/confirmar-recepcion-de-pedidos"
+    },
+    {
+      "id": "dar-entrada-al-almacen",
+      "nombre": "dar entrada a las unidades recibidas",
+      "area": "Almacén",
+      "resumen": "Primera versión: después de Todo correcto, clasificar cada producto como Stock para venta o Compra personal, crear una referencia alfanumérica de tres caracteres por unidad destinada a venta y lanzar inmediatamente sus tareas de publicación. Una recepción incorrecta no crea stock y queda como incidencia; costes, reembolsos y sustituciones detallados siguen pendientes.",
+      "estado": "en entrevista",
+      "depende_de": ["confirmar-recepcion-de-pedidos"],
+      "carpeta": "actividades/dar-entrada-al-almacen"
+    },
+    {
+      "id": "controlar-stock-y-trazabilidad",
+      "nombre": "controlar el stock y la trazabilidad",
+      "area": "Almacén",
+      "resumen": "Primera versión: conocer el estado y el lote de cada unidad física, su referencia visible de tres caracteres y sus anuncios y ventas; reservar atómicamente la unidad exacta indicada en el título y no permitir stock negativo. Si la referencia no puede conciliarse, no se aplica FIFO automáticamente: se abre una excepción.",
+      "estado": "en entrevista",
+      "depende_de": ["dar-entrada-al-almacen"],
+      "carpeta": "actividades/controlar-stock-y-trazabilidad"
+    },
+    {
+      "id": "ajustar-existencias",
+      "nombre": "ajustar existencias",
+      "area": "Almacén",
+      "resumen": "Registrar correcciones justificadas cuando el recuento físico no coincida con SANIA, sin borrar el historial.",
+      "estado": "sin empezar",
+      "depende_de": ["controlar-stock-y-trazabilidad"]
+    },
+    {
+      "id": "crear-y-mantener-anuncios",
+      "nombre": "crear y mantener anuncios",
+      "area": "Anuncios y ventas",
+      "resumen": "SANIA presenta secuencialmente el par Wallapop/Vinted de un objetivo de publicación antes de pasar al siguiente. Cada acción confirmable resuelve una unidad y una plataforma concretas, con título terminado en la referencia visible de tres caracteres, texto listo e imágenes bajo demanda; sigue pendiente decidir si la generación inicial se agrupa por producto o nace por unidad.",
+      "estado": "en entrevista",
+      "depende_de": ["controlar-stock-y-trazabilidad"],
+      "carpeta": "actividades/crear-y-mantener-anuncios"
+    },
+    {
+      "id": "atender-conversaciones-y-negociar",
+      "nombre": "atender conversaciones y negociar con compradores",
+      "area": "Anuncios y ventas",
+      "resumen": "Víctor seguirá respondiendo y negociando manualmente en Wallapop y Vinted. En una fase futura, y solo mediante una vía autorizada, SANIA podrá aprender de conversaciones reales anonimizadas para proponer respuestas con el tono de Víctor y escalar los casos ambiguos o conflictivos.",
+      "estado": "sin empezar",
+      "depende_de": ["crear-y-mantener-anuncios"]
+    },
+    {
+      "id": "comprobar-productos-publicados",
+      "nombre": "comprobar qué productos están publicados",
+      "area": "Anuncios y ventas",
+      "resumen": "Actividad bloqueada para el MVP: no se ha autorizado una lectura web o pública de Wallapop/Vinted y tampoco se definió cómo comunicar o acreditar una comprobación manual. SANIA solo muestra el estado interno originado por Anuncio creado y las tareas pendientes; la visibilidad real queda marcada como no verificable.",
+      "estado": "en entrevista",
+      "depende_de": ["crear-y-mantener-anuncios"],
+      "carpeta": "actividades/comprobar-productos-publicados"
+    },
+    {
+      "id": "republicar-anuncios",
+      "nombre": "republicar anuncios con stock",
+      "area": "Anuncios y ventas",
+      "resumen": "Fase posterior: recomendar qué anuncios conviene reactivar. SANIA no reasignará ni republicará automáticamente; el comportamiento tras una cancelación permanece pendiente hasta disponer de un caso y un correo reales.",
+      "estado": "sin empezar",
+      "depende_de": ["comprobar-productos-publicados", "controlar-stock-y-trazabilidad"]
+    },
+    {
+      "id": "analizar-competencia-y-precios",
+      "nombre": "analizar la competencia y los precios",
+      "area": "Anuncios y ventas",
+      "resumen": "Fase posterior: comparar anuncios y recomendar precios; cualquier lectura o cambio directo dependerá de una vía autorizada.",
+      "estado": "sin empezar",
+      "depende_de": ["crear-y-mantener-anuncios"]
+    },
+    {
+      "id": "registrar-venta-confirmada",
+      "nombre": "registrar una venta confirmada",
+      "area": "Anuncios y ventas",
+      "resumen": "Primera versión: desde el primer correo reconocido, extraer del título la referencia visible de tres caracteres y reservar exactamente esa unidad una sola vez. Una referencia ausente, alterada, ambigua o ya no disponible abre conciliación sin aplicar FIFO automáticamente ni inventar stock.",
+      "estado": "en entrevista",
+      "depende_de": ["controlar-stock-y-trazabilidad"],
+      "carpeta": "actividades/registrar-venta-confirmada"
+    },
+    {
+      "id": "analizar-rendimiento-de-anuncios",
+      "nombre": "analizar cuánto tardan los anuncios en venderse",
+      "area": "Anuncios y ventas",
+      "resumen": "Fase posterior: medir el tiempo de venta de cada anuncio y comparar tendencias por producto y plataforma usando la referencia visible solo para identificar la unidad, sin automatizar acciones dentro de Wallapop o Vinted. El instante inicial de la medición sigue pendiente.",
+      "estado": "sin empezar",
+      "depende_de": ["crear-y-mantener-anuncios", "registrar-venta-confirmada"]
+    },
+    {
+      "id": "retirar-anuncios-sin-stock",
+      "nombre": "retirar anuncios cuando se agota el stock",
+      "area": "Anuncios y ventas",
+      "resumen": "Cuando el primer correo reserve una última unidad publicada en ambas plataformas, Telegram identifica la unidad y la otra plataforma y pide a Víctor retirar manualmente el anuncio alternativo. La prueba de retirada, el uso opcional del enlace y la cadencia de recordatorio siguen pendientes.",
+      "estado": "en entrevista",
+      "depende_de": ["registrar-venta-confirmada", "comprobar-productos-publicados"],
+      "carpeta": "actividades/retirar-anuncios-sin-stock"
+    },
+    {
+      "id": "preparar-paquete-vendido",
+      "nombre": "preparar el paquete vendido",
+      "area": "Preparación, envío y posventa",
+      "resumen": "Trabajo humano: Telegram facilita la venta, la referencia y el contenido final del anuncio; Víctor obtiene manualmente las instrucciones, el transportista y el QR desde la plataforma, comprueba que cualquier extra figure en la descripción final, reúne los artículos y prepara el paquete.",
+      "estado": "en entrevista",
+      "depende_de": ["registrar-venta-confirmada"],
+      "carpeta": "actividades/preparar-paquete-vendido"
+    },
+    {
+      "id": "entregar-paquete-al-transportista",
+      "nombre": "entregar el paquete al transportista",
+      "area": "Preparación, envío y posventa",
+      "resumen": "Víctor lleva el paquete al punto indicado y presenta manualmente el QR. SANIA solo podrá registrar la admisión desde una plantilla real aportada y validada; LIVE no incluyó correos de admisión de Correos/InPost. La confirmación manual alternativa y la prioridad ante un correo contradictorio siguen pendientes.",
+      "estado": "en entrevista",
+      "depende_de": ["preparar-paquete-vendido"],
+      "carpeta": "actividades/entregar-paquete-al-transportista"
+    },
+    {
+      "id": "seguir-envio-al-comprador",
+      "nombre": "seguir el envío al comprador",
+      "area": "Preparación, envío y posventa",
+      "resumen": "Primera versión: aplicar solo correos de plantillas reales validadas y mantener separados admisión, tránsito y entrega. LIVE aportó la plantilla de entrega de Wallapop, pero no corpus de admisión, tránsito, intento fallido o incidencia; los umbrales, recordatorios y ticket de extravío siguen pendientes.",
+      "estado": "en entrevista",
+      "depende_de": ["entregar-paquete-al-transportista"],
+      "carpeta": "actividades/seguir-envio-al-comprador"
+    },
+    {
+      "id": "cerrar-venta-entregada",
+      "nombre": "cerrar una venta entregada",
+      "area": "Preparación, envío y posventa",
+      "resumen": "Primera versión: mantener separadas entrega y cierre económico. Vinted cierra idempotentemente con el correo TX-COMPLETE y su número de transacción; el correo de entrega de Wallapop mantiene la venta abierta y el cierre queda bloqueado hasta decidir cómo recibe SANIA el movimiento final del monedero.",
+      "estado": "en entrevista",
+      "depende_de": ["seguir-envio-al-comprador"],
+      "carpeta": "actividades/cerrar-venta-entregada"
+    },
+    {
+      "id": "gestionar-devolucion",
+      "nombre": "gestionar una devolución",
+      "area": "Preparación, envío y posventa",
+      "resumen": "Fase posterior: mantener inicialmente la incidencia de forma manual y diseñar la detección, el seguimiento de vuelta y la reposición cuando exista un primer caso real con sus correos y estados verificados.",
+      "estado": "sin empezar",
+      "depende_de": ["registrar-venta-confirmada", "controlar-stock-y-trazabilidad"]
+    },
+    {
+      "id": "gestionar-paquete-extraviado",
+      "nombre": "gestionar un paquete extraviado",
+      "area": "Preparación, envío y posventa",
+      "resumen": "Pendiente para una fase posterior: primero hay que conocer y verificar el procedimiento real de Wallapop y Vinted.",
+      "estado": "sin empezar",
+      "depende_de": ["seguir-envio-al-comprador"]
+    },
+    {
+      "id": "registrar-movimientos-economicos",
+      "nombre": "registrar costes, ingresos y gastos",
+      "area": "Finanzas",
+      "resumen": "Primera versión: guardar el importe comunicado por la plataforma con su origen y mantenerlo provisional hasta el cierre verificable. El movimiento final de Vinted procede de TX-COMPLETE; la fuente del monedero de Wallapop, los costes completos y el pricing por márgenes siguen pendientes o en evolución.",
+      "estado": "en entrevista",
+      "depende_de": ["dar-entrada-al-almacen", "registrar-venta-confirmada"],
+      "carpeta": "actividades/registrar-movimientos-economicos"
+    },
+    {
+      "id": "calcular-beneficio-real",
+      "nombre": "calcular el beneficio real",
+      "area": "Finanzas",
+      "resumen": "Primera versión: no calcular un beneficio definitivo hasta que la venta tenga un cierre verificable y estén relacionados sus costes reales. Vinted puede cerrarse con TX-COMPLETE; Wallapop permanece provisional mientras SANIA no disponga de una fuente de cierre acordada, y comisiones, impuestos y repartos siguen abiertos.",
+      "estado": "en entrevista",
+      "depende_de": ["cerrar-venta-entregada", "registrar-movimientos-economicos"],
+      "carpeta": "actividades/calcular-beneficio-real"
+    },
+    {
+      "id": "consultar-resultados-del-negocio",
+      "nombre": "consultar los resultados del negocio",
+      "area": "Finanzas",
+      "resumen": "Actividad sin empezar: consultar ventas, stock, ingresos, gastos y resultados por periodo. El dispositivo, idioma, superficie real y dificultades de uso siguen pendientes en T10-Q06, y el beneficio no será definitivo mientras falten cierre o costes.",
+      "estado": "sin empezar",
+      "depende_de": ["calcular-beneficio-real"]
+    },
+    {
+      "id": "importar-historico-financiero",
+      "nombre": "importar el histórico financiero",
+      "area": "Finanzas",
+      "resumen": "Fase posterior: trasladar el Excel existente cuando el modelo se haya probado con operaciones nuevas.",
+      "estado": "sin empezar",
+      "depende_de": ["registrar-movimientos-economicos"]
+    },
+    {
+      "id": "atender-alertas-y-confirmaciones",
+      "nombre": "atender alertas y confirmaciones",
+      "area": "Dirección y control",
+      "resumen": "Primera versión: Telegram muestra decisiones, tareas físicas y excepciones ligadas a su operación. Incluye las botoneras confirmadas de recepción y publicación; el texto libre sigue aportando contexto y las cadencias, silencios, respuestas contradictorias y segundas confirmaciones permanecen pendientes.",
+      "estado": "en entrevista",
+      "carpeta": "actividades/atender-alertas-y-confirmaciones"
+    },
+    {
+      "id": "resolver-excepciones-operativas",
+      "nombre": "resolver excepciones operativas",
+      "area": "Dirección y control",
+      "resumen": "Mantener sin aplicar los hechos desconocidos, contradictorios o no conciliables y aplicar los bloqueos concretos confirmados, como una recepción No OK o el cierre pendiente de Wallapop. T02-Q08 y T08-Q04 dejan por decidir cuándo se crea un ticket y qué otras partes pueden continuar.",
+      "estado": "en entrevista",
+      "depende_de": ["atender-alertas-y-confirmaciones"],
+      "carpeta": "actividades/resolver-excepciones-operativas"
+    },
+    {
+      "id": "evaluar-cajas-estandar",
+      "nombre": "evaluar cajas estándar de embalaje",
+      "area": "Dirección y control",
+      "resumen": "Fase posterior: medir tamaños, coste, espacio y tiempo ahorrado para decidir si conviene comprar cajas ya preparadas.",
+      "estado": "sin empezar",
+      "depende_de": ["preparar-paquete-vendido"]
+    },
+    {
+      "id": "generar-videos-de-afiliacion",
+      "nombre": "generar vídeos de afiliación de AliExpress",
+      "area": "Nuevas líneas de ingresos",
+      "resumen": "Fase futura: producir y medir contenido automático que dirija a enlaces de afiliado de AliExpress.",
+      "estado": "sin empezar",
+      "depende_de": ["seleccionar-productos-y-enlaces"]
+    },
+    {
+      "id": "crear-canal-de-desarrollo-con-ia",
+      "nombre": "crear un canal de desarrollo con IA",
+      "area": "Nuevas líneas de ingresos",
+      "resumen": "Fase futura: aplicar la experiencia de producción automática para publicar contenido propio y construir reputación.",
+      "estado": "sin empezar",
+      "depende_de": ["generar-videos-de-afiliacion"]
+    },
+    {
+      "id": "vender-formacion-y-metodo",
+      "nombre": "vender formación y un método propio",
+      "area": "Nuevas líneas de ingresos",
+      "resumen": "Fase futura: convertir la experiencia y la reputación demostradas en un curso de automatización y un método de desarrollo con IA.",
+      "estado": "sin empezar",
+      "depende_de": ["crear-canal-de-desarrollo-con-ia"]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "línea de compra de AliExpress",
+      "guarda": [
+        "identificador del pedido cuando sea observable e identificador de línea solo si una plantilla real demuestra que es estable",
+        "producto y variante únicamente cuando puedan demostrarse",
+        "cantidad comprada solo cuando esté presente en una plantilla validada",
+        "total final pagado solo cuando esté presente y se conozca su significado",
+        "correo de origen"
+      ],
+      "origen": "futuro corpus real de correos AliExpress; LIVE no aportó ninguna plantilla"
+    },
+    {
+      "cosa": "unidad de inventario",
+      "guarda": [
+        "referencia alfanumérica única de tres caracteres",
+        "pedido, paquete y línea de origen únicamente cuando sean identificables y demostrables",
+        "clasificación Stock para venta o Compra personal",
+        "situación física",
+        "coste de adquisición original",
+        "coste actual",
+        "estado disponible, publicada, reservada o afectada por incidencia",
+        "relación con tareas de publicación, anuncios y venta"
+      ],
+      "origen": "contenido físicamente confirmado mediante Todo correcto y clasificación confirmada del producto; la relación con pedido, paquete o línea se conserva solo cuando pueda demostrarse"
+    },
+    {
+      "cosa": "historial de la unidad",
+      "guarda": [
+        "fecha y hora",
+        "actor",
+        "origen automático o manual",
+        "campo modificado",
+        "valor anterior y valor nuevo",
+        "comentario"
+      ],
+      "origen": "cada acción automática o corrección hecha desde SANIA"
+    },
+    {
+      "cosa": "producto y variante",
+      "guarda": [
+        "nombre y código interno",
+        "variante relevante",
+        "clasificación aprendida Stock para venta o Compra personal y su historial de corrección",
+        "datos editoriales vigentes para anuncios",
+        "enlaces y vendedores de compra separados de la identidad del producto"
+      ],
+      "origen": "correos de AliExpress y datos confirmados por Víctor"
+    },
+    {
+      "cosa": "pedido y paquete de AliExpress",
+      "guarda": [
+        "identificadores externos",
+        "líneas incluidas",
+        "estado operativo",
+        "eventos originales de seguimiento",
+        "correos de origen"
+      ],
+      "origen": "correos transaccionales de AliExpress"
+    },
+    {
+      "cosa": "anuncio",
+      "guarda": [
+        "plataforma",
+        "URL o identificador opcional cuando se conserve por navegación o auditoría",
+        "producto y variante",
+        "referencia visible de tres caracteres de la unidad",
+        "título y descripción finales usados",
+        "estado independiente por plataforma",
+        "tarea y confirmación Anuncio creado que originaron el estado",
+        "fecha de publicación cuando se confirme",
+        "fecha de venta o retirada cuando procedió",
+        "tiempo hasta la venta y origen del momento inicial usado"
+      ],
+      "origen": "tarea de publicación ligada a unidad y plataforma y confirmación humana Anuncio creado; no depende de lectura web"
+    },
+    {
+      "cosa": "venta",
+      "guarda": [
+        "plataforma e identificadores externos",
+        "anuncio",
+        "título observado y referencia de tres caracteres extraída",
+        "producto y variante",
+        "referencia reservada",
+        "precio final provisional",
+        "número de transacción de Vinted cuando exista",
+        "evidencia de entrega separada de la evidencia de cierre",
+        "estado y fechas",
+        "correo de origen"
+      ],
+      "origen": "correos transaccionales de Wallapop y Vinted"
+    },
+    {
+      "cosa": "envío",
+      "guarda": [
+        "venta",
+        "transportista",
+        "seguimiento",
+        "fecha límite",
+        "QR, etiqueta o enlace consultado manualmente cuando esté disponible; el QR es sensible y temporal y su retención sigue pendiente",
+        "estado y eventos de seguimiento"
+      ],
+      "origen": "correos de la plataforma y del transportista y acciones físicas de Víctor; los casos admitidos de confirmación manual siguen pendientes"
+    },
+    {
+      "cosa": "movimiento económico",
+      "guarda": [
+        "operación relacionada",
+        "tipo",
+        "importe",
+        "fecha",
+        "estado provisional o definitivo",
+        "origen"
+      ],
+      "origen": "compras, precios comunicados en correos, TX-COMPLETE de Vinted y, cuando se acuerde una fuente, movimientos del monedero Wallapop; gastos, reembolsos y correcciones requieren evidencia"
+    },
+    {
+      "cosa": "ticket operativo",
+      "guarda": [
+        "tipo y estado",
+        "prioridad",
+        "entidad relacionada",
+        "origen y descripción",
+        "historial",
+        "responsable",
+        "resolución y recordatorios"
+      ],
+      "origen": "incidencias y bloqueos para los que un flujo confirmado decide crear un ticket; la regla general para hechos dudosos sigue pendiente"
+    },
+    {
+      "cosa": "evento externo",
+      "guarda": [
+        "plataforma y remitente",
+        "identificadores del mensaje y del negocio",
+        "fecha y hora",
+        "datos extraídos",
+        "copia del contenido de origen",
+        "resultado aplicado, dejado sin aplicar o convertido en ticket cuando exista una regla confirmada"
+      ],
+      "origen": "correos transaccionales y respuestas estructuradas de Telegram"
+    }
+  ],
+  "volumen": [
+    {
+      "que": "usuarios iniciales",
+      "cuanto": "1, Víctor"
+    },
+    {
+      "que": "trabajo manual que se quiere eliminar",
+      "cuanto": "aproximadamente dos horas al día dedicadas al registro de pedidos, almacén, ventas y beneficios"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "una cuenta de Gmail de solo lectura",
+      "para": "recibir y conservar los correos transaccionales de AliExpress, Wallapop, Vinted, Correos e InPost sin modificar el buzón"
+    },
+    {
+      "con": "Telegram",
+      "para": "pedir comprobaciones físicas, entregar tareas de publicación, enviar imágenes bajo demanda, recoger botones ligados a cada operación y mantener visibles decisiones e incidencias sin cadencias inventadas"
+    },
+    {
+      "con": "Excel costes_aliexpress.xlsx",
+      "para": "servir como referencia del cálculo y del histórico actual hasta que se diseñe su importación"
+    },
+    {
+      "con": "fuente de cierre de Wallapop (pendiente)",
+      "para": "resolver cómo llega a SANIA el movimiento final del monedero; no existe integración autorizada ni el correo de entrega puede sustituirla"
+    }
+  ],
+  "superficie": {
+    "puntos": [
+      {
+        "nombre": "Telegram de SANIA",
+        "quien": ["Víctor"],
+        "llega": "mediante Telegram; el dispositivo real, el idioma y las dificultades de uso siguen pendientes en T10-Q06",
+        "cuando": "SANIA necesitó una confirmación física, una decisión o avisar de una excepción",
+        "ve": "el contexto necesario para decidir, la operación afectada, el motivo y las acciones disponibles",
+        "puede": [
+          "confirmar un hecho físico",
+          "resolver una decisión estructurada",
+          "pedir las imágenes de una tarea de publicación",
+          "confirmar Anuncio creado para la unidad y plataforma de ese mensaje",
+          "aplazar o cancelar una sugerencia de publicación",
+          "abrir o completar un ticket",
+          "consultar el estado de una tarea"
+        ],
+        "nunca": [
+          "modificar datos operativos directamente mediante texto libre",
+          "dar por resuelta una excepción con impacto en stock o dinero sin la confirmación exigida",
+          "ser la única fuente donde se conserva una decisión"
+        ]
+      },
+      {
+        "nombre": "Consulta general de SANIA",
+        "quien": ["Víctor"],
+        "llega": "mediante una superficie todavía por definir; móvil, ordenador de casa y ordenador de trabajo son antecedentes no confirmados por LIVE",
+        "cuando": "quiso consultar pedidos, stock, ventas, envíos, tickets o resultados",
+        "ve": "el estado actual y la historia que explica cada cambio",
+        "puede": [
+          "consultar operaciones",
+          "revisar excepciones",
+          "solicitar correcciones admitidas por el flujo y explicar el motivo",
+          "consultar resultados"
+        ],
+        "nunca": [
+          "borrar silenciosamente el historial",
+          "editar directamente la fuente de datos",
+          "actuar automáticamente dentro de Wallapop o Vinted"
+        ]
+      }
+    ],
+    "permisos": {
+      "acciones": [
+        "consultar operaciones",
+        "confirmar hechos físicos",
+        "resolver decisiones",
+        "pedir imágenes y confirmar una publicación manual",
+        "abrir y completar tickets",
+        "solicitar correcciones admitidas por el flujo y explicar el motivo",
+        "consultar resultados"
+      ],
+      "roles": [
+        {
+          "rol": "Víctor",
+          "permitidas": [
+            "consultar operaciones",
+            "confirmar hechos físicos",
+            "resolver decisiones",
+            "pedir imágenes y confirmar una publicación manual",
+            "abrir y completar tickets",
+            "solicitar correcciones admitidas por el flujo y explicar el motivo",
+            "consultar resultados"
+          ]
+        }
+      ]
+    },
+    "avisos": [
+      {
+        "quien": "Víctor",
+        "que": "una confirmación, decisión o excepción necesitó su intervención",
+        "canal": "Telegram",
+        "cuando": "cuando un hecho concreto requirió intervención; cualquier repetición quedó condicionada a una cadencia aún por definir para esa actividad"
+      }
+    ],
+    "condiciones": [
+      "[T10-Q06] No se documentaron los dispositivos, el idioma ni las dificultades de uso reales; las superficies descritas son conceptuales hasta validarlas.",
+      "[T07-Q02 / D-LIVE-010] SANIA registró hechos de correo y preparó tareas; Víctor confirmó hechos físicos y ejecutó todas las acciones dentro de Wallapop y Vinted.",
+      "El texto libre de Telegram aportó contexto o abrió un ticket, pero no cambió por sí solo stock ni dinero.",
+      "Los datos incompletos dejaron una pregunta o incidencia pendiente sin inventar valores.",
+      "Cualquier corrección conservó el valor anterior y el motivo.",
+      "Hasta que una matriz acordada permitiera expresamente una acción automática, SANIA trató como propuesta o intervención obligatoria cualquier decisión sensible sobre compras, margen, stock, mensajes ambiguos, bloqueos de plataforma o situaciones conflictivas."
+    ]
+  },
+  "calidad": [
+    {
+      "id": "Q-5",
+      "criterio": "Un correo duplicado, repetido o recibido fuera de orden aplicó como máximo una vez el mismo cambio de pedido, stock, venta, envío o dinero."
+    },
+    {
+      "id": "Q-6",
+      "criterio": "El 100 % de los cambios de stock, estado y dinero conservó el hecho de origen, la fecha, el actor y el antes y el después cuando hubo una corrección."
+    },
+    {
+      "id": "Q-7",
+      "criterio": "Ningún flujo creó stock negativo ni una referencia ficticia, y ningún resultado económico se declaró definitivo sin relacionar la venta, la unidad y los costes reales respaldados por evidencia."
+    },
+    {
+      "id": "Q-8",
+      "criterio": "T10-Q04 mantiene pendiente la contingencia y recuperación. Los objetivos heredados del 29/07 —pérdida máxima de 24 horas y recuperación inferior a 4 horas en prototipo, PostgreSQL cada 6 horas y archivos cada noche con operaciones reales— se conservan como antecedente que debe reconfirmarse, no como criterio vigente demostrado por LIVE."
+    },
+    {
+      "id": "Q-LIVE-1",
+      "criterio": "Todo título preparado para una unidad anunciada terminó con su referencia alfanumérica de tres caracteres y cada confirmación Anuncio creado quedó ligada a una única unidad y plataforma."
+    },
+    {
+      "id": "Q-LIVE-2",
+      "criterio": "Ningún tracking entregado creó stock antes de Todo correcto y ningún correo de entrega de Wallapop cerró por sí solo la venta o convirtió el ingreso en definitivo."
+    },
+    {
+      "id": "Q-LIVE-3",
+      "criterio": "Ninguna acción creó, editó, retiró, reactivó o publicó automáticamente un anuncio de Wallapop o Vinted; SANIA solo preparó información, registró hechos y pidió acciones humanas."
+    }
+  ],
+  "fuera": [
+    "Automatizar la atención de consultas, la negociación o el cierre dentro de Wallapop y Vinted: Víctor seguirá haciéndolo manualmente mientras no exista una vía autorizada.",
+    "Primera versión: usar scraping o automatización de navegador para crear, editar, republicar o cambiar precios en Wallapop y Vinted.",
+    "Dar por resuelta la identidad física suponiendo que se colocarán o que se descartarán etiquetas QR o de código de barras; esa solución permanece abierta.",
+    "Primera versión: registrar estanterías, cajas o una ubicación física exacta de cada unidad; Víctor todavía no necesita localizar productos dentro de un almacén.",
+    "Primera versión: abrir, negociar o cerrar automáticamente disputas dentro de AliExpress. El actor, el flujo manual y la forma en que SANIA seguirá el caso permanecen pendientes porque LIVE no recuperó ese detalle.",
+    "Primera versión: extraer o analizar conversaciones de Wallapop o Vinted para estudiar la negociación o decidir qué unidad se vendió.",
+    "Primera versión: leer perfiles, páginas o monederos de Wallapop o Vinted hasta que se autorice expresamente una fuente y se definan sus límites.",
+    "Primera versión: automatizar devoluciones de compradores antes de observar un caso real y sus correos.",
+    "Reasignar o republicar automáticamente anuncios después de una venta.",
+    "Primera versión: resolver automáticamente un paquete extraviado antes de conocer y verificar el procedimiento real de cada plataforma.",
+    "Primera versión: generar y rotar variantes de imágenes, títulos o descripciones, negociar ofertas o aplicar pricing avanzado antes de definir reglas, costes, métricas y condiciones de plataforma."
+  ],
+  "preguntas": [
+    "¿Cómo recibirá SANIA el hecho final de Wallapop: confirmación manual de Víctor o una fuente adicional de lectura expresamente autorizada?",
+    "¿Qué correos o señales de Wallapop y Vinted permiten reconocer una cancelación y devolver la misma referencia al stock?",
+    "¿Cómo se representará una venta real con varias unidades o productos y cómo se repartirá su importe, aunque todo extra deba figurar antes en la descripción final del anuncio?",
+    "¿Qué correos, estados y movimientos económicos produce la primera devolución real de un comprador?",
+    "¿Cómo gestionan realmente Wallapop y Vinted un paquete extraviado?",
+    "¿Qué alfabeto usa la referencia de tres caracteres, cómo se evitan colisiones, cuándo puede reutilizarse y qué ocurre al agotarse el espacio?",
+    "¿Cómo se mantiene la identidad exacta de varias unidades físicamente idénticas si no tienen etiqueta ni rasgo diferenciador?",
+    "¿Se elimina por completo la URL del anuncio o se conserva opcionalmente para navegación o auditoría, y dejan de usarse los parámetros b, i y r de Wallapop?",
+    "¿Las tareas de publicación se crean por cada unidad o existe alguna agrupación por producto cuando llegan varias unidades iguales?",
+    "¿Con qué precisión se guardará el coste unitario cuando el total pagado no sea divisible exactamente entre la cantidad?",
+    "¿El precio inicial indicado por Víctor será común a Wallapop y Vinted o podrá ser distinto en cada plataforma?",
+    "¿Se autoriza alguna lectura web pública sin sesión o el MVP queda limitado por completo a Gmail y confirmaciones de Telegram?",
+    "¿Qué decisiones concretas serán automáticas, cuáles serán propuestas que Víctor debe aprobar y cuáles exigirán siempre intervención humana, y cuáles de ellas necesitan una segunda confirmación?",
+    "¿Qué debe ocurrir cuando Víctor no responde, responde tarde o da dos respuestas contradictorias?",
+    "¿Qué estados, prioridades, responsables y plazos tendrá un ticket operativo?",
+    "¿Qué plantillas reales de correo deben formar el conjunto mínimo de pruebas de cada plataforma y transportista?",
+    "¿Para qué tipos concretos de correo se permitirá un segundo intento con IA, qué datos podrá proponer y cuándo deberá dejar el formato como desconocido, sin aplicar o abrir un ticket?",
+    "¿Desde qué instante se medirá el tiempo de venta de un anuncio: la confirmación Anuncio creado, la publicación efectiva u otro hecho?",
+    "[T10-Q03 / T10-Q04] ¿Qué datos son delicados, quién no debe verlos y qué pasaría si SANIA no estuviera disponible durante medio día?",
+    "[T10-Q01 / T10-Q02] ¿Cuántos correos, pedidos, unidades, ventas y decisiones procesa hoy el negocio y qué ocurre si dos ventas intentan reservar a la vez la misma última unidad?",
+    "[T10-Q05] ¿Qué tiempos de espera son tolerables para cada acción y canal?",
+    "¿Qué fórmula y costes intervienen en el precio y el beneficio, cómo se reparten comisiones, portes, embalajes e impuestos y qué correcciones requieren segunda confirmación?"
+  ]
+}

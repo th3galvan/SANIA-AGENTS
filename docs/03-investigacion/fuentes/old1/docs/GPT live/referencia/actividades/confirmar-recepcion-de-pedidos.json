@@ -1,0 +1,77 @@
+{
+  "version": 2,
+  "proyecto": "sania-confirmar-recepcion-de-pedidos",
+  "titulo": "Confirmar la recepción de pedidos",
+  "descripcion": "Esta actividad pedirá a Víctor la comprobación física que un correo de entrega no puede demostrar. Cada línea confirmada continuará hacia el almacén y cada incidencia quedará separada.",
+  "contrato": {
+    "frase": "Cuando el seguimiento indicó que un paquete había llegado, Víctor necesitó confirmar por Telegram qué líneas recibió realmente para que SANIA no creara stock inexistente."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "recibió, contó y revisó físicamente cada producto"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "confirmar-recepcion-por-linea",
+      "titulo": "Víctor confirmó o señaló una incidencia por cada línea",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA reconoció que el seguimiento comunicó la entrega de un paquete."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mostró por Telegram cada línea con producto, variante y cantidad y los botones Confirmar e Incidencia."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor contó y revisó físicamente las unidades de cada línea."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿La línea estuvo completa y correcta?",
+          "sigue": "sí, quedó confirmada",
+          "rama": {
+            "etiqueta": "no, hubo una incidencia",
+            "pasos": [
+              {
+                "tipo": "humano",
+                "quien": "Víctor",
+                "texto": "Víctor indicó qué faltó o llegó defectuoso."
+              },
+              {
+                "tipo": "estatico",
+                "texto": "SANIA abrió una incidencia para las unidades afectadas sin bloquear las líneas correctas."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA envió únicamente las líneas confirmadas a la actividad de entrada al almacén."
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "mostrar cada línea y recoger la confirmación física o la incidencia"
+    }
+  ],
+  "fuera": [
+    "Dar por recibido un paquete únicamente porque lo dijo el seguimiento.",
+    "Crear unidades disponibles antes de la revisión de Víctor."
+  ],
+  "preguntas": [
+    "¿Qué debe ocurrir si Víctor no responde a la confirmación durante un día?",
+    "¿Cómo se corrige una confirmación equivocada sin perder la historia?",
+    "¿Qué pasó la última vez que un paquete llegó dividido, incompleto o con una variante distinta?",
+    "¿Qué datos necesita ver Víctor para distinguir dos líneas parecidas?"
+  ]
+}

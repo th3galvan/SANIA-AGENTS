@@ -1,0 +1,151 @@
+{
+  "version": 2,
+  "proyecto": "sania-atender-alertas-y-confirmaciones",
+  "titulo": "Atender alertas y confirmaciones",
+  "descripcion": "Telegram será la entrada móvil para decisiones, confirmaciones físicas y avisos. Los mensajes estructurados conservarán su relación con la operación; el texto libre solo aportará contexto o abrirá un ticket.",
+  "contrato": {
+    "frase": "Cuando SANIA necesitó a Víctor, él necesitó recibir el contexto suficiente y responder desde Telegram sin que un mensaje ambiguo cambiara stock o dinero."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "recibió avisos y tomó las decisiones que requerían juicio o comprobación física"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "clasificar-decision-sensible",
+      "titulo": "SANIA escaló una decisión según la autonomía acordada",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA detectó una decisión sobre una compra relevante, el margen, el stock, un mensaje ambiguo, un bloqueo de plataforma o una situación potencialmente conflictiva."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Qué nivel de autonomía tenía esa decisión en la matriz acordada?",
+          "ramas": [
+            {
+              "etiqueta": "automática de forma expresa",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA aplicó la acción permitida y conservó el motivo, la operación y el resultado."
+                }
+              ]
+            },
+            {
+              "etiqueta": "propuesta con aprobación",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA envió la propuesta y su contexto por Telegram y esperó la aprobación de Víctor antes de actuar."
+                }
+              ]
+            },
+            {
+              "etiqueta": "intervención humana obligatoria",
+              "pasos": [
+                {
+                  "tipo": "estatico",
+                  "texto": "SANIA detuvo la acción, avisó a Víctor y mantuvo el caso pendiente hasta recibir una respuesta estructurada."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resolver-decision-telegram",
+      "titulo": "Víctor respondió una decisión estructurada",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA envió por Telegram el contexto, la operación afectada y los botones o campos permitidos."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor respondió mediante la opción estructurada correspondiente."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿La acción tuvo impacto crítico en un hecho físico, stock o dinero?",
+          "sigue": "no",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA pidió la segunda confirmación acordada antes de aplicar el cambio."
+              },
+              {
+                "tipo": "humano",
+                "quien": "Víctor",
+                "texto": "Víctor confirmó o canceló la acción crítica."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA guardó la respuesta y su relación con la decisión fuera de Telegram."
+        }
+      ]
+    },
+    {
+      "id": "recibir-texto-libre",
+      "titulo": "Un texto libre no cambió datos directamente",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor envió un texto libre con contexto, una duda o una propuesta."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA añadió el contexto o abrió un ticket, pero no modificó directamente stock, estados ni dinero."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "decisión operativa",
+      "guarda": [
+        "tipo y operación relacionada",
+        "nivel de autonomía: automática, propuesta o intervención obligatoria",
+        "contexto y opciones permitidas",
+        "respuesta y actor",
+        "fechas, recordatorios y resultado",
+        "historial de confirmaciones"
+      ],
+      "origen": "una operación que necesitó una regla, una aprobación o una intervención de Víctor"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "mostrar avisos, decisiones, botones, campos y recordatorios"
+    }
+  ],
+  "fuera": [
+    "Usar Telegram como única fuente de verdad.",
+    "Permitir que el texto libre modifique directamente datos operativos.",
+    "Ejecutar una decisión sensible que la matriz no hubiera autorizado expresamente como automática.",
+    "Enviar informes avanzados semanales en la primera versión."
+  ],
+  "preguntas": [
+    "¿Quién puede responder al bot y cómo se reconoce que es Víctor?",
+    "¿Qué decisiones serán automáticas, cuáles se propondrán para aprobación y cuáles exigirán siempre intervención humana?",
+    "¿Qué propuestas aprobadas requieren además una segunda confirmación antes de afectar stock o dinero?",
+    "¿Qué ocurre si no responde, responde tarde o responde dos veces de forma contradictoria?",
+    "¿Qué cadencia necesita cada tipo de decisión sin generar demasiados avisos?"
+  ]
+}

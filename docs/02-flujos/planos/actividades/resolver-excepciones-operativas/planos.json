@@ -1,0 +1,185 @@
+{
+  "version": 2,
+  "proyecto": "sania-resolver-excepciones-operativas",
+  "titulo": "Resolver excepciones operativas",
+  "descripcion": "Un hecho desconocido, ambiguo, contradictorio o imposible de relacionar quedará sin aplicar. T02-Q08 no decidió si además abre un ticket o permanece solo pendiente de revisión. Los bloqueos concretos confirmados, como la recepción No OK y el cierre de Wallapop sin fuente final, se mantienen sin inventar una regla general.",
+  "definicion": {
+    "estado": "borrador",
+    "modo": "mixto"
+  },
+  "cobertura": {
+    "estado": "no verificado",
+    "evidencias": [],
+    "pruebas": []
+  },
+  "contrato": {
+    "frase": "Cuando SANIA no pudo continuar con seguridad, Víctor necesitó conservar la evidencia y el trabajo correcto, ver qué operación estaba bloqueada y resolverla sin que el sistema inventara datos o reglas.",
+    "exito": [
+      "Un correo desconocido o contradictorio no cambió stock, envío, cierre ni dinero.",
+      "Cuando un caso confirmado produjo una incidencia o ticket, conservó evidencia, operación afectada e historial sin borrar los hechos anteriores.",
+      "Solo se aplicaron continuaciones o bloqueos concretamente confirmados; la matriz general de T08-Q04 siguió pendiente.",
+      "Wallapop permaneció bloqueado para cierre hasta decidir una fuente final permitida."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias"
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-78",
+      "nombre": "Un hecho externo se aplica una sola vez",
+      "texto": "Un duplicado reconocido no repite sus efectos; si no puede determinarse que sea el mismo hecho, queda sin aplicar y T02-Q08 decidirá si además se abre un ticket. [Migración: identificador histórico G-LIVE-001; referencias históricas: T02-Q05]"
+    },
+    {
+      "id": "G-79",
+      "nombre": "Una recepción no correcta no crea stock",
+      "texto": "No OK/Abrir disputa bloquea la entrada y crea una incidencia sin inventar unidades. [Migración: identificador histórico G-LIVE-004; referencias históricas: D-LIVE-018, T08-Q04]"
+    },
+    {
+      "id": "G-80",
+      "nombre": "La entrega de Wallapop no resuelve el cierre",
+      "texto": "La venta permanece abierta y el bloqueo continúa hasta que exista una fuente final acordada; su representación como ticket no está decidida. [Migración: identificador histórico G-LIVE-012; referencias históricas: D-LIVE-005, X-LIVE-005]"
+    },
+    {
+      "id": "G-81",
+      "nombre": "No se autoriza lectura web por hipótesis",
+      "texto": "La mención a Playwright contradijo la limitación posterior a correo; en el MVP no se usa para resolver automáticamente tickets ni el cierre de Wallapop. [Migración: identificador histórico X-LIVE-007]"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "dejar-hecho-no-seguro-sin-aplicar",
+      "titulo": "Un hecho dudoso quedó sin aplicar",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA detectó un correo desconocido, un identificador insuficiente, una relación ambigua, una contradicción o un dato económico no demostrable."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó el origen y dejó el hecho dudoso sin aplicar ni inventar el dato ausente. Su disposición como ticket o como pendiente de revisión siguió abierta en T02-Q08."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA aplicó únicamente los bloqueos y continuaciones ya confirmados para el caso concreto; no supuso que todo lo demás pudiera continuar porque T08-Q04 aún requiere una matriz completa."
+        },
+        {
+          "tipo": "humano",
+          "texto": "Cuando existió un mecanismo de revisión confirmado, Víctor pudo aportar contexto; si no existía una regla aplicable, el hecho permaneció sin aplicar.",
+          "quien": "Víctor"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "Cuando una resolución válida pudo aplicarse, SANIA guardó actor, fecha, antes, después y motivo sin borrar el evento original."
+        }
+      ]
+    },
+    {
+      "id": "bloquear-cierre-wallapop",
+      "titulo": "Wallapop quedó bloqueado después de la entrega",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "Wallapop envió el correo de paquete entregado, que todavía deja el dinero pendiente del OK del comprador."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA registró la entrega, mantuvo abierta la venta y mostró el cierre como bloqueo conocido; no dio por decidido que ese bloqueo deba representarse como ticket."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El bloqueo explicó que el hecho final aparece como movimiento de venta en el monedero, pero no existe correo final ni se ha decidido una fuente manual o automática permitida."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA no cerró la venta, no creó el movimiento definitivo y no calculó beneficio final."
+        }
+      ]
+    },
+    {
+      "id": "bloquear-stock-por-recepcion-no-correcta",
+      "titulo": "Una recepción no correcta quedó en incidencia",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "texto": "Después de la comprobación física, Víctor indicó No OK/Abrir disputa porque producto o cantidades no coincidían.",
+          "quien": "Víctor"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA no creó unidades de stock y abrió una incidencia vinculada al pedido y paquete."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "La disputa y sus posibles reembolsos, sustituciones o devoluciones quedaron pendientes de definición y no se resolvieron por hipótesis."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "EP-33",
+      "texto": "El correo real de Wallapop de paquete entregado no fue un cierre; el movimiento final solo se observó en el historial del monedero, fuente que SANIA aún no puede recibir. [Migración: referencias históricas: E-LIVE-008, E-LIVE-009, T06-Q02, X-LIVE-005]"
+    },
+    {
+      "id": "EP-34",
+      "texto": "Los productos defectuosos, faltantes o equivocados no cuentan con un caso real; Víctor indicó hipotéticamente que abriría disputa, por lo que no se debe inventar el flujo de resolución. [Migración: referencias históricas: T03-Q01, T11-Q03]"
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "ticket operativo",
+      "guarda": [
+        "tipo y estado sin inventar un catálogo no acordado",
+        "operación y transición afectadas",
+        "origen y evidencia",
+        "descripción del dato desconocido, ambiguo o contradictorio",
+        "bloqueo concreto confirmado y efectos conocidos; continuaciones generales pendientes de T08-Q04",
+        "responsable inicial Víctor",
+        "historial, contexto y resolución",
+        "antes, después, actor, fecha y motivo cuando se aplique una corrección",
+        "recordatorios solo cuando exista una cadencia definida"
+      ],
+      "origen": "casos para los que un flujo confirmado decide crear una incidencia o ticket; no todo hecho dudoso lo crea automáticamente"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "avisar a Víctor y recoger contexto estructurado o texto libre sin aplicar automáticamente una interpretación ambigua"
+    },
+    {
+      "con": "Gmail",
+      "para": "conservar el correo que originó la excepción"
+    }
+  ],
+  "fuera": [
+    "Ocultar una excepción inventando un dato, una transición o una fuente.",
+    "Aplicar una regla general de detener o continuar actividades sin la matriz pendiente de T08-Q04.",
+    "Borrar el origen o el historial después de resolver.",
+    "Cerrar Wallapop mediante correo de entrega, precio inicial o un OK manual todavía no acordado.",
+    "Usar Playwright o lectura web para resolver el bloqueo sin una autorización explícita.",
+    "Asignar prioridades, estados, plazos o cadencias de ticket que aún no fueron definidos.",
+    "Implementar devoluciones, extravíos o resoluciones de disputa a partir de respuestas hipotéticas."
+  ],
+  "preguntas": [
+    "[T02-Q08] ¿Qué regla general distinguirá correo desconocido, lectura dudosa y contradicción, y cuándo basta con dejarlo sin aplicar?",
+    "[T05-Q06] ¿Qué prioridad tendrá una confirmación manual si después llega un correo contradictorio?",
+    "[T06-Q02, X-LIVE-005] ¿Qué fuente permitirá resolver el bloqueo de cierre de Wallapop?",
+    "[T08-Q01] ¿Qué estados y prioridades tendrá un ticket?",
+    "[T08-Q02] ¿Cuándo podrá cambiar el responsable inicial, que hoy es Víctor?",
+    "[T08-Q03, T07-Q05] ¿Qué plazos, recordatorios y escalados tendrá cada clase de ticket?",
+    "[T08-Q04] ¿Qué excepciones bloquean una transición y cuáles permiten continuar el resto?",
+    "[T10-Q02] ¿Cómo se concilian dos hechos casi simultáneos o contradictorios sobre la misma operación?",
+    "[T11-Q01, T11-Q02, T11-Q03] ¿Qué primeros casos reales permitirán modelar devoluciones y extravíos fuera del MVP?"
+  ]
+}

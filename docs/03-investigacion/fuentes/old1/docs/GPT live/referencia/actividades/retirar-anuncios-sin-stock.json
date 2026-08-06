@@ -1,0 +1,58 @@
+{
+  "version": 2,
+  "proyecto": "sania-retirar-anuncios-sin-stock",
+  "titulo": "Retirar anuncios cuando se agota el stock",
+  "descripcion": "Cuando la última unidad compatible deje de estar disponible, SANIA avisará a Víctor de los anuncios restantes. La retirada seguirá siendo manual y el aviso diario continuará hasta que Víctor confirme que terminó.",
+  "contrato": {
+    "frase": "Cuando la última unidad quedó reservada o vendida, Víctor necesitó conocer y retirar los demás anuncios para no volver a ofrecer un producto sin stock."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "retiró manualmente los anuncios y confirmó la tarea"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "retirar-anuncios-restantes",
+      "titulo": "Víctor retiró los anuncios después de agotar el stock",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA comprobó que la reserva dejó cero unidades compatibles disponibles."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA envió por Telegram los enlaces de los anuncios restantes que Víctor debía retirar."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor retiró manualmente los anuncios en cada plataforma."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA repitió el aviso una vez al día hasta que Víctor pulsó Ya eliminado."
+        }
+      ]
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "entregar los enlaces, recordar la tarea y recoger Ya eliminado"
+    }
+  ],
+  "fuera": [
+    "Eliminar o pausar automáticamente anuncios.",
+    "Reasignar o republicar automáticamente un anuncio.",
+    "Ocultar una falta de stock mediante una referencia ficticia."
+  ],
+  "preguntas": [
+    "¿Qué ocurrió la última vez que un producto se vendió a la vez en dos plataformas?",
+    "¿Qué debe ocurrir con la tarea si la venta se cancela y la misma unidad vuelve a estar disponible?",
+    "¿Cómo comprueba Víctor que retiró todos los anuncios relacionados?",
+    "¿Qué hora resulta útil para el recordatorio diario?"
+  ]
+}

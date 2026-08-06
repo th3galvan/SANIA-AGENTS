@@ -1,0 +1,77 @@
+{
+  "version": 2,
+  "proyecto": "sania-crear-y-mantener-anuncios",
+  "titulo": "Crear y mantener anuncios",
+  "descripcion": "Víctor seguirá publicando y modificando los anuncios manualmente. SANIA conservará el enlace que Víctor envíe por Telegram y lo relacionará con una referencia interna sin escribir esa referencia en la plataforma.",
+  "contrato": {
+    "frase": "Cuando Víctor publicó o modificó un anuncio, necesitó vincularlo con la unidad correcta para que una venta posterior pudiera reservar primero esa referencia."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "creó y modificó manualmente los anuncios en Wallapop y Vinted"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "vincular-anuncio-manual",
+      "titulo": "Víctor vinculó un anuncio con una unidad",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor creó o modificó manualmente el anuncio en Wallapop o Vinted."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor envió a SANIA por Telegram el enlace del anuncio."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA relacionó la plataforma y el enlace con el producto, la variante y la referencia elegida, y guardó cuándo recibió el enlace y la fecha de publicación cuando estuvo disponible."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó la referencia únicamente dentro de sus datos y no la escribió en el anuncio público."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "anuncio",
+      "guarda": [
+        "plataforma",
+        "URL o identificador",
+        "producto y variante",
+        "referencia vinculada",
+        "estado conocido",
+        "fecha de vinculación a SANIA",
+        "fecha de publicación cuando estuvo disponible",
+        "fecha de venta o retirada",
+        "tiempo hasta la venta y origen del momento inicial usado"
+      ],
+      "origen": "enlace enviado por Víctor"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "recibir el enlace y elegir la unidad que quedó vinculada"
+    }
+  ],
+  "fuera": [
+    "Crear, editar o republicar automáticamente el anuncio.",
+    "Responder o negociar con compradores.",
+    "Escribir u ocultar la referencia interna dentro del texto público."
+  ],
+  "preguntas": [
+    "¿Cómo elige Víctor la referencia cuando publica varias unidades iguales?",
+    "¿Un anuncio puede representar varias unidades o siempre una sola referencia?",
+    "¿Qué precios distintos necesita conservar por plataforma?",
+    "¿Desde qué instante empieza a contar el tiempo hasta la venta: publicación, envío del enlace a SANIA o primera observación pública?",
+    "¿Qué ocurrió la última vez que un enlace cambió, caducó o se publicó por error?"
+  ]
+}

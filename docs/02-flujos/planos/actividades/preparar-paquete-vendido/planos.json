@@ -1,0 +1,144 @@
+{
+  "version": 2,
+  "proyecto": "sania-preparar-paquete-vendido",
+  "titulo": "Preparar el paquete vendido",
+  "descripcion": "SANIA mantendrá la venta reservada y mostrará la unidad y el contenido documentado, pero Víctor revisará y preparará físicamente el paquete. La descripción final del anuncio es la referencia operativa de lo vendido: cualquier extra o lote acordado debe quedar reflejado allí antes de cerrar la oferta.",
+  "definicion": {
+    "estado": "borrador",
+    "modo": "mixto"
+  },
+  "cobertura": {
+    "estado": "no verificado",
+    "evidencias": [],
+    "pruebas": []
+  },
+  "contrato": {
+    "frase": "Cuando una venta quedó reservada, Víctor necesitó reconocer la unidad y comprobar en el anuncio final qué debía introducir en el paquete, incluidos los extras documentados, sin convertir una conversación aislada en la fuente definitiva.",
+    "exito": [
+      "El paquete preparado coincidió con la descripción final del anuncio.",
+      "Un extra acordado solo se trató como contenido vendido después de reflejarse en el anuncio.",
+      "Preparar el paquete no se confundió con entregarlo al transportista ni con cerrar la venta."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "descripción final del anuncio",
+      "significado": "versión pública del anuncio que debe reflejar exactamente el contenido vendido, incluidos los extras acordados"
+    },
+    {
+      "termino": "unidad reservada",
+      "significado": "unidad apartada desde que una plataforma comunica la venta; deja de contar como disponible aunque la operación todavía no haya terminado"
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-61",
+      "nombre": "El paquete coincide con el anuncio final",
+      "texto": "La descripción final del anuncio, no una conversación aislada, documenta el contenido vendido; un extra solo se prepara después de quedar reflejado en el anuncio. [Migración: identificador histórico G-LIVE-010; referencias históricas: D-LIVE-002, T01-Q07]"
+    },
+    {
+      "id": "G-62",
+      "nombre": "El material de envío se obtiene manualmente",
+      "texto": "Víctor consulta manualmente desde el correo o la conversación las instrucciones, el transportista y el QR; SANIA no debe afirmar que los obtiene de la plataforma. [Migración: identificador histórico D-LIVE-003]"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "preparar-paquete-manualmente",
+      "titulo": "Víctor preparó el contenido documentado en el anuncio final",
+      "momento": "futuro",
+      "origen": "usuario",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mostró la plataforma, la venta, el título final con la referencia de tres caracteres y la unidad reservada."
+        },
+        {
+          "tipo": "humano",
+          "texto": "Víctor abrió manualmente el anuncio y, cuando fue necesario, la conversación para revisar qué se había vendido.",
+          "quien": "Víctor"
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Se había acordado un extra o un lote?",
+          "sigue": "no, se preparó lo descrito en el anuncio",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "humano",
+                "texto": "Víctor comprobó que el anuncio se había modificado para reflejar el contenido y el importe acordados antes de tratar el extra como vendido.",
+                "quien": "Víctor"
+              },
+              {
+                "tipo": "decision",
+                "clase": "excepcion",
+                "condicion": "¿La descripción final seguía sin coincidir con el acuerdo?",
+                "sigue": "no, continuó la preparación",
+                "rama": {
+                  "etiqueta": "sí",
+                  "pasos": [
+                    {
+                      "tipo": "estatico",
+                      "texto": "SANIA mantuvo la preparación bloqueada sin inventar el contenido del paquete; T05-Q03 dejó pendiente si la discrepancia abre una incidencia o ticket y cuál es su tratamiento."
+                    }
+                  ],
+                  "termina": true
+                }
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "humano",
+          "texto": "Víctor localizó visualmente la unidad en la caja bajo el escritorio, reunió el contenido descrito y cerró físicamente el paquete.",
+          "quien": "Víctor"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mantuvo la venta pendiente de admisión; el hecho de que el paquete estuviera preparado no probó su entrega al transportista."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "id": "EP-23",
+      "texto": "En una venta ordinaria, Víctor revisa anuncio y conversación, localiza la unidad con ojos y manos y prepara físicamente el paquete antes de obtener y presentar el QR. [Migración: referencias históricas: E-LIVE-001, T01-Q01, T05-Q01]"
+    },
+    {
+      "id": "EP-24",
+      "texto": "Cuando se acuerda un extra, Víctor pide una oferta que lo incluya y modifica el anuncio para que la descripción final documente exactamente lo enviado. [Migración: referencias históricas: E-LIVE-002, T01-Q07, T05-Q02]"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "mostrar el contexto de la venta y avisar de una discrepancia sin sustituir la revisión física de Víctor"
+    },
+    {
+      "con": "Wallapop y Vinted",
+      "para": "ser consultadas manualmente por Víctor; SANIA no lee conversaciones ni modifica anuncios"
+    }
+  ],
+  "fuera": [
+    "Leer automáticamente conversaciones o instrucciones dentro de Wallapop o Vinted.",
+    "Crear, modificar o completar automáticamente el anuncio para documentar un extra.",
+    "Embalar físicamente el producto.",
+    "Crear un recordatorio genérico para preparar la unidad: Víctor lo rechazó en la entrevista.",
+    "Dar por admitido o enviado un paquete únicamente porque se preparó."
+  ],
+  "preguntas": [
+    "[T01-Q06, T05-Q02] ¿Qué ocurrió en una venta real con varios productos o varias unidades y cómo se documentó todo el contenido?",
+    "[T05-Q01] ¿Qué datos mínimos, además del título con referencia y la descripción final, necesita ver Víctor para localizar la unidad correcta?",
+    "[T05-Q03] ¿Qué errores reales de preparación deben abrir una incidencia antes de entregar el paquete?",
+    "[T04-Q02, X-LIVE-004] ¿Cómo se sostiene la identidad exacta de referencias distintas cuando las unidades idénticas no llevan etiqueta ni tienen rasgos diferenciadores?"
+  ]
+}

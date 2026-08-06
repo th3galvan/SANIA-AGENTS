@@ -1,0 +1,77 @@
+{
+  "version": 2,
+  "proyecto": "sania-resolver-excepciones-operativas",
+  "titulo": "Resolver excepciones operativas",
+  "descripcion": "Cualquier correo, venta, recepción, consulta o dato que SANIA no pueda resolver con seguridad quedará como un ticket visible. El ticket conservará contexto e historia y nunca ocultará el problema alterando datos.",
+  "contrato": {
+    "frase": "Cuando SANIA no pudo continuar con seguridad, Víctor necesitó un caso visible y explicable que pudiera resolver sin perder el trabajo ya correcto."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "revisó y resolvió las excepciones que requerían contexto o decisión humana"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "resolver-ticket-operativo",
+      "titulo": "Una excepción quedó visible hasta su resolución",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA detectó un correo no reconocido, un dato incompleto, una venta sin unidad, una incidencia física o un bloqueo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA abrió un ticket relacionado con la operación y conservó el origen, la descripción y el historial."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA mantuvo operativo el resto del proceso que no dependía del dato pendiente."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor revisó el contexto, aportó la decisión o corrigió el dato desde SANIA."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA guardó la resolución y cerró el ticket sin borrar los eventos anteriores."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "ticket operativo",
+      "guarda": [
+        "tipo y estado",
+        "prioridad",
+        "operación relacionada",
+        "origen y descripción",
+        "historial",
+        "responsable",
+        "resolución y recordatorios"
+      ],
+      "origen": "cualquier hecho que no pudo resolverse con seguridad"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Telegram",
+      "para": "avisar a Víctor y recoger la respuesta estructurada"
+    }
+  ],
+  "fuera": [
+    "Ocultar una excepción inventando un dato.",
+    "Detener actividades independientes que pudieron continuar con seguridad.",
+    "Borrar el origen o el historial después de resolver."
+  ],
+  "preguntas": [
+    "¿Qué estados y prioridades tendrá un ticket?",
+    "¿Quién es responsable y cuándo cambia el responsable?",
+    "¿Qué plazos y recordatorios necesita cada clase de ticket?",
+    "¿Qué excepciones bloquean una operación y cuáles permiten continuar?"
+  ]
+}

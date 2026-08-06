@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "proyecto": "sania-seguir-envio-al-comprador",
+  "titulo": "Seguir el envío al comprador",
+  "descripcion": "SANIA relacionará los correos de seguimiento con la venta correcta y conservará admisión, tránsito y entrega sin aplicar dos veces el mismo hecho.",
+  "contrato": {
+    "frase": "Cuando el transportista comunicó un cambio, Víctor necesitó que SANIA actualizara el envío correcto y le avisara únicamente cuando quedara una acción pendiente."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "atendió los retrasos e incidencias que no pudieron resolverse automáticamente"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "seguir-envio-por-correo",
+      "titulo": "SANIA actualizó el trayecto de un paquete",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "La plataforma o el transportista envió un correo de admisión, tránsito o entrega."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA relacionó el correo mediante el seguimiento o los identificadores de la operación y evitó repetir el mismo evento."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA actualizó el estado operativo y conservó el evento original con su fecha."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Quedó una acción o un dato pendiente durante 48 horas?",
+          "sigue": "no",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA avisó a Víctor por Telegram con el contexto y la acción pendiente."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "envío",
+      "guarda": [
+        "venta",
+        "seguimiento",
+        "transportista",
+        "estado operativo",
+        "eventos originales",
+        "fechas"
+      ],
+      "origen": "correos de la plataforma y del transportista"
+    }
+  ],
+  "fuera": [
+    "Resolver automáticamente un paquete extraviado antes de conocer el procedimiento real.",
+    "Inventar una transición cuando el correo no pudo relacionarse."
+  ],
+  "preguntas": [
+    "¿Qué plantillas reales cubren admisión, tránsito, intento fallido y entrega en cada plataforma?",
+    "¿Qué ocurrió la última vez que un evento llegó tarde o contradijo el estado anterior?",
+    "¿Qué acciones concretas necesitan recordatorio a las 48 horas?",
+    "¿Cuándo se abre un ticket de extravío y qué se mantiene pendiente mientras tanto?"
+  ]
+}

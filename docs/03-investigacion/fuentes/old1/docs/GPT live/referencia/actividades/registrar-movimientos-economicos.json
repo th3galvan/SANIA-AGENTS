@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "proyecto": "sania-registrar-movimientos-economicos",
+  "titulo": "Registrar costes, ingresos y gastos",
+  "descripcion": "SANIA separará el coste real de compra, el precio mínimo aceptable, el precio publicado y el precio final. Los movimientos conservarán su origen y el ingreso de una venta seguirá provisional hasta el cierre.",
+  "contrato": {
+    "frase": "Cuando una compra, venta, gasto o ajuste produjo dinero, Víctor necesitó que SANIA lo relacionara con la operación correcta sin copiarlo al Excel ni confundir importes distintos."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "confirmó o corrigió los importes que no pudieron obtenerse con seguridad"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "registrar-movimiento-economico",
+      "titulo": "SANIA registró un movimiento con su origen",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA recibió un coste, ingreso, gasto, reembolso o corrección relacionado con una operación."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿El importe y su operación estuvieron identificados con seguridad?",
+          "sigue": "sí",
+          "rama": {
+            "etiqueta": "no",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA dejó el movimiento pendiente, abrió un ticket y pidió la confirmación necesaria sin inventar el importe."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA guardó el tipo, el importe, la fecha, el origen y si el movimiento era provisional o definitivo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó por separado el coste, el precio mínimo, el precio publicado y el precio final."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "movimiento económico",
+      "guarda": [
+        "operación relacionada",
+        "tipo",
+        "importe",
+        "fecha",
+        "origen",
+        "estado provisional o definitivo"
+      ],
+      "origen": "compras, ventas, gastos, reembolsos y correcciones"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "correos transaccionales",
+      "para": "obtener importes que las plataformas comunicaron"
+    },
+    {
+      "con": "Telegram",
+      "para": "confirmar o corregir importes con impacto económico"
+    }
+  ],
+  "fuera": [
+    "Importar todo el histórico financiero antes de estabilizar el modelo.",
+    "Convertir un precio final provisional en beneficio definitivo antes del cierre.",
+    "Borrar el valor anterior de una corrección."
+  ],
+  "preguntas": [
+    "¿Qué gastos reales, comisiones e impuestos deben relacionarse con cada venta?",
+    "¿Qué documentos o correos demuestran cada importe?",
+    "¿Qué cambios económicos requieren una segunda confirmación?",
+    "¿Cómo se corrige un importe y qué motivo debe quedar escrito?"
+  ]
+}

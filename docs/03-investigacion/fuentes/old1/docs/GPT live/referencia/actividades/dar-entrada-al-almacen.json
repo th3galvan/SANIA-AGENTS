@@ -1,0 +1,758 @@
+{
+  "version": 2,
+  "proyecto": "sania-dar-entrada-al-almacen",
+  "titulo": "Dar entrada a las unidades recibidas",
+  "descripcion": "Esta actividad convirtió cada línea recibida de AliExpress en unidades trazables de SANIA. Conservó el total realmente pagado, calculó el coste por unidad, separó la situación física del resultado económico y mantuvo la historia completa de incidencias, sustituciones y correcciones.",
+  "contrato": {
+    "frase": "Cuando recibió y revisó una línea de compra de AliExpress, Víctor necesitó que SANIA registrara exactamente una referencia por unidad y su coste real para conocer el stock y el margen sin copiar datos al Excel.",
+    "exito": [
+      "Una línea confirmada con cantidad N creó exactamente N referencias únicas vinculadas al pedido y nunca las duplicó al procesar otra vez el mismo hecho.",
+      "El total dedicado a registrar manualmente en Excel las unidades, sus costes y sus incidencias bajó a cero; Víctor solo revisó físicamente y confirmó o corrigió.",
+      "Cada cambio de estado o coste quedó explicado en un historial cronológico que conservó el valor anterior."
+    ]
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "recibió y revisó los productos, confirmó cantidades y estado, indicó el precio inicial y resolvió manualmente las excepciones"
+    }
+  ],
+  "vocabulario": [
+    {
+      "termino": "línea de compra",
+      "significado": "un correo de confirmación de AliExpress para un solo producto y variante, con la cantidad de unidades iguales y el total final pagado por todas ellas"
+    },
+    {
+      "termino": "referencia de unidad",
+      "significado": "identificador interno único de una unidad; no exigió una etiqueta física en la primera versión"
+    },
+    {
+      "termino": "coste de adquisición original",
+      "significado": "parte del total pagado que correspondió inicialmente a la unidad y que nunca se borró del historial"
+    },
+    {
+      "termino": "coste actual de unidad",
+      "significado": "coste usado para el resultado actual; pudo quedar a cero por un reembolso o trasladarse a una unidad de sustitución"
+    },
+    {
+      "termino": "situación física",
+      "significado": "condición material de la unidad, independiente de cómo terminó económicamente la incidencia"
+    },
+    {
+      "termino": "resultado económico",
+      "significado": "consecuencia económica de la compra o la incidencia: normal, reembolso, coste trasladado o pérdida asumida"
+    },
+    {
+      "termino": "disputa",
+      "significado": "incidencia que Víctor gestionó manualmente con AliExpress y que SANIA mantuvo abierta y recordó hasta conocer su resolución"
+    },
+    {
+      "termino": "precio mínimo de negociación",
+      "significado": "último precio que Víctor aceptaría para conservar al menos un 25 % de margen, redondeado hacia arriba a una terminación de ,95 €"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "entrada-actual-en-excel",
+      "titulo": "Víctor registró hoy una recepción en Excel",
+      "momento": "hoy",
+      "descripcion": "La recepción y el cálculo se hicieron manualmente por cada conjunto de unidades iguales.",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "AliExpress envió un correo de confirmación para un producto y variante con la cantidad comprada y el total final pagado por ese conjunto."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor abrió el pedido, comprobó cuánto había pagado y contó que las unidades del paquete coincidían."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor añadió una fila al Excel con el producto, la cantidad del pedido, el coste total y un precio de venta orientativo."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "El Excel calculó el coste por unidad, el margen, el beneficio potencial y las unidades restantes al restar las ventas anotadas."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor fue modificando el precio orientativo hasta que el margen mostrado le pareció correcto y quedó por encima del mínimo."
+        }
+      ]
+    },
+    {
+      "id": "entrada-normal-con-sania",
+      "titulo": "SANIA dio entrada a una línea recibida correctamente",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA había registrado desde el correo una sola línea con pedido, producto, variante, cantidad y total final pagado, sin duplicarla."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor contó y revisó físicamente las unidades y confirmó que la línea estaba correcta."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA creó tantas referencias únicas como unidades indicaba la línea y las vinculó con el pedido y la línea de compra."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA dividió el total final pagado entre la cantidad, guardó el coste de adquisición y el coste actual de cada unidad y dejó su situación física como disponible."
+        },
+        {
+          "tipo": "decision",
+          "clase": "regla",
+          "condicion": "¿Era la primera entrada de ese producto y variante?",
+          "sigue": "no, ya tenía precio inicial",
+          "rama": {
+            "etiqueta": "sí, era un producto nuevo",
+            "pasos": [
+              {
+                "tipo": "humano",
+                "quien": "Víctor",
+                "texto": "Víctor indicó en SANIA el precio inicial que después usaría al crear el anuncio."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA calculó el margen del precio inicial y el precio mínimo de negociación que conservó un 25 % de margen."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿El precio inicial dejó un margen inferior al 25 % con el coste de la nueva línea?",
+          "sigue": "no, conservó el margen mínimo",
+          "rama": {
+            "etiqueta": "sí, quedó por debajo",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA avisó a Víctor por Telegram y mantuvo disponibles las unidades sin bloquear una futura venta."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "incidencia-de-compra",
+      "titulo": "SANIA siguió una unidad ausente o defectuosa",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor indicó que faltaba una unidad o que una de las recibidas estaba defectuosa."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA creó todas las referencias previstas por la cantidad comprada, dejó disponibles las unidades correctas y abrió una incidencia solo para las afectadas."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor eligió arbitrariamente la referencia afectada cuando las unidades idénticas todavía no se podían distinguir mediante etiquetas."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor abrió y gestionó manualmente la disputa dentro de AliExpress."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA envió cada semana por Telegram un recordatorio de la disputa abierta con el botón Disputa cerrada."
+        },
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor pulsó Disputa cerrada y respondió si hubo reembolso, si llegó una sustitución, si devolvió o conservó la unidad original y cuál fue su condición física final."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA aplicó el resultado físico y económico confirmado, creó y relacionó una nueva referencia si hubo sustitución y conservó toda la historia de la disputa."
+        }
+      ]
+    },
+    {
+      "id": "correccion-manual-en-sania",
+      "titulo": "Víctor corrigió una excepción desde SANIA",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "humano",
+          "quien": "Víctor",
+          "texto": "Víctor abrió la unidad en SANIA, cambió el estado, el coste u otro dato excepcional y explicó el motivo en un comentario."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA añadió al historial la fecha y hora, el actor, el origen manual, el valor anterior, el valor nuevo y el comentario sin borrar el registro previo."
+        }
+      ]
+    }
+  ],
+  "episodios": [
+    {
+      "texto": "El 20 de julio de 2026, el correo del pedido 3074442296049454 confirmó la variante BLACK, cantidad 7 y un total de 80,72 €; el coste matemático por unidad fue 80,72 / 7 y el precio mínimo comercial que Víctor aceptó para conservar el 25 % terminó en 15,95 €.",
+      "refs": ["G-8", "G-9", "R-2", "R-3"]
+    },
+    {
+      "texto": "En el Excel actual, una fila de «x2 9 mm» mostró precio de venta 7,00 €, coste unitario 6,76 € y calculó el margen con la fórmula (precio de venta - coste unitario) / precio de venta.",
+      "refs": ["G-9", "R-3"]
+    }
+  ],
+  "recorridos": [
+    {
+      "id": "REC-1",
+      "nombre": "Registrar una línea correcta sin copiarla al Excel",
+      "objetivo": "Convertir una línea confirmada en unidades disponibles, trazables y valoradas.",
+      "estado": "pendiente",
+      "requisitos": [
+        {
+          "id": "R-1",
+          "texto": "Cuando SANIA recibió otra vez el mismo correo o la misma confirmación, el sistema deberá reconocer el hecho ya tratado y no crear una segunda línea."
+        },
+        {
+          "id": "R-2",
+          "texto": "Cuando Víctor confirmó una línea correcta, el sistema deberá crear exactamente tantas referencias como unidades compradas y asignar a cada una el total pagado dividido entre la cantidad.",
+          "regla": "G-8"
+        },
+        {
+          "id": "R-3",
+          "texto": "Cuando existió un coste unitario y un precio inicial, el sistema deberá calcular el margen y el precio mínimo de negociación; si el margen fue inferior al 25 %, deberá avisar por Telegram sin bloquear la unidad.",
+          "regla": "G-9"
+        }
+      ],
+      "criterios": [
+        {
+          "id": "C-1",
+          "dado": "una línea ya registrada y confirmada",
+          "cuando": "llegó otra vez el mismo correo o se repitió la confirmación",
+          "entonces": "continuó existiendo una sola línea y el mismo número de referencias",
+          "cubre": "R-1"
+        },
+        {
+          "id": "C-2",
+          "dado": "el pedido 3074442296049454 con variante BLACK, cantidad 7 y total 80,72 €",
+          "cuando": "Víctor confirmó que las siete unidades estaban correctas",
+          "entonces": "SANIA creó siete referencias vinculadas a esa línea y calculó para cada una el coste 80,72 / 7",
+          "cubre": "R-2"
+        },
+        {
+          "id": "C-3",
+          "dado": "un coste unitario que produjo un mínimo matemático de 15,38 € para conservar el 25 %",
+          "cuando": "SANIA calculó el precio mínimo de negociación",
+          "entonces": "mostró 15,95 € y avisó por Telegram si el precio inicial estaba por debajo del margen, sin bloquear la unidad",
+          "cubre": "R-3"
+        }
+      ]
+    },
+    {
+      "id": "REC-2",
+      "nombre": "Resolver una incidencia sin perder la trazabilidad",
+      "objetivo": "Mantener vendibles las unidades correctas y cerrar cada unidad afectada con su resultado físico y económico.",
+      "estado": "pendiente",
+      "requisitos": [
+        {
+          "id": "R-4",
+          "texto": "Cuando faltó una unidad o una llegó defectuosa, el sistema deberá crear todas las referencias previstas, dejar disponibles las correctas y permitir que Víctor eligiera arbitrariamente la afectada mientras no hubiera etiquetas.",
+          "regla": "G-12"
+        },
+        {
+          "id": "R-5",
+          "texto": "Mientras una disputa siguió abierta, el sistema deberá recordarla semanalmente por Telegram y, al pulsar Disputa cerrada, deberá recoger y aplicar su resolución.",
+          "regla": "G-10"
+        },
+        {
+          "id": "R-6",
+          "texto": "Cuando llegó una sustitución, el sistema deberá crear una referencia nueva, vincularla con la unidad disputada y el pedido original y asignar el coste según la disponibilidad final de la unidad original.",
+          "regla": "G-10"
+        },
+        {
+          "id": "R-7",
+          "texto": "Cuando Víctor corrigió manualmente un estado o coste desde SANIA, el sistema deberá añadir un evento con el antes, el después, el actor, la fecha y el comentario sin modificar el historial anterior.",
+          "regla": "G-11"
+        }
+      ],
+      "criterios": [
+        {
+          "id": "C-4",
+          "dado": "una línea de siete unidades idénticas de las que una no llegó",
+          "cuando": "Víctor marcó la incidencia sin disponer de etiquetas físicas",
+          "entonces": "se crearon siete referencias, seis quedaron disponibles y Víctor pudo elegir arbitrariamente cuál quedó afectada",
+          "cubre": "R-4"
+        },
+        {
+          "id": "C-5",
+          "dado": "una disputa que continuó abierta durante más de una semana",
+          "cuando": "llegó el recordatorio y Víctor pulsó Disputa cerrada",
+          "entonces": "Telegram preguntó por reembolso, sustitución, devolución o conservación y condición final antes de cerrar el caso",
+          "cubre": "R-5"
+        },
+        {
+          "id": "C-6",
+          "dado": "una unidad defectuosa no vendible con coste 10 € y una sustitución recibida",
+          "cuando": "Víctor indicó que la original no estaba disponible",
+          "entonces": "la sustitución recibió una referencia nueva y el coste 10 €, la original quedó con coste actual cero y ambos registros conservaron el vínculo y el coste histórico",
+          "cubre": "R-6"
+        },
+        {
+          "id": "C-7",
+          "dado": "una unidad disponible cuyo coste actual era 10 €",
+          "cuando": "Víctor lo cambió manualmente a cero por un reembolso y escribió el motivo",
+          "entonces": "la unidad conservó el coste original de 10 € en su historia y añadió un evento manual con el nuevo coste cero y el comentario",
+          "cubre": "R-7"
+        }
+      ]
+    }
+  ],
+  "reglas": [
+    {
+      "id": "G-8",
+      "nombre": "Una línea y un coste por conjunto de unidades iguales",
+      "texto": "Cada correo de confirmación correspondió a un solo producto y variante. SANIA guardó la cantidad y el total final realmente pagado, no el subtotal previo a descuentos o impuestos, y calculó el coste de adquisición por unidad como total pagado / cantidad."
+    },
+    {
+      "id": "G-9",
+      "nombre": "Margen mínimo de negociación del 25 %",
+      "texto": "El margen fue (precio de venta - coste actual de unidad) / precio de venta. El mínimo matemático fue coste actual / (1 - 0,25) y SANIA lo redondeó hacia arriba al siguiente precio terminado en ,95 €. El precio inicial lo indicó Víctor y se conservó para las nuevas entradas; si con un nuevo coste quedó por debajo del 25 %, SANIA avisó por Telegram pero no bloqueó la disponibilidad ni una venta confirmada por Víctor."
+    },
+    {
+      "id": "G-10",
+      "nombre": "Cierre físico y económico de una disputa",
+      "tabla": {
+        "columnas": [
+          "Resolución comunicada",
+          "Situación final de la original",
+          "Coste actual de la original",
+          "Unidad de sustitución",
+          "Resultado económico"
+        ],
+        "filas": [
+          [
+            "Se comprobó que funcionaba y no hubo compensación",
+            "disponible",
+            "conservó su coste",
+            "no se creó",
+            "normal, con la disputa conservada en el historial"
+          ],
+          [
+            "Hubo reembolso total y Víctor conservó una unidad vendible",
+            "disponible",
+            "cero",
+            "no se creó",
+            "reembolso"
+          ],
+          [
+            "Hubo reembolso total y la original fue devuelta",
+            "devuelta y fuera del recuento disponible",
+            "cero, con el coste original en el historial",
+            "no se creó",
+            "reembolso"
+          ],
+          [
+            "Llegó una sustitución y la original faltó o no se pudo vender",
+            "nunca llegó o defectuosa",
+            "cero, con el coste original en el historial",
+            "se creó una referencia nueva que heredó el coste original",
+            "coste trasladado"
+          ],
+          [
+            "Llegó una sustitución y la original siguió disponible",
+            "disponible",
+            "conservó su coste",
+            "se creó una referencia nueva con coste cero",
+            "sustitución gratuita"
+          ],
+          [
+            "No hubo reembolso ni sustitución y la original faltó o no se pudo vender",
+            "nunca llegó o defectuosa",
+            "conservó su coste como pérdida",
+            "no se creó",
+            "pérdida asumida"
+          ],
+          [
+            "El reembolso fue parcial o apareció otra excepción extraña",
+            "*",
+            "Víctor lo ajustó desde SANIA",
+            "se creó solo si realmente llegó",
+            "ajuste manual explicado en el historial"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G-11",
+      "nombre": "Correcciones manuales con historia inmutable",
+      "texto": "Víctor pudo corregir estados, costes y otros datos desde SANIA, nunca directamente en la base de datos. Cada cambio añadió fecha y hora, actor, origen automático o manual, valor anterior, valor nuevo y comentario; ningún evento anterior se sobrescribió ni se borró silenciosamente."
+    },
+    {
+      "id": "G-12",
+      "nombre": "Una referencia por unidad aunque falte físicamente",
+      "texto": "Una compra de N unidades creó N referencias vinculadas con su línea y pedido. Las unidades correctas siguieron disponibles y solo las afectadas entraron en incidencia. Mientras no existieron etiquetas físicas, Víctor pudo escoger arbitrariamente qué referencia idéntica representó la unidad ausente o defectuosa."
+    }
+  ],
+  "estados": [
+    {
+      "entidad": "situación física de la unidad",
+      "estados": [
+        {
+          "nombre": "pendiente de revisión",
+          "acciones": [
+            {
+              "accion": "Víctor confirmó que estaba correcta",
+              "quien": "Víctor",
+              "pasa_a": "disponible"
+            },
+            {
+              "accion": "Víctor confirmó que no llegó",
+              "quien": "Víctor",
+              "pasa_a": "nunca llegó"
+            },
+            {
+              "accion": "Víctor confirmó que llegó defectuosa",
+              "quien": "Víctor",
+              "pasa_a": "defectuosa"
+            }
+          ]
+        },
+        {
+          "nombre": "disponible",
+          "acciones": [
+            {
+              "accion": "Víctor devolvió la unidad al vendedor",
+              "quien": "Víctor",
+              "pasa_a": "devuelta"
+            }
+          ]
+        },
+        {
+          "nombre": "nunca llegó",
+          "acciones": []
+        },
+        {
+          "nombre": "defectuosa",
+          "acciones": [
+            {
+              "accion": "Víctor comprobó después que funcionaba",
+              "quien": "Víctor",
+              "pasa_a": "disponible"
+            },
+            {
+              "accion": "Víctor devolvió la unidad",
+              "quien": "Víctor",
+              "pasa_a": "devuelta"
+            },
+            {
+              "accion": "Víctor decidió que no se podía vender ni devolver",
+              "quien": "Víctor",
+              "pasa_a": "eliminada"
+            }
+          ]
+        },
+        {
+          "nombre": "devuelta",
+          "acciones": []
+        },
+        {
+          "nombre": "eliminada",
+          "acciones": []
+        }
+      ]
+    },
+    {
+      "entidad": "disputa de compra",
+      "estados": [
+        {
+          "nombre": "abierta",
+          "acciones": [
+            {
+              "accion": "Víctor inició la disputa en AliExpress",
+              "quien": "Víctor",
+              "pasa_a": "en disputa"
+            }
+          ]
+        },
+        {
+          "nombre": "en disputa",
+          "acciones": [
+            {
+              "accion": "Víctor pulsó Disputa cerrada y respondió el cuestionario",
+              "quien": "Víctor",
+              "pasa_a": "cerrada"
+            }
+          ]
+        },
+        {
+          "nombre": "cerrada",
+          "acciones": []
+        }
+      ]
+    },
+    {
+      "entidad": "resultado económico de la unidad",
+      "estados": [
+        {
+          "nombre": "pendiente",
+          "acciones": [
+            {
+              "accion": "La compra o la disputa terminó sin ajuste",
+              "quien": "SANIA",
+              "pasa_a": "normal"
+            },
+            {
+              "accion": "Víctor confirmó el reembolso",
+              "quien": "Víctor",
+              "pasa_a": "reembolso"
+            },
+            {
+              "accion": "SANIA trasladó el coste a la sustitución",
+              "quien": "SANIA",
+              "pasa_a": "coste trasladado"
+            },
+            {
+              "accion": "Víctor cerró sin compensación una unidad no vendible",
+              "quien": "Víctor",
+              "pasa_a": "pérdida asumida"
+            }
+          ]
+        },
+        {
+          "nombre": "normal",
+          "acciones": []
+        },
+        {
+          "nombre": "reembolso",
+          "acciones": []
+        },
+        {
+          "nombre": "coste trasladado",
+          "acciones": []
+        },
+        {
+          "nombre": "pérdida asumida",
+          "acciones": []
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "línea de compra",
+      "guarda": [
+        "identificador de pedido",
+        "identificador estable de la línea",
+        "producto y variante",
+        "cantidad",
+        "total final pagado",
+        "correo de origen"
+      ],
+      "origen": "correo de confirmación de AliExpress"
+    },
+    {
+      "cosa": "producto y variante",
+      "guarda": [
+        "código interno",
+        "nombre",
+        "variante",
+        "precio inicial indicado por Víctor"
+      ],
+      "origen": "correo de AliExpress y dato manual de Víctor"
+    },
+    {
+      "cosa": "unidad",
+      "guarda": [
+        "referencia única",
+        "línea y pedido de origen",
+        "coste de adquisición original",
+        "coste actual",
+        "precio mínimo de negociación",
+        "situación física",
+        "resultado económico",
+        "unidad original o sustituta relacionada"
+      ],
+      "origen": "se creó al confirmar o conciliar una línea de compra"
+    },
+    {
+      "cosa": "disputa de compra",
+      "guarda": [
+        "unidades afectadas",
+        "estado",
+        "fecha de apertura",
+        "fecha del último recordatorio",
+        "reembolso",
+        "sustitución",
+        "devolución o conservación de la original",
+        "resolución final"
+      ],
+      "origen": "confirmaciones y cuestionario de Víctor por Telegram"
+    },
+    {
+      "cosa": "evento del historial",
+      "guarda": [
+        "unidad",
+        "fecha y hora",
+        "actor",
+        "origen automático o manual",
+        "campo",
+        "valor anterior",
+        "valor nuevo",
+        "comentario"
+      ],
+      "origen": "cada cambio realizado por SANIA o por Víctor desde la aplicación"
+    }
+  ],
+  "volumen": [
+    {
+      "que": "usuarios iniciales",
+      "cuanto": "1, Víctor"
+    },
+    {
+      "que": "tiempo dedicado hoy al registro del negocio",
+      "cuanto": "aproximadamente dos horas al día para el conjunto de compras, inventario, ventas y beneficios"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "correos transaccionales de AliExpress",
+      "para": "obtener pedido, producto, variante, cantidad y total final pagado por cada línea"
+    },
+    {
+      "con": "Telegram",
+      "para": "confirmar la revisión física, avisar de margen bajo, recordar semanalmente disputas y ejecutar el cuestionario de cierre"
+    },
+    {
+      "con": "Excel costes_aliexpress.xlsx",
+      "para": "documentar el cálculo y los registros actuales; la importación histórica quedó para otra actividad"
+    }
+  ],
+  "superficie": {
+    "puntos": [
+      {
+        "nombre": "Almacén de Víctor",
+        "quien": ["Víctor"],
+        "llega": "desde SANIA en el móvil o en cualquiera de sus ordenadores",
+        "cuando": "quiso revisar una entrada, una unidad, una disputa o una corrección excepcional",
+        "ve": "la línea de compra, sus unidades, costes, márgenes, situaciones física y económica, vínculos de sustitución y cronología",
+        "puede": [
+          "indicar el precio inicial de un producto nuevo",
+          "abrir y revisar una incidencia",
+          "cambiar manualmente un estado o coste",
+          "relacionar una sustitución",
+          "añadir un comentario"
+        ],
+        "nunca": [
+          "editar directamente la base de datos",
+          "borrar silenciosamente un evento anterior",
+          "convertir una unidad ausente o defectuosa en disponible sin una confirmación de Víctor"
+        ]
+      },
+      {
+        "nombre": "Telegram de SANIA",
+        "quien": ["Víctor"],
+        "llega": "desde el mensaje o botón enviado por el bot",
+        "cuando": "hubo que confirmar una recepción, avisar de margen bajo o revisar una disputa abierta",
+        "ve": "producto, variante, cantidad, referencias afectadas, motivo del aviso y botones adecuados al estado",
+        "puede": [
+          "confirmar que una línea estaba correcta",
+          "declarar una incidencia",
+          "pulsar Disputa cerrada",
+          "responder el cuestionario de resolución"
+        ],
+        "nunca": [
+          "dar por recibido o correcto un producto sin la acción de Víctor",
+          "cerrar una disputa sin recoger su resultado físico y económico",
+          "bloquear una venta solo porque el margen calculado quedó por debajo del 25 %"
+        ]
+      }
+    ],
+    "permisos": {
+      "acciones": [
+        "consultar líneas y unidades",
+        "confirmar recepciones",
+        "declarar incidencias",
+        "abrir y revisar incidencias",
+        "indicar precios iniciales",
+        "cerrar disputas",
+        "relacionar sustituciones",
+        "corregir estados y costes",
+        "añadir comentarios"
+      ],
+      "roles": [
+        {
+          "rol": "Víctor",
+          "permitidas": [
+            "consultar líneas y unidades",
+            "confirmar recepciones",
+            "declarar incidencias",
+            "abrir y revisar incidencias",
+            "indicar precios iniciales",
+            "cerrar disputas",
+            "relacionar sustituciones",
+            "corregir estados y costes",
+            "añadir comentarios"
+          ]
+        }
+      ]
+    },
+    "avisos": [
+      {
+        "quien": "Víctor",
+        "que": "el precio inicial dejó un margen inferior al 25 % con el coste actual de una nueva línea",
+        "canal": "Telegram",
+        "cuando": "después de calcular el coste de las unidades recibidas"
+      },
+      {
+        "quien": "Víctor",
+        "que": "una disputa continuó abierta y mostró el botón Disputa cerrada",
+        "canal": "Telegram",
+        "cuando": "una vez por semana hasta cerrar la disputa"
+      }
+    ],
+    "condiciones": [
+      "Víctor pudo consultar y corregir la información desde móvil y ordenador.",
+      "Reprocesar el mismo correo o confirmación no creó líneas, unidades ni movimientos duplicados.",
+      "Las correcciones excepcionales se hicieron desde SANIA y siempre conservaron el antes y el después.",
+      "Una alerta de margen informó, pero nunca sustituyó la decisión de Víctor de aceptar una venta."
+    ]
+  },
+  "calidad": [
+    {
+      "id": "Q-1",
+      "criterio": "Para cualquier línea con cantidad N, después de confirmarla existieron exactamente N referencias únicas y reprocesar el mismo hecho mantuvo ese número."
+    },
+    {
+      "id": "Q-2",
+      "criterio": "Para cada línea, la fórmula de coste fue total final pagado / cantidad y la de margen fue (precio de venta - coste actual) / precio de venta."
+    },
+    {
+      "id": "Q-3",
+      "criterio": "El 100 % de los cambios automáticos o manuales de estado y coste añadió un evento con fecha y hora, actor, origen, valor anterior, valor nuevo y comentario cuando fue manual."
+    },
+    {
+      "id": "Q-4",
+      "criterio": "El recuento disponible incluyó solo unidades físicamente disponibles; nunca incluyó unidades que no llegaron, defectuosas no vendibles, devueltas o eliminadas."
+    }
+  ],
+  "fuera": [
+    "Colocar etiquetas QR o de código de barras en las unidades durante la primera versión.",
+    "Registrar la estantería, caja o posición física exacta: Víctor todavía guardó los productos bajo su escritorio y no tuvo problemas para encontrarlos.",
+    "Abrir, negociar o cerrar automáticamente una disputa dentro de AliExpress.",
+    "Automatizar negociaciones de precio con compradores de Wallapop o Vinted.",
+    "Importar todo el histórico del Excel antes de probar el modelo con nuevas recepciones."
+  ],
+  "preguntas": [
+    "¿Con qué precisión se guardará y mostrará el coste unitario cuando el total pagado no sea divisible exactamente entre la cantidad?",
+    "¿El precio inicial indicado por Víctor será común a Wallapop y Vinted o podrá ser distinto en cada plataforma?",
+    "¿Qué día y a qué hora deberá enviarse el recordatorio semanal de cada disputa abierta?",
+    "¿Qué identificador estable del correo o de AliExpress distinguirá una línea de compra cuando el texto visible cambie?",
+    "¿Qué formato visible tendrá la referencia interna de una unidad y qué parte necesita reconocer Víctor?"
+  ]
+}

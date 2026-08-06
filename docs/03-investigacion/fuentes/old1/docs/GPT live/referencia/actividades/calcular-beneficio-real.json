@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "proyecto": "sania-calcular-beneficio-real",
+  "titulo": "Calcular el beneficio real",
+  "descripcion": "SANIA calculará el resultado de una venta cerrada a partir del precio final, el coste actual de las unidades y los demás gastos acordados. El cálculo no será definitivo mientras la operación siga abierta.",
+  "contrato": {
+    "frase": "Cuando una venta terminó de verdad, Víctor necesitó conocer el beneficio real que dejó después de relacionar el ingreso con las unidades y gastos correctos."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó el resultado y resolvió los gastos o ajustes pendientes"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "calcular-beneficio-venta",
+      "titulo": "SANIA calculó el beneficio de una venta cerrada",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "estatico",
+          "texto": "SANIA comprobó que la venta estaba cerrada y que el ingreso había dejado de ser provisional."
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA reunió el precio final, el coste actual de las unidades y los demás gastos relacionados."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Quedó algún importe o incidencia económica pendiente?",
+          "sigue": "no",
+          "rama": {
+            "etiqueta": "sí",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA mantuvo el resultado como provisional y mostró el motivo pendiente."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA calculó y guardó el beneficio y el margen definitivos con sus importes de origen."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "resultado de venta",
+      "guarda": [
+        "venta",
+        "ingreso final",
+        "coste de unidades",
+        "otros gastos",
+        "beneficio",
+        "margen",
+        "estado provisional o definitivo"
+      ],
+      "origen": "venta cerrada y movimientos económicos relacionados"
+    }
+  ],
+  "fuera": [
+    "Dar por definitivo un resultado mientras la venta, devolución o incidencia siguió abierta.",
+    "Inventar comisiones, impuestos o gastos que no se hayan acordado.",
+    "Calcular aquí precios dinámicos o recomendaciones comerciales."
+  ],
+  "preguntas": [
+    "¿Qué hecho exacto vuelve definitivo el ingreso en cada plataforma?",
+    "¿Qué comisiones, portes, embalajes, impuestos y otros gastos deben restarse?",
+    "¿Cómo se reparte un gasto que afectó a varias unidades o ventas?",
+    "¿Qué ejemplo real normal y qué ejemplo raro usarán para comprobar el cálculo?"
+  ]
+}

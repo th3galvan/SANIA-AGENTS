@@ -1,0 +1,115 @@
+{
+  "version": 2,
+  "proyecto": "sania-seguir-pedidos-aliexpress",
+  "titulo": "Seguir pedidos de AliExpress",
+  "descripcion": "Esta actividad convertirá los correos de compra y seguimiento de AliExpress en pedidos, líneas, paquetes y eventos ordenados de SANIA. El plano está iniciado con la información vigente de Notion y continúa en entrevista.",
+  "contrato": {
+    "frase": "Cuando AliExpress comunicó una compra o un cambio de seguimiento, Víctor necesitó que SANIA actualizara el pedido correcto una sola vez y dejara visible cualquier dato que faltara."
+  },
+  "actores": [
+    {
+      "nombre": "Víctor",
+      "rol": "consultó pedidos y resolvió los datos que SANIA no pudo identificar con seguridad"
+    }
+  ],
+  "flujos": [
+    {
+      "id": "seguir-pedido-desde-correo",
+      "titulo": "SANIA actualizó un pedido desde sus correos",
+      "momento": "futuro",
+      "pasos": [
+        {
+          "tipo": "externo",
+          "texto": "AliExpress envió un correo de confirmación de compra, envío o seguimiento."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿El remitente, el tipo de correo y sus campos coincidieron con un patrón probado?",
+          "sigue": "sí, SANIA extrajo los datos con el patrón determinista acordado",
+          "rama": {
+            "etiqueta": "no, el formato fue desconocido o ambiguo",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA conservó el correo como formato desconocido y abrió un ticket sin aplicar cambios al pedido; un posible segundo intento con IA solo podrá proponer datos cuando sus límites y ejemplos de fallo estén acordados."
+              }
+            ],
+            "termina": true
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA conservó el correo, relacionó sus identificadores con el pedido y comprobó que el mismo hecho no estuviera tratado."
+        },
+        {
+          "tipo": "decision",
+          "clase": "excepcion",
+          "condicion": "¿Faltó el nombre, la variante o un identificador estable?",
+          "sigue": "no, el correo fue suficiente",
+          "rama": {
+            "etiqueta": "sí, faltó un dato",
+            "pasos": [
+              {
+                "tipo": "estatico",
+                "texto": "SANIA dejó el dato pendiente, abrió un ticket y pidió a Víctor la comprobación necesaria sin inventar el valor."
+              }
+            ]
+          }
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA actualizó el estado operativo del pedido y conservó por separado el evento original de seguimiento."
+        }
+      ]
+    }
+  ],
+  "datos": [
+    {
+      "cosa": "pedido de AliExpress",
+      "guarda": [
+        "identificador externo",
+        "líneas y paquetes",
+        "estado operativo",
+        "eventos originales",
+        "correos de origen"
+      ],
+      "origen": "correos transaccionales de AliExpress"
+    },
+    {
+      "cosa": "plantilla de correo de AliExpress",
+      "guarda": [
+        "remitente y tipo",
+        "patrón de asunto y cuerpo",
+        "campos presentes",
+        "identificadores estables",
+        "clasificación como determinista, posible apoyo de IA o desconocida",
+        "ejemplos normales y de fallo"
+      ],
+      "origen": "corpus etiquetado de correos reales"
+    }
+  ],
+  "integraciones": [
+    {
+      "con": "Gmail de solo lectura",
+      "para": "recibir y conservar los correos de AliExpress"
+    },
+    {
+      "con": "Telegram",
+      "para": "pedir a Víctor los datos o comprobaciones que faltaron"
+    }
+  ],
+  "fuera": [
+    "Realizar la compra dentro de AliExpress.",
+    "Inventar un producto, variante o identificador cuando el correo no fue suficiente.",
+    "Permitir que una interpretación de IA aplique directamente un cambio de pedido sin límites, revisión y ejemplos de fallo acordados.",
+    "Dar entrada al almacén antes de la confirmación física."
+  ],
+  "preguntas": [
+    "¿Qué identificador estable distingue una línea de compra cuando cambia el texto visible?",
+    "¿Qué plantillas reales de confirmación, envío, división de paquetes y entrega deben reconocerse y cuáles admiten un patrón determinista?",
+    "¿Para qué formatos podrá una IA proponer datos, qué nivel de seguridad se exigirá y qué ejemplos obligarán a abrir un ticket sin cambiar el pedido?",
+    "¿Qué ocurrió la última vez que un correo llegó repetido, tarde o fuera de orden?",
+    "¿Qué datos debe mostrar Víctor al consultar un pedido a medias?"
+  ]
+}

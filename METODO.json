@@ -1,4 +1,5 @@
 {
+  "actualizado": "2026-08-06",
   "archivos": [
     "docs/00-metodo/README.md",
     "docs/00-metodo/VERSION",
@@ -83,6 +84,6 @@
     "docs/00-metodo/scripts/workspace_paths.py"
   ],
   "formato": 1,
-  "huella": "d616aaef826ba93da140816f96a5785121439d0cec53111e538f2ceac829a31d",
+  "huella": "ba1119a52e45687afe1918cdf39db6c74d848a41e4f25c7514ce1ae2d4543357",
   "version": "1.1.1"
 }

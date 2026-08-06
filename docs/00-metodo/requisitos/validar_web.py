@@ -153,6 +153,16 @@ def comprobar_lateral(page, datos, ancho):
                             b.classList.contains('activo'))""",
                 arg=actividad["nombre"],
             )
+        # El bucle deja abierta la última actividad. Las comprobaciones
+        # transversales que siguen (personas, permisos y contrato E2E)
+        # pertenecen al mapa y sus pestañas no tienen por qué existir en
+        # una actividad aún sin planos. Volvemos al mapa explícitamente.
+        page.get_by_role("button", name="🗺 El mapa", exact=True).click()
+        page.wait_for_function(
+            """() => Array.from(document.querySelectorAll('#menuIzq button'))
+              .some(b => b.textContent.trim() === '🗺 El mapa' &&
+                         b.classList.contains('activo'))"""
+        )
     elif flujos:
         esperados = [x["titulo"] for x in flujos]
         if textos != esperados:

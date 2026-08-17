@@ -148,12 +148,6 @@ def _scope_key(scope):
 
 def _fsync_directory(path):
     """Hace durable un replace/unlink, no solo los bytes del fichero."""
-    # Windows no permite abrir un directorio con ``os.open`` para hacer
-    # ``fsync`` (WinError 5/PermissionError). ``os.replace`` ya ofrece la
-    # operación atómica necesaria allí; la sincronización explícita del
-    # directorio es una garantía adicional disponible en POSIX.
-    if os.name == "nt":
-        return
     flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
     descriptor = os.open(str(path), flags)
     try:

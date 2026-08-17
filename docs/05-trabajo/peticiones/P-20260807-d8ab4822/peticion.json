@@ -1,0 +1,20 @@
+{
+  "aclaraciones": [],
+  "actualizada": "2026-08-07T14:38:11+00:00",
+  "cierres": [],
+  "creada": "2026-08-07T14:38:11+00:00",
+  "estado": "capturada",
+  "evaluaciones": [],
+  "formato": 1,
+  "id": "P-20260807-d8ab4822",
+  "original": {
+    "autor": "Víctor",
+    "resumen": "Cerrar especificaciones del MVP operativo de SANIA y entrevistar sus preguntas",
+    "texto": "Quiero seleccionar las preguntas que sirvan para cerrar los casos del mínimo producto viable: seguimiento de pedidos de AliExpress, aviso por Telegram cuando llegan, confirmación y registro de recepción, preparación para la venta, aviso para subir el anuncio, feedback con enlaces, registro de venta y beneficio. También quiero dejar previstas futuras especificaciones para preparación/envío/posventa, finanzas, dirección/control, blog de referidos de AliExpress y generación automática de shorts desde contenido de Roma para Instagram. Quiero que las preguntas se hagan una a una para responderlas y puntualizar el primer boceto y futuras especificaciones."
+  },
+  "procesos": [],
+  "reclamos": [],
+  "relaciones": [],
+  "responsable": null,
+  "revision": 1
+}

@@ -1,0 +1,20 @@
+{
+  "aclaraciones": [],
+  "actualizada": "2026-08-08T11:28:38+00:00",
+  "cierres": [],
+  "creada": "2026-08-08T11:28:38+00:00",
+  "estado": "capturada",
+  "evaluaciones": [],
+  "formato": 1,
+  "id": "P-20260808-2d8ba940",
+  "original": {
+    "autor": "Víctor",
+    "resumen": "Añadir OpenMontage como futura integración audiovisual de SANIA",
+    "texto": "Quiero añadir como futura feature la propuesta de utilizar OpenMontage como motor independiente de producción audiovisual: SANIA selecciona oportunidades y crea un briefing con presupuesto; OpenMontage produce vídeo, subtítulos y recursos; SANIA conserva control de estrategia, licencias, aprobación de gasto, miniatura, publicación, pruebas y métricas. Debe quedar fuera del MVP actual y como posible especificación futura."
+  },
+  "procesos": [],
+  "reclamos": [],
+  "relaciones": [],
+  "responsable": null,
+  "revision": 1
+}

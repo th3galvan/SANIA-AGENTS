@@ -1,0 +1,20 @@
+{
+  "aclaraciones": [],
+  "actualizada": "2026-08-08T14:50:04+00:00",
+  "cierres": [],
+  "creada": "2026-08-08T14:50:04+00:00",
+  "estado": "capturada",
+  "evaluaciones": [],
+  "formato": 1,
+  "id": "P-20260808-5fdee5c2",
+  "original": {
+    "autor": "Víctor",
+    "resumen": "Control total de tokens y costes de toda intervención de IA",
+    "texto": "Eje obligatorio de SANIA: cualquier tarea que pase por inteligencia artificial debe registrar de forma clara su consumo de tokens y gasto de API. Durante las primeras fases hay que medir cuánto cuesta cada intervención, acumularlo por función y evaluar si compensa seguir usando servicios externos o ejecutar modelos localmente para evitar costes elevados a largo plazo. Deben existir trazabilidad, presupuestos, alertas y comparación entre API y ejecución local."
+  },
+  "procesos": [],
+  "reclamos": [],
+  "relaciones": [],
+  "responsable": null,
+  "revision": 1
+}

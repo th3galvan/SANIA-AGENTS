@@ -1,4 +1,5 @@
 {
+  "actualizado": "2026-08-17",
   "archivos": [
     "docs/00-metodo/README.md",
     "docs/00-metodo/VERSION",
@@ -36,6 +37,8 @@
     "docs/00-metodo/decisiones/023-control-plane-concurrencia-local.md",
     "docs/00-metodo/decisiones/024-control-plane-de-seguridad-y-evidencia-causal.md",
     "docs/00-metodo/decisiones/025-el-trabajo-aparcado-no-bloquea-el-modo-d.md",
+    "docs/00-metodo/decisiones/026-guiar-no-bloquear.md",
+    "docs/00-metodo/decisiones/028-ci-es-guia-no-gate.md",
     "docs/00-metodo/runbooks/adopcion.md",
     "docs/00-metodo/runbooks/auditoria.md",
     "docs/00-metodo/runbooks/bug.md",
@@ -83,6 +86,6 @@
     "docs/00-metodo/scripts/workspace_paths.py"
   ],
   "formato": 1,
-  "huella": "d616aaef826ba93da140816f96a5785121439d0cec53111e538f2ceac829a31d",
-  "version": "1.1.1"
+  "huella": "5697c46724e00b0293bf107a1d9cd00ea2345d06b7e1b6bb396cf82957e10996",
+  "version": "1.3.0"
 }

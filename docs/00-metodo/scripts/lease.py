@@ -20,6 +20,7 @@ import os
 import socket
 import subprocess
 import tempfile
+import time
 import uuid
 from pathlib import Path
 
@@ -31,6 +32,11 @@ try:
     import msvcrt
 except ImportError:
     msvcrt = None
+
+# Tope de espera al candado del coordinador, en las DOS plataformas: esperar sin límite a
+# un candado huérfano dejaba a todas las sesiones colgadas en silencio (ADR-026). Los
+# tests lo bajan por entorno para no pagar el minuto entero.
+TOPE_COORDINADOR_SEGUNDOS = int(os.environ.get("IR_TOPE_COORDINADOR_SEGUNDOS", "60"))
 
 
 class LeaseError(RuntimeError):
@@ -148,6 +154,10 @@ def _scope_key(scope):
 
 def _fsync_directory(path):
     """Hace durable un replace/unlink, no solo los bytes del fichero."""
+    if os.name == "nt":  # pragma: no cover - Windows no deja abrir directorios
+        # con os.open (PermissionError); NTFS journalea los metadatos y no
+        # ofrece fsync de directorio, así que no hay versión durable posible.
+        return
     flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
     descriptor = os.open(str(path), flags)
     try:
@@ -173,7 +183,11 @@ def _write_json_atomic(path, data):
 
 
 def failpoint(name):
-    """Barrera determinista de tests: notifica por un FD y espera por otro."""
+    """Barrera determinista de tests: notifica por un FD y espera por otro.
+
+    En Windows los FDs no cruzan procesos (no hay pass_fds), así que existe la
+    variante por ficheros: *_READY_FILE se toca al llegar y *_WAIT_FILE se
+    espera hasta que exista. Misma semántica, transporte portable."""
     prefix = f"IR_FAILPOINT_{name.upper()}"
     ready = os.environ.get(f"{prefix}_READY_FD")
     wait = os.environ.get(f"{prefix}_WAIT_FD")
@@ -181,6 +195,22 @@ def failpoint(name):
         os.write(int(ready), b"1")
     if wait:
         os.read(int(wait), 1)
+    ready_file = os.environ.get(f"{prefix}_READY_FILE")
+    wait_file = os.environ.get(f"{prefix}_WAIT_FILE")
+    if ready_file:
+        with open(ready_file, "w", encoding="ascii") as stream:
+            stream.write("1")
+    if wait_file:
+        # Tope de seguridad: la variante por FDs se desbloquea sola si el otro
+        # extremo muere; la de ficheros no lo detecta, así que un test colgado (o
+        # una env var olvidada en una shell de producción) no cuelga para siempre.
+        limite = time.monotonic() + 300
+        while not os.path.exists(wait_file):
+            if time.monotonic() >= limite:
+                raise RuntimeError(
+                    f"failpoint {name}: la barrera {wait_file} no se abrió en 300 s"
+                )
+            time.sleep(0.01)
 
 
 class LeaseGroup:
@@ -231,15 +261,48 @@ class LeaseManager:
         lock_path = self.root / "coordinator.lock"
         descriptor = os.open(str(lock_path), os.O_RDWR | os.O_CREAT, 0o600)
         try:
+            tope = TOPE_COORDINADOR_SEGUNDOS
             if fcntl is not None:
-                fcntl.flock(descriptor, fcntl.LOCK_EX)
+                # Mismo contrato que la rama Windows de abajo: se sondea con tope y se
+                # traduce a LeaseBusy. El flock bloqueante sin límite dejaba a TODAS las
+                # sesiones POSIX esperando para siempre a un candado huérfano — el arreglo
+                # de 1.1.1/1.2.0 solo había llegado a Windows (ADR-026).
+                limite = time.monotonic() + tope
+                while True:
+                    try:
+                        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        break
+                    except OSError:
+                        if time.monotonic() >= limite:
+                            raise LeaseBusy(
+                                f"el coordinador de leases sigue ocupado tras {tope} s; "
+                                "¿otra sesión retiene el candado?"
+                            )
+                        time.sleep(0.05)
                 liberar = lambda: fcntl.flock(descriptor, fcntl.LOCK_UN)
             elif msvcrt is not None:
                 if os.fstat(descriptor).st_size == 0:
                     os.write(descriptor, b"0")
-                os.lseek(descriptor, 0, os.SEEK_SET)
-                msvcrt.locking(descriptor, msvcrt.LK_LOCK, 1)
-                liberar = lambda: msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+                # LK_LOCK abandona a los ~10 s con EDEADLK y el OSError no es LeaseError:
+                # ningún llamador lo captura. Se sondea sin bloquear hasta un límite ancho
+                # y, si no entra, se traduce a LeaseBusy como en el resto del control plane.
+                limite = time.monotonic() + tope
+                while True:
+                    os.lseek(descriptor, 0, os.SEEK_SET)
+                    try:
+                        msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+                        break
+                    except OSError:
+                        if time.monotonic() >= limite:
+                            raise LeaseBusy(
+                                f"el coordinador de leases sigue ocupado tras {tope} s; "
+                                "¿otra sesión retiene el candado?"
+                            )
+                        time.sleep(0.05)
+
+                def liberar():
+                    os.lseek(descriptor, 0, os.SEEK_SET)
+                    msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
             else:
                 raise LeaseError(
                     "los leases locales requieren un lock exclusivo del sistema "

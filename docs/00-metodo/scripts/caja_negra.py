@@ -25,6 +25,11 @@ from pathlib import Path
 
 import control_plane
 
+# Windows: la salida por PIPE hereda cp1252 y los acentos salen como mojibake.
+for _salida in (sys.stdout, sys.stderr):
+    if hasattr(_salida, "reconfigure"):
+        _salida.reconfigure(encoding="utf-8", errors="replace")
+
 SEVERIDADES = ("P0", "P1", "P2", "nota")
 # Campos sin los cuales un incidente no cuenta nada. Las líneas v1 no llevan severidad ni
 # version_metodo y siguen siendo válidas: solo se exige lo que siempre existió.
@@ -348,6 +353,13 @@ def enviar(args):
     print("\nCompartirlo es VOLUNTARIO y sirve solo para mejorar el método. "
           "No se envía nada más que lo de arriba.")
     if not args.si:
+        # Un stdin que no es una terminal (un agente, un PIPE) no puede contestar: el
+        # input() se quedaba esperando para siempre. El consentimiento no se presupone:
+        # sin terminal, no se envía y se dice cómo consentir (ADR-026).
+        if not sys.stdin.isatty():
+            print("\nSin terminal interactiva no envío nada. Para consentir el envío, "
+                  "repite el comando con --si.")
+            return 0
         try:
             respuesta = input("¿Enviar ahora? [s/N] ").strip().lower()
         except EOFError:

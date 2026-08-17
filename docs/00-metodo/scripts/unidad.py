@@ -31,6 +31,7 @@ import os
 import posixpath
 import re
 import shutil
+import signal
 import stat
 import subprocess
 import sys
@@ -713,6 +714,41 @@ def escribir_recibo_preparacion(destino, estado, hook=None, hook_sha256=None,
     return ruta
 
 
+def _which_sin_cwd(programa):
+    """shutil.which pero SIN el directorio actual, que en Windows se antepone al
+    PATH: si no, un bash.exe versionado en el repo de código (que suele ser el cwd)
+    ganaría al bash de Git for Windows y se ejecutaría fuera de todo control."""
+    rutas = os.environ.get("PATH", os.defpath).split(os.pathsep)
+    cwd = os.path.abspath(os.getcwd())
+    limpias = [r for r in rutas if r and os.path.abspath(r) != cwd]
+    return shutil.which(programa, path=os.pathsep.join(limpias))
+
+
+def orden_para_hook(gancho):
+    """En POSIX el shebang ejecuta el hook solo; en Windows el shebang no existe:
+    si el hook lo trae se ejecuta vía bash (viene con Git for Windows), y si no hay
+    bash se dice en claro en vez de morir con WinError 193."""
+    if gancho.suffix == ".py":
+        return [sys.executable, str(gancho)]
+    if os.name == "nt":
+        with open(gancho, "rb") as stream:
+            if stream.read(2) == b"#!":
+                bash = _which_sin_cwd("bash")
+                if not bash:
+                    raise OSError(
+                        "en Windows este hook necesita bash (Git for Windows) "
+                        "o un worktree-listo.py"
+                    )
+                return [bash, str(gancho)]
+    return [str(gancho)]
+
+
+# El hook corre con los leases de la unidad tomados: sin tope, un hook colgado retiene
+# los candados de todas las sesiones. 10 min dan para un `npm ci`/`pip install` normal;
+# un entorno que tarde más de verdad lo sube por entorno (y los tests lo bajan).
+TOPE_HOOK_SEGUNDOS = int(os.environ.get("IR_TOPE_HOOK_SEGUNDOS", "600"))
+
+
 def preparar_worktree(destino):
     """Ejecuta, si existe, el gancho explícito del proyecto y devuelve si permite despachar.
 
@@ -787,12 +823,49 @@ def preparar_worktree(destino):
         fail(f"preparación bloqueada: {nombre} no es ejecutable; recibo {rel(ruta)}")
         return False
     huella = hashlib.sha256(gancho.read_bytes()).hexdigest()
-    orden = [sys.executable, str(gancho)] if gancho.suffix == ".py" else [str(gancho)]
     print(f"\n  Preparando el entorno del worktree con {nombre}…", flush=True)
     try:
-        codigo = subprocess.run(
-            [*orden, str(destino_real)], cwd=str(destino_real), shell=False, close_fds=True
-        ).returncode
+        orden = orden_para_hook(gancho)
+        # stdin CERRADO, tope de tiempo y salida a FICHERO: este hook corre con los
+        # leases de la unidad ya tomados. Un `npm install` que pregunta, un ssh pidiendo
+        # host-key o cualquier `read` colgaba aquí el despacho reteniendo los candados —
+        # el "subagente esperando una aprobación que no llega" del feedback de campo
+        # (ADR-026). Y la salida NO se hereda: un nieto huérfano que sobreviva al kill
+        # (msys rompe la cadena de padres, killpg no existe en Windows) retendría la
+        # tubería del agente padre y lo dejaría colgado leyendo; con un fichero de
+        # .runtime/ retiene el fichero y a nadie más (regla 12: outputs por ruta).
+        registro = RAIZ / ".runtime/worktree-readiness" / f"{destino.name}.log"
+        registro.parent.mkdir(parents=True, exist_ok=True)
+        with open(registro, "wb") as salida_hook:
+            proceso = subprocess.Popen(
+                [*orden, str(destino_real)], cwd=str(destino_real), shell=False,
+                close_fds=True, stdin=subprocess.DEVNULL,
+                stdout=salida_hook, stderr=subprocess.STDOUT,
+                start_new_session=(os.name == "posix"),
+            )
+            try:
+                codigo = proceso.wait(timeout=TOPE_HOOK_SEGUNDOS)
+            except subprocess.TimeoutExpired:
+                if os.name == "posix":
+                    with contextlib.suppress(ProcessLookupError):
+                        os.killpg(proceso.pid, signal.SIGKILL)
+                else:
+                    subprocess.run(
+                        ["taskkill", "/T", "/F", "/PID", str(proceso.pid)],
+                        capture_output=True,
+                    )
+                    proceso.kill()
+                proceso.wait()
+                ruta = escribir_recibo_preparacion(
+                    destino, "fallido", hook=nombre, hook_sha256=huella,
+                    motivo="hook_timeout",
+                )
+                fail(f"preparación bloqueada: {nombre} superó su tope de "
+                     f"{TOPE_HOOK_SEGUNDOS} s sin terminar (su stdin va cerrado a "
+                     f"propósito: si esperaba input, ese es el bug del hook); su salida "
+                     f"quedó en {rel(registro)} · recibo {rel(ruta)}")
+                return False
+        print(f"  salida del hook: {rel(registro)}")
     except OSError as exc:
         ruta = escribir_recibo_preparacion(
             destino, "fallido", hook=nombre, hook_sha256=huella,
@@ -1035,8 +1108,12 @@ def _cmd_despachar(args, autoridad, snapshot=None):
             ok(f"nivel de test declarado: {nivel[:60]}")
 
     # --- Precondición 5: trabajo en vuelo (regla 5: UNA unidad por defecto) ------------------
+    # Las documentales quedan fuera del censo de vuelo: la regla 5 lo dice («las --documental
+    # tampoco: pueden ir en paralelo») y contarlas bloqueaba despachos legítimos por tope
+    # (caso de campo, 05-08: una auditoría documental aparcada consumía cupo de constructor).
     activas = sorted(n for n, u in censo().items()
-                     if n != nombre and u["fm"].get("estado") in EN_VUELO)
+                     if n != nombre and u["fm"].get("estado") in EN_VUELO
+                     and (u["fm"].get("ejecucion") or "").strip() != "documental")
     if activas and not args.paralelo:
         fail(f"ya hay {len(activas)} unidad(es) en vuelo: {', '.join(activas)}")
         err(f"\n  Regla 5: UNA unidad en vuelo por defecto — el límite real es la atención, no\n"
@@ -1076,6 +1153,21 @@ def _cmd_despachar(args, autoridad, snapshot=None):
         warn(f"despacho documental en paralelo con: {', '.join(activas)} (no toca código)")
     else:
         ok("no hay ninguna otra unidad en vuelo")
+
+    # --- Guía (ADR-026): en un brownfield, la ADOPCIÓN va primero ---------------------------
+    # El HARD-GATE de adopcion.md era prosa que nadie ejecutaba: los despachos de código
+    # salían sin gap-map y la fase 3 se comía el repo entero (caso de campo 08-08). Avisa,
+    # no encierra: el despacho sigue, con la deuda nombrada.
+    if not args.documental:
+        bias = RAIZ / "docs/01-constitucion/bias.md"
+        adopcion = RAIZ / "docs/03-investigacion/ADOPCION.md"
+        if (bias.is_file() and not adopcion.is_file()
+                and "brownfield" in bias.read_text(encoding="utf-8",
+                                                   errors="replace").lower()):
+            warn(f"brownfield sin {rel(adopcion)}: la ADOPCIÓN es la primera unidad del "
+                 f"workspace (runbook adopcion.md) — sin ella no hay gap-map código↔flujos "
+                 f"y la fase 3 no está acotada. Este despacho sigue, pero esa deuda no se "
+                 f"paga sola.")
 
     if args.documental:
         autoridad.assert_owner()
@@ -1200,7 +1292,10 @@ def _cmd_despachar(args, autoridad, snapshot=None):
             f"--prompt \"{prompt}\"\n"
             f"       python3 {launcher} lanzar {nombre} --harness codex --rol constructor "
             f"--prompt \"{prompt}\"\n"
-            f"       El launcher deriva y verifica {rel(destino)}; no pases cwd ni argv a mano."
+            f"       El launcher deriva y verifica {rel(destino)}; no pases cwd ni argv a mano.\n"
+            f"       Tarda lo que tarde la unidad: lánzalo en SEGUNDO PLANO y sigue su recibo\n"
+            f"       en .runtime/ejecucion/ — un shell con tope corto (p. ej. 10 min) lo\n"
+            f"       mataría a mitad y lo verías como «esperando una aprobación que no llega»."
         )
     print(f"\n  Siguientes pasos:\n{paso_obra}\n"
           f"    2. Actualiza ESTADO.md con la unidad en obra (lo escribe el padre).\n"
@@ -1260,13 +1355,16 @@ def fecha_ok(valor):
 
 
 def veredicto_elegido(texto):
-    """El veredicto de la revisión, o None si sigue siendo el menú de la plantilla."""
+    """El veredicto de la revisión MÁS RECIENTE, o None si sigue siendo el menú de la
+    plantilla. hallazgos.md acumula una ronda de revisión debajo de otra: quedarse con
+    la primera coincidencia devolvía el veredicto superado de la 1ª ronda (bug 004)."""
+    elegido = None
     for m in RE_VEREDICTO.finditer(texto):
         valor = m.group(1).strip().strip("*").strip()   # `**Veredicto:** LIMPIO` → `LIMPIO`
         if "|" in valor or not valor or valor in {"—", "-"}:
             continue                                   # menú sin elegir o hueco vacío
-        return valor
-    return None
+        elegido = valor
+    return elegido
 
 
 def sin_cosechar(texto):
@@ -1362,8 +1460,32 @@ def rama_mergeada(repo, rama, principal, fusion_declarada=""):
         if git(repo, "merge-base", "--is-ancestor", sha, base, silencioso=True)[0] == 0:
             return True, f"{etiqueta} está dentro de {base} ({sha[:8]})", True, sha
 
-    # Ninguna referencia viva es ancestro de la principal. Antes de bloquear, la huella del
-    # squash: el método exige NNN-slug en el título del PR, y el squash lo hereda como asunto.
+    # Ninguna referencia viva es ancestro de la principal. La huella FUERTE de un squash:
+    # algún commit de la principal desde la base común tiene EXACTAMENTE el mismo árbol que
+    # la punta de la unidad. No depende de cómo se titulara el PR — los PR de campo se
+    # titulan «044: …» sin el slug entero y el grep de abajo no los ve, con el trabajo ya
+    # dentro (visto en cinco unidades de un mismo proyecto, 04-08). Verificarlo a mano era `git diff <rama> <sha>`
+    # vacío; esto es esa misma comprobación, commit a commit.
+    for sha, etiqueta in vivos:
+        codigo, arbol = git(repo, "rev-parse", f"{sha}^{{tree}}", silencioso=True)
+        if codigo != 0:
+            continue
+        codigo, mb = git(repo, "merge-base", sha, base, silencioso=True)
+        if codigo != 0:
+            continue
+        codigo, salida = git(repo, "log", base, f"^{mb.strip()}", "--format=%H %T",
+                             silencioso=True)
+        if codigo != 0:
+            continue
+        for linea in salida.splitlines():
+            csha, _, carbol = linea.strip().partition(" ")
+            if carbol.strip() == arbol.strip():
+                return True, (f"{base} contiene el commit {csha[:8]} con el MISMO árbol que "
+                              f"{etiqueta}: el trabajo completo está dentro (huella de squash "
+                              f"merge), se titulara como se titulara el PR"), True, csha
+
+    # Y como último recurso, la huella DÉBIL del squash: el método exige NNN-slug en el
+    # título del PR, y el squash lo hereda como asunto.
     codigo, salida = git(repo, "log", base, f"--grep={rama}", "--format=%H %s", "-1",
                          silencioso=True)
     if codigo == 0 and salida.strip():
@@ -1419,12 +1541,37 @@ def escribir_ok_usuario(ruta, fecha):
     escribir_fichero_unidad(ruta, texto)
 
 
+def procesos_dentro(destino):
+    """PIDs ajenos con ficheros abiertos bajo `destino` (best-effort: lsof en POSIX).
+
+    Sin lsof (o en Windows) devuelve [] y el borrado sigue como siempre: es un guard de
+    máximo esfuerzo, no una promesa — pero cubre el caso real (macOS/Linux, una suite de
+    tests corriendo en el worktree cuando alguien cierra la unidad)."""
+    if not shutil.which("lsof"):
+        return []
+    try:
+        r = subprocess.run(["lsof", "-t", "+D", str(destino)], capture_output=True,
+                           text=True, timeout=15)
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    propios = {str(os.getpid()), str(os.getppid())}
+    return sorted({pid.strip() for pid in r.stdout.split()
+                   if pid.strip() and pid.strip() not in propios})
+
+
 def borrar_worktree(repo, destino):
     """Quita el worktree. Se ha comprobado antes que no tiene cambios: --force solo vence a
     los ficheros IGNORADOS (node_modules, .venv, build/), que `git status` no ve y que en un
     proyecto real siempre están ahí. Sin esto el comando no valdría fuera de un repo de juguete."""
     if not destino.exists():
         return True, "ya no existía"
+    # Borrar el directorio de trabajo de un proceso vivo lo mata sin aviso — así murieron
+    # suites de tests de campo (07-08). Daño irreversible ⇒ gate duro con salida (ADR-026).
+    vivos = procesos_dentro(destino)
+    if vivos:
+        return False, (f"hay procesos vivos trabajando dentro (PID {', '.join(vivos)}): "
+                       f"no lo borro para no matarlos a mitad; espera a que terminen o "
+                       f"ciérralos tú y repite el cierre")
     codigo, salida = git(repo, "worktree", "remove", str(destino))
     if codigo == 0:
         return True, "borrado"
@@ -1442,6 +1589,30 @@ def cmd_cerrar(args):
     if not RE_UNIDAD.match(nombre):
         fail(f"'{nombre}' no tiene forma NNN-slug (tres dígitos, guion, slug)")
         return 1
+    # ADR-023: el cierre reescribe fichas, archiva y deja el metarrepo listo para
+    # commitear — toma la unidad y `git-index` para no cruzarse con Modo D ni con
+    # un despacho de la misma unidad en otra sesión.
+    manager = gestion_leases.LeaseManager(RAIZ)
+    # El except cubre SOLO la adquisición: si el cuerpo del cierre completa y luego
+    # el release tropieza (registro corrupto a media ejecución), no se puede reportar
+    # "bloqueado" sobre un cierre que ya archivó y reconcilió.
+    try:
+        grupo = manager.acquire((f"unit:{nombre}", "git-index"))
+    except gestion_leases.LeaseError as exc:
+        fail(f"cierre bloqueado: otra sesión tiene la unidad o el índice ({exc})")
+        return 1
+    try:
+        grupo.assert_owner()
+        return _cerrar_bajo_lease(args, nombre, grupo)
+    finally:
+        try:
+            grupo.release()
+        except gestion_leases.LeaseError as exc:
+            warn(f"el lease del cierre no se liberó limpiamente ({exc}); otra sesión lo "
+                 "reclamará cuando este proceso muera")
+
+
+def _cerrar_bajo_lease(args, nombre, autoridad):
     unidad = buscar_unidad(nombre)
     if unidad is None:
         fail(f"no existe la unidad {nombre} (¿ya está cerrada y archivada?)")
@@ -1662,6 +1833,16 @@ def cmd_cerrar(args):
     else:
         ok(f"ruta {politica.name}: OK de usuario no aplica")
 
+    # ADR-023: revalidar la autoridad JUSTO antes de la primera escritura irreversible.
+    # Todo lo anterior fue lectura y verificación; de aquí en adelante se muta el
+    # metarrepo (estado, archivado, worktree). Un fencing perdido en la ventana entre
+    # el assert inicial y aquí (el linter tarda) bloquea esta escritura, no la consuma.
+    try:
+        autoridad.assert_owner()
+    except gestion_leases.LeaseError as exc:
+        fail(f"cierre abortado antes de tocar nada: se perdió la autoridad del lease ({exc})")
+        return 1
+
     texto = leer_fichero_unidad(ruta)
     texto = re.sub(r"^estado:\s*\S+", "estado: mergeada", texto, count=1, flags=re.M)
     texto = re.sub(r"^actualizado:\s*\S+", f"actualizado: {HOY}", texto, count=1, flags=re.M)
@@ -1791,15 +1972,25 @@ def cmd_estado(_args):
     if esperando:
         warn(f"{len(esperando)} unidad(es) esperando a que el usuario pruebe la app: "
              f"{', '.join(esperando)} — no cuentan para el tope, pero tampoco están cerradas")
-    for huerfano in sorted(set(wt) - set(unidades)):
+    # Mismo criterio que lint_metodo.py sección 5 (bug 003): una unidad archivada con
+    # worktree aún en disco no es un huérfano ciego — es un resto que puede necesitar
+    # borrado manual si `borrar_worktree` falló, así que avisa en vez de fallar en
+    # silencio o de callarse del todo.
+    archivadas = {p.name for p in ARCHIVO.iterdir() if p.is_dir()} if ARCHIVO.is_dir() else set()
+    huerfanos_reales = set(wt) - set(unidades) - archivadas
+    huerfanos_archivados = (set(wt) - set(unidades)) & archivadas
+    for huerfano in sorted(huerfanos_reales):
         fail(f"worktree sin unidad: worktrees/{huerfano} (¿cierre a medias?)")
+    for huerfano in sorted(huerfanos_archivados):
+        warn(f"worktrees/{huerfano}: su unidad ya está archivada pero el worktree sigue "
+             f"en disco — bórralo a mano si el cierre no pudo hacerlo")
     requieren_wt = [
         n for n in activas
         if unidades[n]["fm"].get("ejecucion") != "documental"
     ]
     for sin_wt in [n for n in requieren_wt if n not in wt]:
         warn(f"unidad {sin_wt} en obra SIN worktree (¿despachada de verdad?)")
-    if wt and not (set(wt) - set(unidades)) and all(n in wt for n in requieren_wt):
+    if wt and not huerfanos_reales and not huerfanos_archivados and all(n in wt for n in requieren_wt):
         ok("worktrees y unidades casan")
 
     nnn, _ = siguiente_nnn()

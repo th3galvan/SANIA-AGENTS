@@ -26,6 +26,14 @@ for _salida in (sys.stdout, sys.stderr):
         _salida.reconfigure(encoding="utf-8", errors="replace")
 
 RAIZ = Path(__file__).resolve().parents[3]
+# `--raiz RUTA` desacopla el linter del workspace donde vive: Modo D mide el workspace
+# VIEJO con el linter NUEVO —la misma vara antes y después de actualizar— para que un
+# cambio de redacción de un check no se disfrace de regresión y revierta en falso (ADR-026).
+if "--raiz" in sys.argv:
+    _indice = sys.argv.index("--raiz")
+    if _indice + 1 >= len(sys.argv):
+        sys.exit("uso: lint_metodo.py [--raiz RUTA_DEL_META_REPO]")
+    RAIZ = Path(sys.argv[_indice + 1]).resolve()
 fallos, avisos = [], []
 HOY = datetime.date.today()
 
@@ -631,6 +639,9 @@ else:
         else:
             rotos = []
             for relativo in archivos_metodo:
+                # Manifiestos generados en Windows antes de 1.1.3 traen \ como
+                # separador; se normaliza al leer y Modo D los reescribe con /.
+                relativo = str(relativo).replace("\\", "/")
                 ruta = RAIZ / relativo
                 if not ruta.is_file():
                     rotos.append(f"{relativo} (no existe)")
@@ -839,11 +850,27 @@ en_obra = {
     if fm.get("estado") in {"en_obra", "en_revision"}
     and fm.get("ejecucion") != "documental"
 }
-for h in sorted(wt - set(unidades)):
+# cmd_cerrar archiva la ficha ANTES de correr este linter y ANTES de borrar el worktree
+# (orden necesario para poder restaurar los tres a la vez si el linter bloquea). En esa
+# ventana intermedia la unidad ya no está en `unidades` (que se salta archivo/): sin
+# distinguir este caso, un cierre legítimo se ve como huérfano y se revierte a sí mismo
+# (bug 003). PERO archivar no garantiza que el worktree se borrara: si `borrar_worktree`
+# falla (proceso vivo dentro, error de git), `cmd_cerrar` solo avisa y sigue — sin FAIL
+# aquí ese resto quedaría invisible PARA SIEMPRE (revisión ronda 1 del bug 003). Por eso
+# una unidad archivada con worktree en disco no es un OK silencioso: es un WARN que no
+# bloquea el cierre en curso pero tampoco se pierde si el borrado de verdad falló.
+archivo = RAIZ / "docs/05-trabajo/archivo"
+archivadas = {p.name for p in archivo.iterdir() if p.is_dir()} if archivo.is_dir() else set()
+huerfanos_reales = wt - set(unidades) - archivadas
+huerfanos_archivados = (wt - set(unidades)) & archivadas
+for h in sorted(huerfanos_reales):
     fail(f"worktree huérfano sin unidad: worktrees/{h} (¿cierre a medias?)")
+for h in sorted(huerfanos_archivados):
+    warn(f"worktrees/{h}: su unidad ya está archivada pero el worktree sigue en disco — "
+         f"bórralo a mano si el cierre no pudo hacerlo (o es la ventana normal de un cierre en curso)")
 for z in sorted(en_obra - wt):
     warn(f"unidad {z} en obra sin worktree (¿aún no despachada de verdad?)")
-if wt and not (wt - set(unidades)):
+if wt and not huerfanos_reales and not huerfanos_archivados:
     ok(f"worktrees coherentes con unidades: {sorted(wt)}")
 elif not wt:
     ok("sin worktrees")
@@ -890,9 +917,19 @@ for nombre in sorted(en_obra):
         elif tiene_local:
             codigo, salida = git(repo_cod, "rev-list", "--count", f"{rama_principal}..{nombre}")
             if codigo == 0 and salida.strip() == "0":
-                fail(f"{nombre}: en_revision y su rama no tiene NI UN commit por encima de "
-                     f"{rama_principal} — no hay nada que revisar ni que mergear (¿el "
-                     f"constructor murió a mitad?)")
+                # 0 commits por encima también es la foto DESPUÉS de un fast-forward: la
+                # rama quedó contenida en la principal y la unidad espera validación. Si la
+                # bitácora acredita el merge (fusion: anotado y ese commit dentro de la
+                # principal), no hay constructor muerto que denunciar (incidente
+                # incidente de campo, 06-08: FAIL precisamente por haber fusionado).
+                acreditada = anotada and git(
+                    repo_cod, "merge-base", "--is-ancestor", anotada, rama_principal
+                )[0] == 0
+                if not acreditada:
+                    fail(f"{nombre}: en_revision y su rama no tiene NI UN commit por encima "
+                         f"de {rama_principal} — no hay nada que revisar ni que mergear (¿el "
+                         f"constructor murió a mitad?). Si en realidad ya se fusionó, la "
+                         f"ficha debe acreditarlo con su 'fusion: <sha>'")
 
 # --- 6. Archivo: lo archivado debe estar mergeada/descartada ---
 archivo = trabajo / "archivo"
@@ -1030,7 +1067,7 @@ if repo_cod.is_dir():
     artefactos_kill += [repo_cod / n for n in ("Makefile", "makefile", "package.json")
                         if (repo_cod / n).is_file()]
 culpables_kill = sorted(
-    str(p.relative_to(RAIZ))
+    p.relative_to(RAIZ).as_posix()
     for p in artefactos_kill
     if any(pat in p.read_text(encoding="utf-8", errors="ignore") for pat in PATRONES_KILL))
 if culpables_kill:
@@ -1040,7 +1077,10 @@ if culpables_kill:
 else:
     ok("sin pkill -f ni killall en scripts, workflows ni Makefile del repo de código")
 
-# --- 7b. El CI real nace junto al stack; empezarlo y dejarlo a medias es fallo ---
+# --- 7b. El CI real es guía, no gate (ADR-028 aplica ADR-026 a este control) ---
+# Ausencia de CI no pierde trabajo, no pisa producción, no filtra secretos ni absorbe
+# cambios ajenos: por la regla de ADR-026 nunca debió ser un fail(). Quien SÍ quiera
+# materializar su CI sigue teniendo el mismo detalle de qué falta o está mal formado.
 PIEZAS_CI = (
     "scripts/ci/full-suite", "scripts/ci/lint", "scripts/ci/security",
     ".github/workflows/tests.yml", ".github/workflows/quality-security.yml",
@@ -1048,7 +1088,13 @@ PIEZAS_CI = (
 )
 presentes_ci = [ruta for ruta in PIEZAS_CI if (repo_cod / ruta).is_file()]
 lint_ci = RAIZ / "docs/00-metodo/scripts/lint_ci.py"
-if hay_repo and lint_ci.is_file():
+if not lint_ci.is_file():
+    warn("no se pudo comprobar el contrato de CI: falta "
+         "docs/00-metodo/scripts/lint_ci.py")
+elif not hay_repo:
+    warn(f"no se pudo comprobar el contrato de CI: el repo de código ({repo_cod}) "
+         "no existe o no es un repositorio git")
+else:
     requiere_e2e = planos_declaran_e2e()
     opciones_ci = [sys.executable, str(lint_ci), "--repo", str(repo_cod)]
     if requiere_e2e:
@@ -1058,7 +1104,7 @@ if hay_repo and lint_ci.is_file():
         capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
     )
     if (presentes_ci or requiere_e2e) and resultado_ci.returncode:
-        fail("la materialización del CI está incompleta; ejecuta "
+        warn("la materialización del CI está incompleta; ejecuta "
              "`python3 docs/00-metodo/scripts/lint_ci.py --repo main"
              f"{' --require-e2e' if requiere_e2e else ''}` para ver el detalle")
     elif presentes_ci:

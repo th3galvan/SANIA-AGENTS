@@ -8,6 +8,7 @@ constitución y flows, conserva ``main/`` y deja ambos repos enlazados.
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -87,6 +88,23 @@ def congelar_planos(mapa):
         )
 
 
+def reescribir_enlaces_indice(texto):
+    """compilar.py escribe el índice con las rutas de SU carpeta temporal
+    (01-constitution/constitution.md, 02-flows/AREA/ID.md); este volcado renombra la
+    constitución y aplana todas las actividades como hermanas del propio índice — sin
+    reescribir los enlaces, el 100% apuntaba a rutas que nunca existieron (bug 005)."""
+    texto = texto.replace(
+        "](01-constitution/constitution.md)", "](../01-constitucion/manifiesto.md)"
+    )
+    texto = re.sub(r"\]\(02-flows/(?:[^)]+/)?([^/)]+\.md)\)", r"](\1)", texto)
+    # No es un enlace, pero nombra una carpeta que tras aplanar no existe en el
+    # destino — mismo síntoma (hace dudar si el proyecto está mal creado).
+    return texto.replace(
+        "- `02-flows/`: un documento por actividad.",
+        "- un documento por actividad, en esta misma carpeta.",
+    )
+
+
 def copiar_documentacion(workspace, salida):
     constitucion = salida / "01-constitution" / "constitution.md"
     flows = salida / "02-flows"
@@ -99,12 +117,36 @@ def copiar_documentacion(workspace, salida):
     for anterior in destino_flows.glob("*.md"):
         anterior.unlink()
     indice = salida / "README.md"
-    shutil.copyfile(indice, destino_flows / "INDICE.md")
+    texto_indice = reescribir_enlaces_indice(indice.read_text(encoding="utf-8"))
+    (destino_flows / "INDICE.md").write_text(texto_indice, encoding="utf-8")
     for documento in sorted(flows.rglob("*.md")):
         nombre = documento.stem + ".md"
         if (destino_flows / nombre).exists():
             morir("dos actividades compiladas tienen el mismo id: %s" % documento.stem)
         shutil.copyfile(documento, destino_flows / nombre)
+
+
+def escribir_estado_congelado(workspace):
+    """Las rutas a commitear tras congelar la documentación.
+
+    ESTADO.md lo escribe el PADRE del workspace: en un re-vuelco (modo C) machacarlo
+    destruía la tabla de unidades y los bloqueos reales (ADR-026). Solo se escribe si
+    no existe (primer finalizado); si existe, se conserva y se dice."""
+    estado = workspace / "docs" / "05-trabajo" / "ESTADO.md"
+    rutas_commit = ["docs/01-constitucion", "docs/02-flujos"]
+    if not estado.is_file():
+        estado.write_text(
+            "# ESTADO — diseño congelado\n\n"
+            "- Los planos fueron aprobados y pasaron validación estructural y E2E.\n"
+            "- Constitución y flows están regenerados desde la fuente canónica.\n"
+            "- Siguiente fase: investigación/planificación e implementación por recorridos.\n",
+            encoding="utf-8",
+        )
+        rutas_commit.append("docs/05-trabajo/ESTADO.md")
+    else:
+        print("ESTADO.md conservado: lo mantiene el padre del workspace; anota tú allí "
+              "que los planos quedaron congelados.")
+    return rutas_commit
 
 
 def commit_si_hay_cambios(repo, mensaje, incluir_todo=False):
@@ -117,6 +159,22 @@ def commit_si_hay_cambios(repo, mensaje, incluir_todo=False):
         r = ejecutar(["git", "commit", "-m", mensaje], cwd=repo)
         if r.returncode:
             morir("no pude crear el commit en %s:\n%s" % (repo, r.stdout))
+
+
+def commit_inicial_o_aviso(main):
+    """El barrido total (`add -A`) SOLO vale para el primer import de una carpeta ingerida
+    sin historia: ahí todo lo que hay es, por definición, el estado inicial. Con historia,
+    ese mismo barrido absorbía en silencio trabajo sin commitear del usuario o de una
+    unidad a medio cerrar (ADR-026): se publica lo commiteado y lo demás se nombra."""
+    sin_historia = ejecutar(["git", "rev-parse", "--verify", "HEAD"], cwd=main).returncode != 0
+    if sin_historia:
+        commit_si_hay_cambios(main, "Importa el estado inicial del código", incluir_todo=True)
+        return
+    pendiente = ejecutar(["git", "status", "--porcelain=v1"], cwd=main)
+    if pendiente.stdout.strip():
+        print("OJO: main/ tiene cambios sin commitear. NO los toco ni los publico "
+              "(se publica lo commiteado); revisa si son tuyos o de una unidad a "
+              "medio cerrar.")
 
 
 def repo_github(owner, nombre):
@@ -148,9 +206,7 @@ def publicar_github(workspace, owner, nombre):
     url_codigo = repo_github(owner, nombre)
     url_meta = repo_github(owner, nombre_meta)
 
-    # La copia de trabajo es propiedad de este workspace: se conserva también
-    # cualquier fichero local que llegó al ingerir una carpeta sin remoto.
-    commit_si_hay_cambios(main, "Importa el estado inicial del código", incluir_todo=True)
+    commit_inicial_o_aviso(main)
     configurar_remoto(main, url_codigo)
     subida = ejecutar(["git", "push", "-u", "origin", "HEAD:main"], cwd=main)
     if subida.returncode:
@@ -230,15 +286,9 @@ def main():
         )
         copiar_documentacion(workspace, salida)
 
-    estado = workspace / "docs" / "05-trabajo" / "ESTADO.md"
-    estado.write_text(
-        "# ESTADO — diseño congelado\n\n"
-        "- Los planos fueron aprobados y pasaron validación estructural y E2E.\n"
-        "- Constitución y flows están regenerados desde la fuente canónica.\n"
-        "- Siguiente fase: investigación/planificación e implementación por recorridos.\n",
-        encoding="utf-8",
-    )
-    ejecutar(["git", "add", "docs"], cwd=workspace)
+    # Rutas explícitas: `git add docs` entero arrastraba trabajo del usuario sin
+    # commitear, contradiciendo la regla 3 del propio método.
+    ejecutar(["git", "add", *escribir_estado_congelado(workspace)], cwd=workspace)
     commit_si_hay_cambios(workspace, "Congela planos aprobados y documentación")
 
     nombre = args.nombre or workspace.name.removesuffix("-agents")

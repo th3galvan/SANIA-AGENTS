@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-08-17",
+  "actualizado": "2026-08-19",
   "archivos": [
     "docs/00-metodo/README.md",
     "docs/00-metodo/VERSION",
@@ -38,6 +38,7 @@
     "docs/00-metodo/decisiones/024-control-plane-de-seguridad-y-evidencia-causal.md",
     "docs/00-metodo/decisiones/025-el-trabajo-aparcado-no-bloquea-el-modo-d.md",
     "docs/00-metodo/decisiones/026-guiar-no-bloquear.md",
+    "docs/00-metodo/decisiones/027-sin-tope-numerico-de-paralelismo.md",
     "docs/00-metodo/decisiones/028-ci-es-guia-no-gate.md",
     "docs/00-metodo/runbooks/adopcion.md",
     "docs/00-metodo/runbooks/auditoria.md",
@@ -73,9 +74,11 @@
     "docs/00-metodo/plantillas/roadmap.md",
     "docs/00-metodo/plantillas/sintesis.md",
     "docs/00-metodo/scripts/caja_negra.py",
+    "docs/00-metodo/scripts/canario.py",
     "docs/00-metodo/scripts/control_plane.py",
     "docs/00-metodo/scripts/doctor.py",
     "docs/00-metodo/scripts/ejecucion.py",
+    "docs/00-metodo/scripts/herramienta.py",
     "docs/00-metodo/scripts/lint_ci.py",
     "docs/00-metodo/scripts/lint_deploy.py",
     "docs/00-metodo/scripts/lint_metodo.py",
@@ -86,6 +89,7 @@
     "docs/00-metodo/scripts/workspace_paths.py"
   ],
   "formato": 1,
-  "huella": "5697c46724e00b0293bf107a1d9cd00ea2345d06b7e1b6bb396cf82957e10996",
-  "version": "1.3.0"
+  "huella": "af22e69f6706bdc267e8e366c2d6297c941e8301f902fae108f2e8827a19e8df",
+  "origen": "https://github.com/nategentile/ingenieria-requisitos",
+  "version": "1.7.3"
 }

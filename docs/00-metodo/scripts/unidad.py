@@ -73,7 +73,6 @@ RE_UNIDAD = re.compile(r"^(\d{3})-([a-z0-9][a-z0-9-]*)$")
 
 # Caracteres mínimos de prosa PROPIA que debe tener el contrato para poder despacharse.
 MINIMO_PROSA = 200
-TOPE_EN_VUELO = 3  # regla 5: default 1, tope absoluto 3 y solo con --paralelo explícito
 
 # El contrato lo aprueba el USUARIO, no el agente: `aprobado:` solo vale si es una fecha ISO.
 # Todo lo demás (`no`, vacío, ausente, "sí", "ok") es ausencia de aprobación.
@@ -282,6 +281,37 @@ def repo_codigo():
     return repo_config.repo_code(RAIZ)
 
 
+def modo_push():
+    """Política de publicación del workspace (repos.yaml): `agente` (defecto) | `usuario`."""
+    return repo_config.modo_push(RAIZ)
+
+
+def avisar_principal_sin_empujar(repo, principal):
+    """Camino B del cierre: la rama principal local fusionada y todavía sin publicar.
+
+    Con `push: agente` es un descuido y se avisa: al despachar, la rama de cada unidad nace
+    de `origin/<principal>`, así que si el merge se queda en local la SIGUIENTE unidad parte
+    de una base vieja y su merge ya no será fast-forward. Con `push: usuario` es exactamente
+    lo que el workspace pidió (007, R2 punto 6): mismo comando, pero como recibo del cierre,
+    no como alarma. Sin remoto no hay nada que decir.
+    """
+    if git(repo, "remote", "get-url", "origin", silencioso=True)[0] != 0:
+        return
+    codigo, salida = git(repo, "rev-list", "--count",
+                         f"origin/{principal}..{principal}", silencioso=True)
+    if codigo != 0 or not salida.strip().isdigit() or int(salida.strip()) == 0:
+        return
+    comando = f"git -C {rel(repo)} push origin {principal}"
+    if modo_push() == "usuario":
+        ok(f"push: usuario — la rama principal local va {salida.strip()} commit(s) por "
+           f"delante de origin/{principal}: el método no la empuja. Publícala tú cuando "
+           f"quieras → {comando}")
+    else:
+        warn(f"la rama principal local va {salida.strip()} commit(s) por delante de "
+             f"origin/{principal}: empújala o la siguiente unidad partirá de una base "
+             f"vieja → {comando}")
+
+
 def git(repo, *args, silencioso=False):
     """Ejecuta git y devuelve (codigo, salida). Nunca lanza: los errores se deciden arriba."""
     try:
@@ -459,9 +489,20 @@ def validar_origenes(referencias, carril, tipo):
     return resultado
 
 
-def revalidar_origenes(fm, proceso=None):
+def revalidar_origenes(fm, proceso=None, permitir_legacy=False):
+    """Valida (o revalida) las peticiones de origen de una unidad/bug.
+
+    `permitir_legacy` (unidad 027, R1/R2) solo lo activa `cerrar`: una unidad SIN
+    `peticiones:` que figure en `peticiones/LEGACY.json` se acepta con lista vacía en vez de
+    bloquear para siempre — la vía es para el pasado (anterior al sistema de peticiones), no
+    un agujero: sin listar en LEGACY.json, el bloqueo de siempre sigue igual.
+    """
     referencias = peticiones_de(fm)
     if not referencias:
+        if permitir_legacy and proceso:
+            tipo_proceso, nombre = proceso
+            if gestion_peticiones.unidad_legacy(nombre, tipo_proceso):
+                return []
         raise gestion_peticiones.ErrorPeticion(
             "la unidad no declara peticiones: [P-ID@revision]"
         )
@@ -1120,10 +1161,9 @@ def _cmd_despachar(args, autoridad, snapshot=None):
             f"  la máquina. Cierra la que está en obra, o repite con --paralelo si esta unidad\n"
             f"  NO comparte ningún fichero con ella (declarado en el frontmatter 'ficheros').")
         return 1
-    if len(activas) >= TOPE_EN_VUELO:
-        fail(f"{len(activas)} unidades en vuelo: {', '.join(activas)} — tope absoluto "
-             f"{TOPE_EN_VUELO}, ni con --paralelo")
-        return 1
+    # Sin tope numérico (ADR-027): con --paralelo caben tantas unidades como quepan sin
+    # chocar — el límite lo pone el propio grafo de ficheros del trabajo pedido, no una
+    # constante. El único gate real es la disjunción de ficheros que sigue abajo.
     # La regla "en paralelo jamás se comparten ficheros" la comprobaba un WARN dirigido a un
     # humano, o sea a nadie: se despachaban dos unidades sobre el mismo fichero sin que nada
     # avisara. Aquí se verifica y se bloquea. Una unidad --documental no toca el repo de
@@ -1527,6 +1567,24 @@ def anotar_fusion(ruta, sha):
     return False
 
 
+def anotar_origen_legacy(ruta):
+    """Deja escrito en el frontmatter que esta unidad se cerró por la vía legacy (unidad 027,
+    R1): sin `peticiones:` propias, pero listada en `peticiones/LEGACY.json`. Mismo patrón que
+    `anotar_fusion`: se inserta una vez, antes del `---` de cierre."""
+    texto = leer_fichero_unidad(ruta)
+    if re.search(r"^origen:\s*\S", texto, flags=re.M):
+        return False
+    lineas = texto.splitlines()
+    if not lineas or lineas[0].strip() != "---":
+        return False
+    for i, linea in enumerate(lineas[1:], start=1):
+        if linea.strip() == "---":
+            lineas.insert(i, "origen: legacy (peticiones/LEGACY.json)")
+            escribir_fichero_unidad(ruta, "\n".join(lineas) + "\n")
+            return True
+    return False
+
+
 def escribir_ok_usuario(ruta, fecha):
     """Deja escrito el OK del usuario donde ya se lee la revisión. Sin vocabulario nuevo."""
     texto = leer_fichero_unidad(ruta)
@@ -1625,10 +1683,16 @@ def _cerrar_bajo_lease(args, nombre, autoridad):
         return 1
     try:
         tipo_proceso = "bug" if clase == "bug" else "unidad"
-        referencias_peticion = revalidar_origenes(fm, proceso=(tipo_proceso, nombre))
+        referencias_peticion = revalidar_origenes(
+            fm, proceso=(tipo_proceso, nombre), permitir_legacy=True
+        )
     except gestion_peticiones.ErrorPeticion as exc:
         fail(f"{rel(ruta)}: {exc}")
         return 1
+    origen_legacy = not referencias_peticion
+    if origen_legacy:
+        ok(f"{nombre}: sin `peticiones:` propias, pero listada en peticiones/LEGACY.json "
+           "— cierre por la vía legacy")
 
     print(f"== Cerrando {nombre} ({fm.get('tipo')}) ==\n")
     print("Puertas (lo que NO se puede saltar):")
@@ -1848,6 +1912,8 @@ def _cerrar_bajo_lease(args, nombre, autoridad):
     texto = re.sub(r"^actualizado:\s*\S+", f"actualizado: {HOY}", texto, count=1, flags=re.M)
     escribir_fichero_unidad(ruta, texto)
     ok(f"{rel(ruta)}: estado → mergeada")
+    if origen_legacy and anotar_origen_legacy(ruta):
+        ok(f"{rel(ruta)}: origen legacy anotado (peticiones/LEGACY.json)")
 
     # Para una unidad normal, `mergeada` solo es válida dentro de archivo/. Se mueve antes
     # del lint y se revierte junto con los ficheros si aparece cualquier incoherencia.
@@ -1890,16 +1956,8 @@ def _cerrar_bajo_lease(args, nombre, autoridad):
                f"refs/remotes/origin/{nombre}", silencioso=True)[0] == 0:
             ok(f"rama remota origin/{nombre}: se conserva (respaldo del trabajo entregado)")
 
-    # Camino B (merge local, sin `gh`): si la principal se queda sin empujar, la SIGUIENTE
-    # unidad nacerá de una `origin/<principal>` vieja y su merge ya no será fast-forward.
-    # Se avisa aquí, que es cuando acaba de pasar, y con el comando exacto.
-    if hay_repo and git(repo, "remote", "get-url", "origin", silencioso=True)[0] == 0:
-        codigo, salida = git(repo, "rev-list", "--count",
-                             f"origin/{principal}..{principal}", silencioso=True)
-        if codigo == 0 and salida.strip().isdigit() and int(salida.strip()) > 0:
-            warn(f"la rama principal local va {salida.strip()} commit(s) por delante de "
-                 f"origin/{principal}: empújala o la siguiente unidad partirá de una base "
-                 f"vieja → git -C {rel(repo)} push origin {principal}")
+    if hay_repo:
+        avisar_principal_sin_empujar(repo, principal)
 
     if clase == "bug":
         # ADR-006: la ficha del bug NO se archiva; docs/bugs/ es el historial.
@@ -1910,14 +1968,17 @@ def _cerrar_bajo_lease(args, nombre, autoridad):
     # Esta es la última mutación semántica: el proceso canónico ya está terminal y, si algo
     # falla aquí, la petición queda abierta y el comando `peticion.py reconciliar` permite
     # reanudar sin fingir que la entrega terminó antes de tiempo.
-    try:
-        gestion_peticiones.reconciliar_ids(
-            referencias_peticion, tipo_proceso, nombre, evidencia_peticion
-        )
-    except gestion_peticiones.ErrorPeticion as exc:
-        fail(f"la unidad quedó terminal, pero falta reconciliar su petición: {exc}")
-        return 1
-    ok("peticiones de origen reconciliadas con el cierre")
+    if referencias_peticion:
+        try:
+            gestion_peticiones.reconciliar_ids(
+                referencias_peticion, tipo_proceso, nombre, evidencia_peticion
+            )
+        except gestion_peticiones.ErrorPeticion as exc:
+            fail(f"la unidad quedó terminal, pero falta reconciliar su petición: {exc}")
+            return 1
+        ok("peticiones de origen reconciliadas con el cierre")
+    else:
+        ok("origen legacy: sin petición que reconciliar (peticiones/LEGACY.json)")
 
     print("\nLo que queda es tuyo, porque es criterio y no mecánica:")
     print("    · aplicar los Deltas al mapa (docs/02-flujos/) y pasar el flujo a 'entregada'")
@@ -1961,7 +2022,7 @@ def cmd_estado(_args):
     print("\nCoherencia:")
     activas = sorted(n for n, u in unidades.items() if u["fm"].get("estado") in EN_VUELO)
     if not activas:
-        ok("nada en vuelo (regla 5: 1 por defecto, tope 3)")
+        ok("nada en vuelo (regla 5: 1 por defecto)")
     elif len(activas) == 1:
         ok(f"1 unidad en vuelo: {activas[0]}")
     else:
@@ -2039,7 +2100,7 @@ def main():
                             help="crea rama y worktree de una unidad ya especificada y aprobada")
     p_desp.add_argument("unidad", help="nombre completo NNN-slug")
     p_desp.add_argument("--paralelo", action="store_true",
-                        help="permite despachar con otra unidad en vuelo (tope 3) — solo si NO "
+                        help="permite despachar con otras unidades en vuelo — solo si NO "
                              "comparten ningún fichero")
     p_desp.add_argument(
         "--documental",

@@ -35,3 +35,34 @@ Estado anterior: `b54397c0` — ahí está lo que hubiera aquí antes (`git chec
 - `docs/00-metodo/scripts/unidad.py`
 - `setup.py`
 - `worktrees/README.md`
+
+## 2026-08-19 · método af22e69f6706…
+
+Estado anterior: `1c9bcf4e` — ahí está lo que hubiera aquí antes (`git checkout 1c9bcf4e`).
+25 fichero(s) sobrescritos:
+
+- `.githooks/pre-push`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `GEMINI.md`
+- `docs/00-metodo/README.md`
+- `docs/00-metodo/VERSION`
+- `docs/00-metodo/decisiones/027-sin-tope-numerico-de-paralelismo.md`
+- `docs/00-metodo/runbooks/bug.md`
+- `docs/00-metodo/runbooks/cierre.md`
+- `docs/00-metodo/runbooks/directo.md`
+- `docs/00-metodo/runbooks/documentacion.md`
+- `docs/00-metodo/runbooks/expres.md`
+- `docs/00-metodo/runbooks/feature.md`
+- `docs/00-metodo/runbooks/hotfix.md`
+- `docs/00-metodo/runbooks/migracion.md`
+- `docs/00-metodo/runbooks/refactor.md`
+- `docs/00-metodo/scripts/canario.py`
+- `docs/00-metodo/scripts/ejecucion.py`
+- `docs/00-metodo/scripts/herramienta.py`
+- `docs/00-metodo/scripts/lease.py`
+- `docs/00-metodo/scripts/lint_ci.py`
+- `docs/00-metodo/scripts/lint_metodo.py`
+- `docs/00-metodo/scripts/peticion.py`
+- `docs/00-metodo/scripts/repo_config.py`
+- `docs/00-metodo/scripts/unidad.py`

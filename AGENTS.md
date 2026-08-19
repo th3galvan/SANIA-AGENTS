@@ -2,25 +2,37 @@
 
 Este es el **meta-repo de orquestación**: aquí vive el pensamiento del proyecto (`docs/`) y el
 método. El código vive en otro repo, `main/` (solo lectura), y se trabaja en `worktrees/`.
+`.claude/personalidad.md` con directrices se aplica desde tu primera respuesta (CÓMO hablas, no QUÉ haces);
+placeholder o vacío: ni lo apliques ni lo menciones; si NO existe, créalo tú en silencio
+(cabecera `# Personalidad del agente (opcional)`); ilegible: avísalo UNA vez y sigue, sin bloquear.
 
 ## Al arrancar (haz esto antes que nada)
 
-0. **Solo-consulta arranca ligero.** ¿La petición solo LEE (una duda, enseñar el estado,
-   explicar algo del proyecto)? Salta el arranque y responde con el router de abajo, sin
-   declarar rol. En cuanto la sesión vaya a escribir o ejecutar algo, arranque completo (1-4).
-1. **Actualiza el taller:** ejecuta `setup.py` con el Python disponible. Esto coloca
-   `main/` en la última `origin/main` mediante fast-forward; si no puede, PARA y explica
-   por qué. Nunca trabajes desde una referencia remota antigua.
-2. **Linta el método:** `python3 docs/00-metodo/scripts/lint_metodo.py`. Un FAIL tuyo se
+0. **El aviso del método corre SIEMPRE, también en solo-consulta, y va lo primero.** Ejecuta
+   `python3 docs/00-metodo/scripts/herramienta.py comprobar` (se corta solo: ≤15 s TODO el
+   proceso): compara con el repo del método (`origen` de `METODO.json`) leyendo solo su fichero de
+   versión; calla si `.claude/actualizaciones.md` dice `preferencia: nunca`. Con versión nueva, dilo
+   UNA vez por sesión: **tu PRIMER párrafo al usuario ES ese aviso con sus cuatro respuestas, antes
+   de cualquier otro contenido o trabajo** — posponerlo o mencionarlo de pasada es un fallo de arranque:
+   **sí** (`… herramienta.py aplicar`: consigue la herramienta sola —tu clon si es del mismo origen y
+   está limpio; si no, descarga temporal que jamás toca el tuyo— y confirma qué cambió) · **todos** (`… aplicar --todos`) · **no
+   por ahora** · **nunca más** (`… herramienta.py nunca`). ¿Fallo, tardanza, red o acceso? Ni una línea: arranca igual, sin aviso ni pedir nada.
+1. **Solo-consulta arranca ligero.** ¿La petición solo LEE? Salta el resto del arranque (2-6) —el
+   paso 0 no se salta jamás— y responde con el router, sin rol. Si va a escribir o ejecutar: 2-6.
+2. **Actualiza el taller:** ejecuta `setup.py` con el Python disponible: coloca `main/` en la última
+   `origin/main` por fast-forward; si no puede, PARA y explica por qué. Nunca trabajes desde una referencia remota antigua.
+3. **Linta el método:** `python3 docs/00-metodo/scripts/lint_metodo.py`. Un FAIL tuyo se
    arregla antes de seguir; uno causado por el método no te bloquea (regla 13, ADR-026).
-3. **Lee `docs/05-trabajo/ESTADO.md`**: dónde estamos, qué hay en vuelo y qué toca ahora.
-4. **Declara tu rol al usuario y confírmalo ANTES de trabajar.** Ofrécele los tres:
+4. **Lee `docs/05-trabajo/ESTADO.md`**: dónde estamos, qué hay en vuelo y qué toca ahora.
+5. **Declara tu rol al usuario y confírmalo ANTES de trabajar.** Ofrécele los tres:
    - **CONSTRUCTOR** (el de por defecto): construye, especifica, despacha y cierra unidades.
    - **OBSERVABILIDAD** (solo lectura): revisa el estado real del sistema y reporta; no arregla.
    - **DEPLOY**: el único con manos en producción.
-
    Un rol = una sesión: **no se mezclan**. Por defecto: CONSTRUCTOR. Para tocar flujos asume
    ANALISTA DE FLUJOS (regla 14). Permisos y gates: `docs/00-metodo/roles.md`.
+6. **Mira el canario:** `python3 docs/00-metodo/scripts/canario.py`, y otra vez tras cada tarea larga. Si avisa
+   —capacidad ("zona de riesgo") o conducta ("ya está degradando")— pega el parte de `canario.py retomada` y di que
+   esta sesión está degradada: mejor cortar y seguir en una NUEVA. En Codex, sin hook, es el ÚNICO mecanismo.
 
 ## Orden de lectura (router) — lee solo lo que tu tarea necesita
 
@@ -65,8 +77,8 @@ método. El código vive en otro repo, `main/` (solo lectura), y se trabaja en `
    petición accionable es `peticion.py capturar`; después se evalúa por `runbooks/peticiones.md`.
    Una unidad nace con `unidad.py nueva <tipo> <slug> --desde P-ID [--directo]`: asigna el NNN
    y bloquea trabajo sin origen. `--force` solo sirve para el hotfix y deja deuda escrita.
-5. **Trabajo en vuelo: UNA unidad de código por defecto**, tope 3 y solo si no comparten
-   ficheros (`ficheros:`, que el script cruza). Las `en_validacion` no cuentan. Las unidades
+5. **Trabajo en vuelo: UNA unidad de código por defecto**, sin tope numérico, solo si no
+   comparten ficheros (`ficheros:`, que el script cruza). Las `en_validacion` no cuentan. Las unidades
    `--documental` (leen, no escriben código) tampoco: pueden ir en paralelo.
 6. **Búsquedas de código: dentro de `main/` o de tu worktree.** Desde la raíz no verás código
    (el gitignore lo oculta a las herramientas de búsqueda); eso es intencional.
@@ -79,14 +91,9 @@ método. El código vive en otro repo, `main/` (solo lectura), y se trabaja en `
 8. **Desviación de contrato → PARA y escala.** Si al construir tu trabajo va a contradecir la
    especificación o el mapa (eliminar algo, cambiar comportamiento prometido), detente. Las
    desviaciones de implementación (cambia el cómo, no el contrato) se terminan y se reportan.
-9. **Carriles (cuatro).** Exprés: cabe en una frase Y no cambia comportamiento → sin documentos.
-   **Directo, el del día a día**: cambia comportamiento pero encaja en una actividad que YA está
-   en el mapa, sin moverlo, 1-3 ficheros sin hotspots, diff < 250 líneas y se deshace
-   revirtiendo → ficha de una pantalla y 2 puertas (`runbooks/directo.md`). Normal: mueve el
-   mapa, toca hotspots o no cabe en la ficha. Completo: transversal, arriesgado o desconocido,
-   `+ investigacion.md`. **Si cambia comportamiento nunca es exprés**, y ante la duda se SUBE de
-   carril. Producción caída: `hotfix.md`. Ningún carril recorta la evidencia, la revisión firmada
-   ni el OK del usuario sobre la app.
+9. **Carriles (cuatro).** Exprés: cabe en una frase Y no cambia comportamiento → sin documentos. **Directo, el del día a día**: cambia comportamiento pero encaja en una actividad que YA está en el mapa, sin moverlo, 1-3 ficheros sin hotspots, diff < 250 líneas y se deshace
+   revirtiendo → ficha de una pantalla y 2 puertas (`runbooks/directo.md`). Normal: mueve el mapa, toca hotspots o no cabe en la ficha. Completo: transversal, arriesgado o desconocido,
+   `+ investigacion.md`. **Si cambia comportamiento nunca es exprés**, y ante la duda se SUBE de carril. Producción caída: `hotfix.md`. Ningún carril recorta la evidencia, la revisión firmada ni el OK del usuario sobre la app.
 10. **Esfuerzo y modelo por carril (ADR-016).** Exprés y directo: el modelo y el razonamiento
     más baratos que hagan el trabajo. Normal: medio. Completo y hotfix: el alto. Revisor:
     modelo DISTINTO al que construyó. Lint y unidades documentales: el modelo pequeño.
@@ -100,12 +107,8 @@ método. El código vive en otro repo, `main/` (solo lectura), y se trabaja en `
     no se pegan**: solo el veredicto y las líneas que lo prueban.
 13. **Los guardianes se lintean.** `lint_metodo.py` al arrancar y cerrar; `lint_ci.py` antes
     del merge (`--require-e2e` si los planos seleccionan E2E); `lint_deploy.py` antes de producción. Un FAIL del proyecto se arregla; uno causado por el MÉTODO se registra (`caja_negra.py registrar`) y NO te bloquea: sigue, el arreglo llega por Modo D (ADR-026). Estructura solo con ADR.
-14. **Los flujos siguen vivos — la puerta la abre el DELTA, no el cambio.** Si el trabajo
-    **añade, quita o contradice** algo del mapa, asume el rol ANALISTA DE FLUJOS y sigue
-    `docs/00-metodo/requisitos/RUNBOOK.md`: modifica `docs/02-flujos/planos/`, enseña el visor
-    web y obtén la aprobación ANTES de crear unidades de código (ADR-007). Si cabe dentro de un
-    flujo ya escrito, esa puerta NO se abre: el delta, si lo hay, se escribe en el cierre con el
-    trabajo ya visto funcionando (ADR-014).
+14. **Los flujos siguen vivos — la puerta la abre el DELTA, no el cambio.** Si el trabajo **añade, quita o contradice** algo del mapa, asume el rol ANALISTA DE FLUJOS y sigue `docs/00-metodo/requisitos/RUNBOOK.md`: modifica `docs/02-flujos/planos/`, enseña el visor web y obtén la aprobación ANTES de crear unidades de código (ADR-007). Si cabe dentro de un
+    flujo ya escrito, esa puerta NO se abre: el delta, si lo hay, se escribe en el cierre con el trabajo ya visto funcionando (ADR-014).
 15. **Proceso nativo (ADR-021).** Diseño, plan, debugging, TDD, revisión y cierre son locales;
     skills de proceso no, skills técnicas sí. Todo agente delegado pasa por `ejecucion.py` (ADR-022).
 16. **Nadie espera a ciegas** (§ más abajo): un rato largo callado es un fallo, no una espera.
@@ -140,10 +143,8 @@ método. El código vive en otro repo, `main/` (solo lectura), y se trabaja en `
 
 ## Autoridad de la información (qué fuente manda en conflicto)
 
-El código y sus tests describen el producto de su rama · `docs/` describe el workspace y el
-método · `git -C main worktree list` es el inventario autoritativo de worktrees · `docs/bugs/`
-es la verdad de los bugs · los papeles de una unidad archivada son historia, no doctrina ·
-**lo escrito gana a lo recordado**.
+El código y sus tests describen el producto de su rama · `docs/` describe el workspace y el método · `git -C main worktree list` es el inventario autoritativo de worktrees · `docs/bugs/`
+es la verdad de los bugs · los papeles de una unidad archivada son historia, no doctrina · **lo escrito gana a lo recordado**.
 
 ## El repo de código
 

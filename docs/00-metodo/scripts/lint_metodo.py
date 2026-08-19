@@ -249,8 +249,11 @@ def rama_fusionada(repo, rama, principal, metadata):
         return False
     codigo, punta = git(repo, "rev-parse", "--verify", "--quiet", f"{rama}^{{commit}}")
     punta = punta.strip() if codigo == 0 else metadata.get("tip_sha", "")
-    if not base_sha or not punta or punta == base_sha:
+    if punta == base_sha:
         return False
+    # Sin punta (rama borrada tras el merge y sin tip_sha guardado) los caminos
+    # por ancestría no existen, pero el grep del squash de más abajo sigue
+    # valiendo: el asunto del merge es el testigo (bugs 021/022).
     punta_existe = git(
         repo, "rev-parse", "--verify", "--quiet", f"{punta}^{{commit}}"
     )[0] == 0
@@ -264,17 +267,28 @@ def rama_fusionada(repo, rama, principal, metadata):
         codigo, asunto = git(repo, "show", "-s", "--format=%s", merge_guardado)
         if modo_guardado == "squash" and codigo == 0 and rama in asunto:
             return True
-    if not punta_existe or git(
-        repo, "merge-base", "--is-ancestor", base_sha, punta
-    )[0] != 0:
-        return False
-    if git(repo, "merge-base", "--is-ancestor", punta, principal)[0] == 0:
-        return True
-    codigo, salida = git(
-        repo, "log", principal, f"^{base_sha}", "--fixed-strings", f"--grep={rama}",
-        "--format=%H", "-1",
-    )
-    return codigo == 0 and bool(salida.strip())
+    if punta:
+        if not punta_existe or git(
+            repo, "merge-base", "--is-ancestor", base_sha, punta
+        )[0] != 0:
+            return False
+        if git(repo, "merge-base", "--is-ancestor", punta, principal)[0] == 0:
+            return True
+    # Grep del squash: primero el nombre exacto de la rama; si el título del PR
+    # no lo conservó, vale el P-ID que el nombre de una rama exprés siempre
+    # contiene. Sin ninguno de los dos en el asunto NO hay testigo (021/022).
+    patrones = [rama]
+    p_id = re.search(r"P-\d{8}-[0-9a-f]{8}", rama)
+    if p_id:
+        patrones.append(p_id.group(0))
+    for patron in patrones:
+        codigo, salida = git(
+            repo, "log", principal, f"^{base_sha}", "--fixed-strings",
+            f"--grep={patron}", "--format=%H", "-1",
+        )
+        if codigo == 0 and salida.strip():
+            return True
+    return False
 
 
 def fecha_iso_valida(valor):
@@ -670,8 +684,10 @@ else:
 
 for puente in ("CLAUDE.md", "GEMINI.md"):
     ruta_puente = RAIZ / puente
-    if not ruta_puente.exists() or ruta_puente.read_text(encoding="utf-8") != "@AGENTS.md\n":
-        fail(f"{puente} debe contener únicamente '@AGENTS.md'")
+    contenido_puente = ruta_puente.read_text(encoding="utf-8") if ruta_puente.exists() else ""
+    lineas_esperadas = ("@AGENTS.md\n", "@AGENTS.md\n@.claude/personalidad.md\n")
+    if contenido_puente not in lineas_esperadas:
+        fail(f"{puente} debe redirigir a AGENTS.md (y opcionalmente a .claude/personalidad.md)")
     else:
         ok(f"{puente} redirige directamente a AGENTS.md")
 
@@ -1103,13 +1119,17 @@ else:
         opciones_ci,
         capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
     )
+    # lint_ci.py degrada el contrato-ausente a WARN con exit 0 (029): ese caso deja de
+    # tener un returncode≠0 que delatarlo, y se reconoce por el marcador `DEUDA-CI:` que
+    # imprime en su lugar. returncode≠0 sigue significando FAIL real (contrato parcial).
+    deuda_sin_materializar = "DEUDA-CI:" in resultado_ci.stdout
     if (presentes_ci or requiere_e2e) and resultado_ci.returncode:
         warn("la materialización del CI está incompleta; ejecuta "
              "`python3 docs/00-metodo/scripts/lint_ci.py --repo main"
              f"{' --require-e2e' if requiere_e2e else ''}` para ver el detalle")
     elif presentes_ci:
         ok("contrato CI materializado y completo")
-    elif resultado_ci.returncode:
+    elif resultado_ci.returncode or deuda_sin_materializar:
         warn("CI real aún sin materializar: en brownfield debe ser la primera unidad técnica "
              "tras la adopción; en proyectos nuevos nace con el esqueleto")
     else:
@@ -1155,6 +1175,28 @@ if git(RAIZ, "rev-parse", "--is-inside-work-tree")[0] == 0 and sin_remoto(RAIZ):
 if hay_repo and sin_remoto(repo_cod):
     warn(f"el repo de código ({repo_cod.name}/) no tiene remoto: el código existe SOLO en "
          f"este ordenador y ningún push lo respalda")
+
+# --- 8b. Política de publicación: `push: usuario` (unidad 018) ---
+# Cuando el workspace declara que publicar es cosa de la persona, la principal local por
+# delante del remoto NO es un olvido: es el estado que el modo produce en cada cierre. Se
+# informa con el conteo y el comando (mismo patrón que el WARN de `unidad.py cerrar`), pero
+# como OK — convertirlo en WARN sería un rojo perpetuo que enseña a ignorar el linter.
+if hay_repo and not sin_remoto(repo_cod):
+    try:
+        modo_push = repo_config.modo_push(RAIZ)
+    except repo_config.RepoConfigError as exc:
+        modo_push = "agente"
+        fail(str(exc))
+    if modo_push == "usuario":
+        codigo, salida = git(repo_cod, "rev-list", "--count",
+                             f"origin/{rama_principal}..{rama_principal}")
+        pendientes = int(salida) if codigo == 0 and salida.isdigit() else 0
+        if pendientes:
+            ok(f"push: usuario — {pendientes} commit(s) de {rama_principal} sin publicar; "
+               f"el método no los empuja. Cuando quieras: "
+               f"git -C {repo_cod.name} push origin {rama_principal}")
+        else:
+            ok(f"push: usuario — {rama_principal} no tiene nada pendiente de publicar")
 
 # --- 9. Higiene ---
 if (RAIZ / "codebase").exists():

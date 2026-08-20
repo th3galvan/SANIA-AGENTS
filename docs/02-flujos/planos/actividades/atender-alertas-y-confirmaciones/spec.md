@@ -8,24 +8,25 @@ Proyecto `sania-atender-alertas-y-confirmaciones`. Generado desde `planos.json` 
 
 ## 1. Propósito
 
-Telegram será el canal para avisos y decisiones concretas de Víctor; el dispositivo real sigue pendiente en T10-Q06. Solo se aplicarán las botoneras cuya semántica quedó confirmada; el texto libre continúa permitido para aportar contexto o abrir tickets. No se impondrán una segunda confirmación general, cadencias ni horas que la entrevista dejó pendientes.
+Telegram será el canal para avisos y decisiones concretas de Víctor; el dispositivo real sigue pendiente en T10-Q06. Solo se aplicarán las botoneras cuya semántica quedó confirmada; el texto libre continúa permitido para aportar contexto o abrir tickets. Recordar más tarde vuelve a presentar las tareas de publicación a las 18:00 del día siguiente según la hora local de SANIA; no se impondrán una segunda confirmación general ni otras cadencias que la entrevista dejó pendientes.
 
 Cuando SANIA necesitó una acción de Víctor, él recibió una tarea ligada a su operación y pudo responder con los botones confirmados o añadir contexto por texto sin que una interpretación ambigua alterara stock o dinero.
 
 Criterios de éxito:
-- Cada botón se aplicó a la tarea concreta y, cuando implicó publicar o confirmar un anuncio, a una unidad y una plataforma resueltas sin volver a pedir su identidad.
-- Las tareas de publicación mostraron Enviar imágenes, Anuncio creado, Recordar más tarde y Cancelar sugerencia.
+- Cada botón se aplicó a la tarea concreta y, cuando implicó confirmar un anuncio creado personalmente por Víctor, SANIA solicitó el enlace antes de marcar como publicados el producto, la plataforma y la referencia ya asignados.
+- Las tareas de publicación mostraron Enviar imágenes, Anuncio creado, Recordar más tarde y Cancelar sugerencia; los anuncios confirmados permitieron Corregir enlace y, cuando SANIA cuestionó o recibió repetido un enlace, las confirmaciones correspondientes también desde Telegram.
 - La comprobación física ofreció Todo correcto o No OK/Abrir disputa; solo Todo correcto permitió entrada en stock.
 - El texto libre siguió disponible y no modificó directamente datos sensibles por interpretación automática.
-- Ningún recordatorio usó una cadencia o una hora no acordadas.
+- Las tareas de publicación aplazadas con Recordar más tarde reaparecieron a las 18:00 del día siguiente según la hora local de SANIA; ningún otro recordatorio usó una cadencia o una hora no acordadas.
 
 ## 2. Actores y vocabulario
 
 - **Víctor · dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias**
 
-- "botón ligado a tarea": acción que identifica la tarea concreta y, cuando corresponde a un anuncio, la unidad y plataforma resueltas; Víctor no debe volver a introducir esa identidad, aunque la granularidad de generación de tareas siga pendiente
+- "botón ligado a tarea": acción que identifica la tarea concreta y, cuando corresponde a un anuncio, el producto, la plataforma y la referencia asignada al crearlo; Víctor no debe volver a introducir esa identidad
 - "No volver a recordar": botón que silencia los recordatorios de recepción; sigue pendiente decidir si además pausa, mantiene visible o cierra la tarea y nunca equivale a Todo correcto
 - "texto libre": entrada permitida para contexto, dudas o tickets; la entrevista no derogó su uso global
+- "El enlace es correcto": acción de Telegram que acepta definitivamente un enlace cuestionado para la tarea o el anuncio ligado y evita que SANIA vuelva a preguntarlo
 
 ## 3. El proceso (flujos)
 
@@ -33,19 +34,21 @@ La versión gráfica vive en el visor local del paquete (visor/servir.py).
 
 ### Víctor respondió una tarea de publicación ligada a una plataforma [con la app · origen: usuario]
 
-- [automático: código] SANIA presentó una acción independiente para una plataforma dentro del par secuencial del objetivo producto/unidad, con texto listo para copiar y pegar y sin adjuntar imágenes por defecto. Antes de admitir una confirmación, la acción quedó resuelta a una unidad y plataforma concretas; la agrupación de origen sigue pendiente.
+- [automático: código] SANIA presentó una tarea independiente para la plataforma dentro del par del producto, con texto listo para copiar y pegar y sin adjuntar imágenes por defecto. Antes de admitir una confirmación, la tarea quedó resuelta al producto, la plataforma y la referencia disponible que SANIA asignó al crear el anuncio.
 - ⚑ Regla: ¿Qué botón pulsó Víctor?
     - si Enviar imágenes:
-        - [automático: código] SANIA envió bajo demanda las imágenes correspondientes a esa tarea sin cambiar su estado de publicación.
+        - [automático: código] SANIA envió bajo demanda las imágenes asociadas al producto de esa tarea sin cambiar su estado de publicación.
         - …y vuelve al flujo
     - si Anuncio creado:
-        - [automático: código] SANIA guardó que la unidad estaba publicada en la plataforma ya identificada por el mensaje.
+        - [automático: código] SANIA solicitó el enlace del anuncio y mantuvo la tarea pendiente sin cambiar el estado de publicación.
+        - [persona] Víctor envió el enlace del anuncio que había creado personalmente. · Víctor
+        - [automático: código] Si SANIA no cuestionó el enlace, lo guardó y marcó como publicados el producto y la referencia asignada en la plataforma ya identificada por la tarea. Si lo cuestionó, ofreció enviar por mensaje el enlace correcto o pulsar El enlace es correcto; cualquiera de las dos acciones lo aceptó y evitó nuevas preguntas para ese enlace.
         - …y vuelve al flujo
     - si Recordar más tarde:
-        - [automático: código] SANIA registró el aplazamiento y mantuvo la tarea sin inventar cuándo debía repetir el aviso.
+        - [automático: código] SANIA registró el aplazamiento, mantuvo la tarea pendiente sin cambiar el stock ni el estado del anuncio y volvió a presentarla a las 18:00 del día siguiente según su hora local.
         - …y vuelve al flujo
     - si Cancelar sugerencia:
-        - [automático: código] SANIA descartó la tarea de publicación y registró la cancelación de la sugerencia; no cambió stock ni estado de publicación porque no se acordó ningún efecto adicional.
+        - [automático: código] SANIA descartó la tarea, registró la cancelación y dejó de generar sugerencias automáticas para ese producto en esa plataforma hasta que Víctor pulsara Volver a sugerir. No cambió el stock ni marcó el producto como publicado; mientras siguieran desactivadas, un anuncio posterior debía vincularse manualmente.
         - …y vuelve al flujo
 - [automático: código] SANIA conservó la respuesta, la tarea, la plataforma, la unidad, el actor y la fecha fuera de Telegram.
 
@@ -59,6 +62,21 @@ La versión gráfica vive en el visor local del paquete (visor/servir.py).
     - si No OK / Abrir disputa:
         - [automático: código] SANIA no creó stock y abrió una incidencia; el flujo interno completo de disputa permanece pendiente.
         - …y vuelve al flujo
+
+### Víctor corrigió desde Telegram el enlace de un anuncio [con la app · origen: usuario]
+
+- [automático: código] Telegram mostró la acción Corregir enlace en un contexto ligado a un anuncio concreto.
+- [persona] Víctor pulsó Corregir enlace y envió el enlace correcto. · Víctor
+- [automático: código] Si SANIA no cuestionó el enlace nuevo, actualizó el enlace del mismo anuncio, eliminó completamente el anterior sin conservarlo en el historial y no cambió el producto, la plataforma, la referencia ni el stock. Si lo cuestionó, Víctor pudo enviar por mensaje el enlace correcto o pulsar El enlace es correcto; cualquiera de las dos acciones lo aceptó y evitó nuevas preguntas para ese enlace.
+
+### Víctor confirmó desde Telegram un enlace repetido [con la app · origen: usuario]
+
+- [automático: código] Telegram avisó a Víctor de que SANIA ya había recibido exactamente el mismo enlace para la misma tarea y le preguntó si estaba seguro.
+- ⚑ Regla: ¿Víctor confirmó que estaba seguro?
+    - si no:
+        - [automático: código] SANIA conservó el estado que ya tenía y no trató el enlace repetido como una confirmación.
+        - aquí termina este camino
+    - camino normal: sí, SANIA aceptó el enlace como El enlace es correcto y no volvió a preguntarlo
 
 ### SANIA recordó una comprobación sin cerrar la tarea por silencio [con la app · origen: usuario]
 
@@ -87,15 +105,15 @@ El orden es el orden de entrega. El primero es el esqueleto: recorre el camino f
 
 ### G-1: Las tareas de publicación son independientes por plataforma
 
-Cada acción confirmable conserva su propia unidad, plataforma y estado; completar una plataforma no completa la otra. D-LIVE-021 confirma presentar el par de un objetivo antes del siguiente, mientras X-LIVE-011 deja abierta la granularidad producto/unidad de la generación. [Migración: identificador histórico G-LIVE-013; referencias históricas: D-LIVE-016]
+Cada producto genera una tarea para Wallapop y otra para Vinted. Si hay al menos dos unidades disponibles, las tareas reciben referencias distintas; si solo hay una, comparten esa referencia. Cada una conserva su plataforma y su propio estado. [Migración: identificador histórico G-LIVE-013; referencias históricas: D-LIVE-016; decisión cerrada de X-LIVE-011]
 
 ### G-2: Las imágenes se envían bajo demanda
 
-El mensaje inicial contiene el texto necesario; Enviar imágenes adjunta los archivos solo cuando Víctor los solicita. [Migración: identificador histórico G-LIVE-014; referencias históricas: D-LIVE-012]
+El mensaje inicial contiene el texto necesario; Enviar imágenes adjunta solo las imágenes asociadas al producto cuando Víctor las solicita. Su formato y cantidad se decidirán al definir la generación, con compatibilidad para Wallapop y Vinted. [Migración: identificador histórico G-LIVE-014; referencias históricas: D-LIVE-012]
 
-### G-3: Anuncio creado persiste la publicación
+### G-3: Anuncio creado solicita el enlace antes de persistir
 
-El botón actualiza la unidad y plataforma ligadas a la tarea, sin pedir de nuevo su identidad. [Migración: identificador histórico G-LIVE-015; referencias históricas: D-LIVE-014]
+Víctor crea personalmente el anuncio. El botón solicita su enlace y solo al recibirlo actualiza el producto y la referencia asignada en la plataforma ligada a la tarea; una pulsación sin enlace mantiene la tarea pendiente. [Migración: identificador histórico G-LIVE-015; referencias históricas: D-LIVE-014]
 
 ### G-4: El tracking entregado no suma stock
 
@@ -117,6 +135,10 @@ SANIA mantiene pendiente la comprobación, puede recordarla y ofrece No volver a
 
 Las botoneras confirmadas conviven con el texto libre para contexto y tickets; una frase ambigua no aplica por sí sola un cambio crítico. [Migración: identificador histórico X-LIVE-008]
 
+### G-97: Las tareas de publicación se recuerdan al día siguiente
+
+Recordar más tarde conserva pendiente la tarea de publicación y hace que SANIA vuelva a presentarla a las 18:00 del día siguiente según su hora local, sin cambiar el stock ni el estado del anuncio.
+
 ## 6. Estados
 
 (Pendiente.)
@@ -125,9 +147,9 @@ Las botoneras confirmadas conviven con el texto libre para contexto y tickets; u
 
 | Cosa | Qué se guarda | De dónde viene |
 |---|---|---|
-| tarea o decisión de Telegram | tipo y operación relacionada, unidad y plataforma cuando correspondan, mensaje y opciones mostradas, respuesta y actor, fecha, estado de la tarea, recordatorios y silenciamiento solicitado con el estado posterior de la tarea todavía pendiente, texto libre relacionado y ticket cuando proceda | una operación que requirió información, comprobación o acción de Víctor |
+| tarea o decisión de Telegram | tipo y operación relacionada, producto, plataforma y referencia asignada cuando correspondan, mensaje y opciones mostradas, respuesta y actor, enlace del anuncio cuando Víctor confirmó una publicación y su aceptación definitiva cuando pulsó El enlace es correcto, fecha, estado de la tarea, recordatorios y silenciamiento solicitado con el estado posterior de la tarea todavía pendiente, texto libre relacionado y ticket cuando proceda | una operación que requirió información, comprobación o acción de Víctor |
 
-- Habla con **Telegram**: mostrar tareas, botones, imágenes bajo demanda, recordatorios y texto libre
+- Habla con **Telegram**: mostrar tareas, botones, imágenes bajo demanda, recordatorios, texto libre, la acción para corregir el enlace de un anuncio, El enlace es correcto cuando SANIA lo cuestione y la confirmación de un enlace repetido
 
 ## 8. Superficie de uso
 
@@ -153,8 +175,8 @@ Buzón del constructor: sus dudas se apuntan aquí, nunca se responden de palabr
 - [T07-Q01] ¿Qué mecanismo técnico reconocerá a Víctor como único usuario inicial del bot?
 - [T07-Q02 / D-LIVE-010] La división general está confirmada —SANIA registra y prepara; Víctor confirma hechos físicos y actúa en plataformas—: ¿qué excepciones concretas faltan para completar la matriz de autonomía?
 - [T07-Q03, T06-Q08] ¿Qué acciones concretas, si alguna, requieren una segunda confirmación?
-- [T07-Q04] ¿Qué efecto exacto tienen Recordar más tarde, Cancelar sugerencia y No volver a recordar sobre la tarea y los datos?
-- [T07-Q04, T05-Q06] ¿Cómo se resuelven dos respuestas duplicadas o contradictorias sobre la misma tarea?
-- [T07-Q05, T07-Q06, T03-Q03] ¿Qué cadencia, hora y escalado necesita cada recordatorio?
+- [T07-Q04] ¿Qué efecto exacto tiene No volver a recordar sobre la tarea y los datos?
+- [T07-Q04, T05-Q06] ¿Cómo se resuelven dos respuestas duplicadas o contradictorias, incluido recibir dos enlaces iguales o diferentes para la misma tarea?
+- [T07-Q06, T03-Q03] ¿Qué cadencia, hora y escalado necesitan los demás recordatorios?
 - [X-LIVE-008] ¿Qué acciones adicionales debe admitir el texto libre además de aportar contexto o abrir un ticket?
 

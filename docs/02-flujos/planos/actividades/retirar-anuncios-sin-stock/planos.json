@@ -2,7 +2,7 @@
   "version": 2,
   "proyecto": "sania-retirar-anuncios-sin-stock",
   "titulo": "Retirar anuncios cuando se agota el stock",
-  "descripcion": "Cuando el primer correo de venta reserva una unidad que también consta anunciada en la otra plataforma, SANIA crea de inmediato una tarea para que Víctor retire manualmente el anuncio alternativo. La tarea se identifica por unidad, referencia, título y plataforma; una URL es opcional. No se ha fijado la evidencia de retirada, el botón de confirmación ni una cadencia diaria.",
+  "descripcion": "Cada plataforma mantiene como máximo un anuncio activo por producto y cada anuncio recibe una referencia disponible al crearse. Cuando una venta reserva esa referencia, SANIA pide retirar el anuncio de la otra plataforma si tenía asignada la misma referencia o si ya no queda ninguna unidad disponible del producto. La tarea se identifica por producto, referencia, título y plataforma; una URL es opcional.",
   "definicion": {
     "estado": "borrador",
     "modo": "mixto"
@@ -13,10 +13,10 @@
     "pruebas": []
   },
   "contrato": {
-    "frase": "Cuando la última unidad quedó reservada desde el primer correo, Víctor necesitó saber qué anuncio alternativo de esa misma unidad debía retirar para evitar una segunda venta.",
+    "frase": "Cuando una venta reservó la referencia asignada a un anuncio, Víctor necesitó saber si el anuncio de la otra plataforma usaba esa misma referencia o si el producto se había quedado sin stock y debía retirarlo.",
     "exito": [
       "La unidad quedó reservada antes de solicitar la retirada.",
-      "La tarea señaló la unidad y la plataforma correctas sin depender de un enlace.",
+      "La tarea señaló el producto, la referencia asignada y la plataforma correctos sin depender de un enlace.",
       "Víctor realizó la retirada dentro de Wallapop o Vinted.",
       "SANIA mantuvo la retirada pendiente de acreditar porque no se definieron la acción ni la evidencia que permiten darla por confirmada, y no leyó la web para comprobarla."
     ]
@@ -30,7 +30,7 @@
   "vocabulario": [
     {
       "termino": "anuncio alternativo",
-      "significado": "anuncio de la otra plataforma que apunta a la misma unidad física ya reservada"
+      "significado": "único anuncio activo del mismo producto en la otra plataforma, con su propia referencia asignada al crearlo"
     },
     {
       "termino": "pendiente de retirada",
@@ -44,13 +44,13 @@
   "reglas": [
     {
       "id": "G-82",
-      "nombre": "Cada anuncio representó una unidad",
-      "texto": "D-LIVE-007 estableció una relación anuncio-unidad. Con varias unidades, Wallapop y Vinted apuntan normalmente a referencias distintas; la retirada de este flujo se dirige al anuncio alternativo de la unidad ya reservada. [Migración: identificador histórico G-LIVE-005]"
+      "nombre": "Un anuncio activo por producto y plataforma",
+      "texto": "Cada plataforma mantiene como máximo un anuncio activo del producto. Con dos o más unidades disponibles, Wallapop y Vinted reciben referencias distintas; con una sola unidad, ambos anuncios comparten esa referencia. [Migración: sustituye el antecedente histórico G-LIVE-005 por decisión del usuario]"
     },
     {
       "id": "G-83",
-      "nombre": "El primer correo ganó para una unidad compartida",
-      "texto": "D-LIVE-001 y D-LIVE-009 dispusieron reservar desde el primer correo reconocido y solicitar inmediatamente la retirada manual del anuncio de la otra plataforma; T10-Q02 mantiene pendiente la concurrencia casi simultánea. [Migración: identificador histórico G-LIVE-008]"
+      "nombre": "La venta retiró el anuncio que ya no podía seguir activo",
+      "texto": "El primer correo reconocido reserva la referencia ya asignada al anuncio. SANIA solicita retirar el anuncio de la otra plataforma si compartía esa referencia o si la reserva agotó el stock del producto; T10-Q02 mantiene pendiente la concurrencia casi simultánea. [Migración: identificador histórico G-LIVE-008]"
     },
     {
       "id": "G-84",
@@ -60,7 +60,7 @@
     {
       "id": "G-85",
       "nombre": "La URL no fue obligatoria",
-      "texto": "La tarea se vinculó por unidad, plataforma y referencia del título. X-LIVE-002 deja la URL como dato opcional para navegación o auditoría, no como requisito. [Migración: identificador histórico D-LIVE-015]"
+      "texto": "La tarea se vinculó por producto, plataforma y referencia asignada al anuncio. X-LIVE-002 deja la URL como dato opcional para navegación o auditoría, no como requisito. [Migración: identificador histórico D-LIVE-015]"
     }
   ],
   "flujos": [
@@ -76,19 +76,19 @@
         },
         {
           "tipo": "estatico",
-          "texto": "SANIA reservó primero la unidad exacta identificada por la referencia de tres caracteres al final del título."
+          "texto": "SANIA reservó exactamente la referencia que había asignado al anuncio cuando lo creó."
         },
         {
           "tipo": "decision",
           "clase": "regla",
-          "condicion": "¿La misma unidad constaba publicada también en la otra plataforma?",
-          "sigue": "no, no hubo anuncio alternativo que retirar",
+          "condicion": "¿El anuncio de la otra plataforma tenía asignada la misma referencia vendida o ya no quedaba ninguna unidad disponible del producto?",
+          "sigue": "no, el otro anuncio conservó una referencia distinta todavía disponible",
           "rama": {
             "etiqueta": "sí",
             "pasos": [
               {
                 "tipo": "estatico",
-                "texto": "SANIA creó inmediatamente una tarea pendiente de retirada con la unidad, referencia, título y plataforma; añadió la URL solo si ya estaba guardada como dato opcional."
+                "texto": "SANIA creó inmediatamente una tarea pendiente de retirada con el producto, la referencia afectada, el título y la plataforma; añadió la URL solo si ya estaba guardada como dato opcional."
               },
               {
                 "tipo": "humano",
@@ -143,7 +143,7 @@
       "cosa": "tarea de retirada",
       "guarda": [
         "venta que reservó la unidad",
-        "unidad física y referencia de tres caracteres",
+        "producto y referencia asignada al anuncio",
         "plataforma del anuncio alternativo",
         "título conocido",
         "URL opcional si fue aportada",
@@ -167,7 +167,7 @@
   ],
   "fuera": [
     "Eliminar, pausar, editar o reactivar automáticamente anuncios.",
-    "Retirar anuncios de unidades distintas que continúan disponibles.",
+    "Retirar un anuncio alternativo cuya referencia asignada siga disponible y sea distinta de la vendida.",
     "Exigir una URL para identificar el anuncio alternativo.",
     "Comprobar la retirada leyendo perfiles públicos o iniciando sesión.",
     "Repetir el aviso una vez al día o a una hora fija sin decisión expresa.",

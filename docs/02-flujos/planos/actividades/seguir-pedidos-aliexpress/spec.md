@@ -55,7 +55,7 @@ La versión gráfica vive en el visor local del paquete (visor/servir.py).
         - [automático: código] SANIA recordó la elección para compras futuras del mismo producto.
         - …y vuelve al flujo
     - camino normal: sí, SANIA aplicó Stock para venta o Compra personal
-- [automático: código] Víctor pudo cambiar manualmente la clasificación aprendida; SANIA conservó el cambio de forma auditable. El efecto sobre pedidos ya existentes y los pedidos mixtos sigue pendiente.
+- [automático: código] Víctor pudo cambiar manualmente la clasificación desde el mismo pedido. Si ya tenía Todo correcto y pasó a Compra personal, SANIA enumeró los productos que se borrarían, pidió confirmación y solo tras el sí los retiró del stock activo, conservando el cambio en el historial.
 
 ## 4. Recorridos, requisitos y criterios de aceptación
 
@@ -83,7 +83,7 @@ Solo los productos clasificados como Stock para venta pueden continuar hacia inv
 
 ### G-91: Clasificación aprendida corregible
 
-La clasificación se recuerda por producto y Víctor puede cambiarla manualmente. [Migración: identificador histórico G-LIVE-017; estado histórico: confirmada; el efecto sobre pedidos ya existentes está pendiente; referencias históricas: D-LIVE-023]
+La clasificación se recuerda por producto y Víctor puede cambiarla manualmente desde el pedido. Si ya tenía Todo correcto y pasa a Compra personal, SANIA muestra qué productos se borrarán del stock y exige confirmación antes de retirarlos, conservando el cambio en el historial. [Migración: identificador histórico G-LIVE-017; referencias históricas: D-LIVE-023]
 
 ## 6. Estados
 
@@ -128,5 +128,4 @@ Buzón del constructor: sus dudas se apuntan aquí, nunca se responden de palabr
 - [T02-Q07] ¿Cuándo puede una IA proponer una extracción y qué revisión humana exige?
 - [T02-Q08] ¿Cómo se clasifica y revisa un correo desconocido, dudoso o contradictorio sin aplicar datos al pedido o al stock?
 - [T02-Q09] ¿Qué datos y estados debe mostrar SANIA mientras un pedido esté parcialmente recibido?
-- [D-LIVE-023 / G-LIVE-017] ¿Qué efecto tiene cambiar una clasificación aprendida sobre pedidos ya existentes o mixtos?
 

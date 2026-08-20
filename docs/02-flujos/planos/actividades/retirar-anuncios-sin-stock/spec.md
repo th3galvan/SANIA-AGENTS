@@ -8,13 +8,13 @@ Proyecto `sania-retirar-anuncios-sin-stock`. Generado desde `planos.json` (la fu
 
 ## 1. Propósito
 
-Cuando el primer correo de venta reserva una unidad que también consta anunciada en la otra plataforma, SANIA crea de inmediato una tarea para que Víctor retire manualmente el anuncio alternativo. La tarea se identifica por unidad, referencia, título y plataforma; una URL es opcional. No se ha fijado la evidencia de retirada, el botón de confirmación ni una cadencia diaria.
+Cada plataforma mantiene como máximo un anuncio activo por producto y cada anuncio recibe una referencia disponible al crearse. Cuando una venta reserva esa referencia, SANIA pide retirar el anuncio de la otra plataforma si tenía asignada la misma referencia o si ya no queda ninguna unidad disponible del producto. La tarea se identifica por producto, referencia, título y plataforma; una URL es opcional.
 
-Cuando la última unidad quedó reservada desde el primer correo, Víctor necesitó saber qué anuncio alternativo de esa misma unidad debía retirar para evitar una segunda venta.
+Cuando una venta reservó la referencia asignada a un anuncio, Víctor necesitó saber si el anuncio de la otra plataforma usaba esa misma referencia o si el producto se había quedado sin stock y debía retirarlo.
 
 Criterios de éxito:
 - La unidad quedó reservada antes de solicitar la retirada.
-- La tarea señaló la unidad y la plataforma correctas sin depender de un enlace.
+- La tarea señaló el producto, la referencia asignada y la plataforma correctos sin depender de un enlace.
 - Víctor realizó la retirada dentro de Wallapop o Vinted.
 - SANIA mantuvo la retirada pendiente de acreditar porque no se definieron la acción ni la evidencia que permiten darla por confirmada, y no leyó la web para comprobarla.
 
@@ -22,7 +22,7 @@ Criterios de éxito:
 
 - **Víctor · dirige el negocio, consulta SANIA, toma decisiones, confirma los hechos físicos, prepara y envía los paquetes y es el responsable por defecto de todas las incidencias**
 
-- "anuncio alternativo": anuncio de la otra plataforma que apunta a la misma unidad física ya reservada
+- "anuncio alternativo": único anuncio activo del mismo producto en la otra plataforma, con su propia referencia asignada al crearlo
 - "pendiente de retirada": estado interno que indica que Víctor todavía debe retirar o confirmar manualmente el anuncio; no prueba su visibilidad real
 - "retirada pendiente de acreditar": situación posterior a la acción manual en la que SANIA aún no puede cerrar la tarea porque T08-Q05 no definió mecanismo ni evidencia
 
@@ -33,14 +33,14 @@ La versión gráfica vive en el visor local del paquete (visor/servir.py).
 ### Víctor retiró manualmente el anuncio alternativo [con la app · origen: usuario]
 
 - [tercero externo] Llegó el primer correo reconocido de venta de Wallapop o Vinted.
-- [automático: código] SANIA reservó primero la unidad exacta identificada por la referencia de tres caracteres al final del título.
-- ⚑ Regla: ¿La misma unidad constaba publicada también en la otra plataforma?
+- [automático: código] SANIA reservó exactamente la referencia que había asignado al anuncio cuando lo creó.
+- ⚑ Regla: ¿El anuncio de la otra plataforma tenía asignada la misma referencia vendida o ya no quedaba ninguna unidad disponible del producto?
     - si sí:
-        - [automático: código] SANIA creó inmediatamente una tarea pendiente de retirada con la unidad, referencia, título y plataforma; añadió la URL solo si ya estaba guardada como dato opcional.
+        - [automático: código] SANIA creó inmediatamente una tarea pendiente de retirada con el producto, la referencia afectada, el título y la plataforma; añadió la URL solo si ya estaba guardada como dato opcional.
         - [persona] Víctor abrió Wallapop o Vinted y retiró manualmente el anuncio. · Víctor
         - [automático: código] SANIA mantuvo la tarea en retirada pendiente de acreditar. No esperó una declaración, captura o botón concreto como si ya estuviera aprobado: la evidencia, el mecanismo de confirmación y la cadencia de recordatorio siguen pendientes.
         - …y vuelve al flujo
-    - camino normal: no, no hubo anuncio alternativo que retirar
+    - camino normal: no, el otro anuncio conservó una referencia distinta todavía disponible
 
 ## 4. Recorridos, requisitos y criterios de aceptación
 
@@ -54,13 +54,13 @@ El orden es el orden de entrega. El primero es el esqueleto: recorre el camino f
 
 ## 5. Reglas de negocio
 
-### G-82: Cada anuncio representó una unidad
+### G-82: Un anuncio activo por producto y plataforma
 
-D-LIVE-007 estableció una relación anuncio-unidad. Con varias unidades, Wallapop y Vinted apuntan normalmente a referencias distintas; la retirada de este flujo se dirige al anuncio alternativo de la unidad ya reservada. [Migración: identificador histórico G-LIVE-005]
+Cada plataforma mantiene como máximo un anuncio activo del producto. Con dos o más unidades disponibles, Wallapop y Vinted reciben referencias distintas; con una sola unidad, ambos anuncios comparten esa referencia. [Migración: sustituye el antecedente histórico G-LIVE-005 por decisión del usuario]
 
-### G-83: El primer correo ganó para una unidad compartida
+### G-83: La venta retiró el anuncio que ya no podía seguir activo
 
-D-LIVE-001 y D-LIVE-009 dispusieron reservar desde el primer correo reconocido y solicitar inmediatamente la retirada manual del anuncio de la otra plataforma; T10-Q02 mantiene pendiente la concurrencia casi simultánea. [Migración: identificador histórico G-LIVE-008]
+El primer correo reconocido reserva la referencia ya asignada al anuncio. SANIA solicita retirar el anuncio de la otra plataforma si compartía esa referencia o si la reserva agotó el stock del producto; T10-Q02 mantiene pendiente la concurrencia casi simultánea. [Migración: identificador histórico G-LIVE-008]
 
 ### G-84: La retirada fue humana
 
@@ -68,7 +68,7 @@ D-LIVE-010 y X-LIVE-003 prohíben que SANIA elimine, pause, edite o reactive anu
 
 ### G-85: La URL no fue obligatoria
 
-La tarea se vinculó por unidad, plataforma y referencia del título. X-LIVE-002 deja la URL como dato opcional para navegación o auditoría, no como requisito. [Migración: identificador histórico D-LIVE-015]
+La tarea se vinculó por producto, plataforma y referencia asignada al anuncio. X-LIVE-002 deja la URL como dato opcional para navegación o auditoría, no como requisito. [Migración: identificador histórico D-LIVE-015]
 
 ## 6. Estados
 
@@ -83,7 +83,7 @@ La tarea se vinculó por unidad, plataforma y referencia del título. X-LIVE-002
 
 | Cosa | Qué se guarda | De dónde viene |
 |---|---|---|
-| tarea de retirada | venta que reservó la unidad, unidad física y referencia de tres caracteres, plataforma del anuncio alternativo, título conocido, URL opcional si fue aportada, estado de la tarea, fecha de creación, recordatorios solo cuando se defina la cadencia, fecha, actor y evidencia de retirada solo cuando existan | primer correo reconocido y estado interno de publicación; el origen de la acreditación final sigue pendiente |
+| tarea de retirada | venta que reservó la unidad, producto y referencia asignada al anuncio, plataforma del anuncio alternativo, título conocido, URL opcional si fue aportada, estado de la tarea, fecha de creación, recordatorios solo cuando se defina la cadencia, fecha, actor y evidencia de retirada solo cuando existan | primer correo reconocido y estado interno de publicación; el origen de la acreditación final sigue pendiente |
 
 - Habla con **Telegram**: entregar la tarea identificada; la recogida de una acreditación solo se incorporará cuando se defina el mecanismo
 - Habla con **Wallapop y Vinted**: ser el lugar donde Víctor realiza manualmente la retirada; SANIA no lee ni modifica la plataforma
@@ -99,7 +99,7 @@ La tarea se vinculó por unidad, plataforma y referencia del título. X-LIVE-002
 ## 10. Fuera de alcance
 
 - Eliminar, pausar, editar o reactivar automáticamente anuncios.
-- Retirar anuncios de unidades distintas que continúan disponibles.
+- Retirar un anuncio alternativo cuya referencia asignada siga disponible y sea distinta de la vendida.
 - Exigir una URL para identificar el anuncio alternativo.
 - Comprobar la retirada leyendo perfiles públicos o iniciando sesión.
 - Repetir el aviso una vez al día o a una hora fija sin decisión expresa.

@@ -1,0 +1,1316 @@
+{
+  "aclaraciones": [
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T18:21:41+00:00",
+      "material": true,
+      "revision": 2,
+      "texto": "simplemente deben de dejar de contar como stock"
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T18:25:27+00:00",
+      "material": true,
+      "revision": 3,
+      "texto": "Debería haber una manera de borrar el stock desde la misma parte del pedido: si un pedido marcado Todo correcto se cambia a Compra personal, SANIA preguntará si está seguro y avisará de que se borrarán del stock los productos generados; si confirma que sí, se borrarán."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T18:32:24+00:00",
+      "material": true,
+      "revision": 4,
+      "texto": "Me encargaría yo personalmente de borrar las tareas de anuncio ya creadas."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T18:40:15+00:00",
+      "material": true,
+      "revision": 5,
+      "texto": "Corrección: las tareas de anuncio deben borrarse automáticamente cuando el pedido pasa a Compra personal. Para varias unidades iguales del mismo producto, SANIA crea una tarea por cada plataforma donde se publicará; con Wallapop y Vinted se crean dos tareas de publicación."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T18:56:58+00:00",
+      "material": true,
+      "revision": 6,
+      "texto": "Solo puede existir un anuncio activo del mismo producto a la vez en cada plataforma. Varias unidades idénticas no generan anuncios duplicados: la única tarea de Wallapop y la única tarea de Vinted corresponden cada una a un solo anuncio del producto, vinculado con todas las unidades disponibles."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T19:08:06+00:00",
+      "material": true,
+      "revision": 7,
+      "texto": "La referencia se asigna al crear el anuncio, no al registrar la venta. SANIA puede escoger cualquier referencia disponible del producto porque el orden no importa. Cuando llega la venta, descuenta la referencia que ya estaba asignada al anuncio."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T19:16:38+00:00",
+      "material": true,
+      "revision": 8,
+      "texto": "Si hay al menos dos unidades disponibles del producto, el anuncio de Wallapop y el de Vinted reciben referencias distintas. Solo cuando queda una única unidad ambos anuncios comparten esa misma referencia."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T19:22:33+00:00",
+      "material": true,
+      "revision": 9,
+      "texto": "Cuando se vende el anuncio de una plataforma y todavía quedan unidades disponibles del producto, SANIA crea automáticamente una nueva tarea de publicación para esa misma plataforma y le asigna otra referencia disponible respetando la regla de referencias entre Wallapop y Vinted."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T19:29:46+00:00",
+      "material": true,
+      "revision": 10,
+      "texto": "Cancelar sugerencia hace que SANIA deje de generar sugerencias automáticas para ese producto en esa plataforma. Si el usuario publica el anuncio por su cuenta, debe vincularlo manualmente con el producto y la referencia correspondiente."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T19:36:26+00:00",
+      "material": true,
+      "revision": 11,
+      "texto": "Debe existir una acción Volver a sugerir para reactivar manualmente las sugerencias automáticas de un producto en una plataforma después de haberlas cancelado."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-19T20:56:55+00:00",
+      "material": true,
+      "revision": 12,
+      "texto": "Al pulsar Volver a sugerir, SANIA debe crear instantáneamente una tarea de publicación para ese producto y plataforma, si hay stock disponible y no existe ya un anuncio activo allí."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T16:21:33+00:00",
+      "material": true,
+      "revision": 13,
+      "texto": "Al pulsar Recordar más tarde, la tarea debe reaparecer al día siguiente."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T16:26:07+00:00",
+      "material": true,
+      "revision": 14,
+      "texto": "Las tareas de publicación aplazadas con Recordar más tarde deben reaparecer a las 18:00 del día siguiente."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T16:35:14+00:00",
+      "material": true,
+      "revision": 15,
+      "texto": "Víctor crea personalmente el anuncio. Al pulsar Anuncio creado, SANIA debe solicitar y recibir el enlace del anuncio; no debe marcarlo como publicado hasta recibir ese enlace."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T16:44:00+00:00",
+      "material": true,
+      "revision": 16,
+      "texto": "Debe existir un lugar en SANIA para corregir el enlace de un anuncio y también debe poder corregirse a través de Telegram."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T16:49:49+00:00",
+      "material": true,
+      "revision": 17,
+      "texto": "Al corregir el enlace de un anuncio, SANIA debe eliminar completamente el enlace anterior y no conservarlo en el historial."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T16:56:03+00:00",
+      "material": true,
+      "revision": 18,
+      "texto": "Si SANIA cuestiona un enlace, Víctor puede enviar por mensaje el enlace correcto o pulsar El enlace es correcto. Cualquiera de las dos acciones acepta el enlace y SANIA no vuelve a pedir confirmación para ese enlace."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T17:03:42+00:00",
+      "material": true,
+      "revision": 19,
+      "texto": "Si SANIA recibe dos veces el mismo enlace para la misma tarea, avisa de que ya lo recibió y pide confirmación. Si Víctor confirma que sí, equivale a El enlace es correcto: acepta el enlace y no vuelve a preguntarlo."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T17:09:47+00:00",
+      "material": true,
+      "revision": 20,
+      "texto": "Cada producto tendrá asociadas sus imágenes, descripción, precio, precio máximo y precio mínimo aceptable en negociación. Enviar imágenes envía las imágenes asociadas al producto. El formato y la cantidad se decidirán al definir su generación, con compatibilidad para Wallapop y Vinted."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T17:15:36+00:00",
+      "material": true,
+      "revision": 21,
+      "texto": "Por lo general, Wallapop y Vinted comparten el mismo precio de publicación y el mismo precio mínimo aceptable en negociación. Se observa que Vinted podría admitir precios de publicación más altos, pero no se ha definido una regla ni una diferencia automática."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T17:27:59+00:00",
+      "material": true,
+      "revision": 22,
+      "texto": "Se permite que Vinted tenga un precio de publicación más alto por producto. El precio mínimo aceptable en negociación sigue siendo el mismo en Wallapop y Vinted. Falta definir cómo se fija esa subida."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:06:25+00:00",
+      "material": true,
+      "revision": 23,
+      "texto": "El precio de publicación superior de Vinted se decide arbitrariamente por Víctor para cada producto; SANIA no aplica fórmula, porcentaje ni recargo automático. El mínimo de negociación sigue siendo común."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:09:32+00:00",
+      "material": true,
+      "revision": 24,
+      "texto": "Si cambia el precio común del producto, el precio específico de Vinted debe revisarse. SANIA no lo recalcula automáticamente."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:16:48+00:00",
+      "material": true,
+      "revision": 25,
+      "texto": "Cuando cambia el precio común y el precio de Vinted queda pendiente de revisión, SANIA no crea una tarea ni envía un aviso inmediato."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:23:43+00:00",
+      "material": true,
+      "revision": 26,
+      "texto": "Cuando el precio específico de Vinted queda pendiente de revisión tras cambiar el precio común, SANIA no crea una tarea ni recordatorio, pero envía un aviso inmediato por Telegram y muestra el pendiente en el dashboard."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:41:50+00:00",
+      "material": true,
+      "revision": 27,
+      "texto": "Cuando varias unidades son idénticas y no llevan etiqueta ni rasgo diferenciador, no importa identificar físicamente cuál corresponde a cada referencia: son intercambiables. La referencia sigue siendo trazabilidad lógica del anuncio y la venta descuenta la ya asignada a ese anuncio."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:48:22+00:00",
+      "material": true,
+      "revision": 28,
+      "texto": "SANIA empieza a medir el tiempo hasta la venta desde el momento en que confirma la publicación del anuncio al recibir y guardar su enlace."
+    },
+    {
+      "autor": "usuario",
+      "fecha": "2026-08-20T18:53:01+00:00",
+      "material": true,
+      "revision": 29,
+      "texto": "Si Víctor corrige el enlace de un anuncio ya publicado, SANIA mantiene la fecha original de confirmación de publicación y no reinicia la medición del tiempo hasta la venta."
+    }
+  ],
+  "actualizada": "2026-08-20T18:55:22+00:00",
+  "aparcada": {
+    "condicion": "Reanudar cuando Víctor quiera definir el formato y la cantidad de imágenes compatibles con Wallapop y Vinted.",
+    "fecha": "2026-08-20T18:55:22+00:00",
+    "motivo": "La medición y la corrección de enlace están cerradas; el formato y la cantidad de imágenes de anuncio siguen aplazados por decisión de Víctor.",
+    "responsable": "agente",
+    "revisar_el": null
+  },
+  "cierres": [],
+  "creada": "2026-08-19T17:54:05+00:00",
+  "estado": "aparcada",
+  "evaluaciones": [
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T18:01:43+00:00",
+      "flujo": {
+        "huella": "a4bab6bf1f7273c1abf2caadaa3fd68e9cb4536d",
+        "refs": [
+          "dar-entrada-al-almacen/REC-1"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Los planos existentes y sus fuentes históricas permiten cerrar primero las decisiones ya documentadas; las dudas reales permanecen visibles para entrevista.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 1,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T18:23:39+00:00",
+      "flujo": {
+        "huella": "32fddc54752f7d5b75fc53942171e52f9d944131",
+        "refs": [
+          "dar-entrada-al-almacen/REC-2"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "La aclaración confirma que al pasar a Compra personal las unidades dejan de contar como stock; se conserva el historial y las demás dudas permanecen visibles.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 2,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T18:30:49+00:00",
+      "flujo": {
+        "huella": "5bfcda1169d5930d9fbcc1a02fd243c78fbcf24e",
+        "refs": [
+          "confirmar-recepcion-de-pedidos/REC-3"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "La aclaración define la corrección desde el pedido: aviso con productos afectados, confirmación expresa y retirada del stock activo con historial; el efecto sobre tareas de anuncio sigue abierto.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 3,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T18:35:35+00:00",
+      "flujo": {
+        "huella": "af15016c0f5231db5200f54b8f21abbca43d7f13",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-4"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "La aclaración asigna a Víctor el borrado manual de las tareas de anuncio; SANIA no las elimina automáticamente cuando el producto sale del stock.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 4,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T18:37:38+00:00",
+      "flujo": {
+        "huella": "b0dfb7b92fd34563b17e0a240c406a6240205118",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-4",
+          "crear-y-mantener-anuncios/REC-6"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "La revisión incorpora el borrado manual de tareas por Víctor y elimina la duda obsoleta sobre la secuencia de referencias, ya definida en los planos canónicos.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 4,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T18:48:19+00:00",
+      "flujo": {
+        "huella": "607c346b0575134f4f92059a74b8907fedeb3a3c",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-4",
+          "crear-y-mantener-anuncios/REC-7"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se cierra que el cambio confirmado a Compra personal elimina automáticamente las tareas de anuncio relacionadas y que varias unidades idénticas generan exactamente una tarea para Wallapop y otra para Vinted.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 5,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T19:04:10+00:00",
+      "flujo": {
+        "huella": "a50c6532463738831c1490993aa3132efff27586",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-7"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se cierra que varias unidades idénticas comparten un único anuncio activo por producto y plataforma; no se crean publicaciones duplicadas. La selección de referencia al registrar una venta individual queda como siguiente pregunta de entrevista.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 6,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T19:14:47+00:00",
+      "flujo": {
+        "huella": "5d4ec6f929369bc5b7738505e965e4f3f9e712c5",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-6",
+          "crear-y-mantener-anuncios/REC-7"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se cierra que SANIA asigna una referencia disponible al crear cada anuncio, sin orden obligatorio, y que la venta descuenta esa referencia ya fijada en vez de elegirla al vender.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 7,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T19:20:16+00:00",
+      "flujo": {
+        "huella": "7de28d1bb0eb39adf8e3a39b46e748ee2dd01f65",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-7"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se cierra la asignación entre plataformas: con dos o más unidades Wallapop y Vinted usan referencias distintas; con una sola, ambos anuncios comparten esa referencia.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 8,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T19:26:06+00:00",
+      "flujo": {
+        "huella": "7be9aaba448829153c1902da92acaa6fcc71d48d",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-7"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se cierra que toda venta que deje stock genera automáticamente una nueva tarea para la misma plataforma con otra referencia disponible; la publicación continúa siendo manual.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 9,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T19:35:14+00:00",
+      "flujo": {
+        "huella": "fd993d4ff6a1eaca25234ad59761d2758ce1fef4",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-8"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se cierra que Cancelar sugerencia desactiva nuevas tareas automáticas para el producto y plataforma; una publicación posterior se vincula manualmente con producto y referencia.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 10,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-19T19:39:40+00:00",
+      "flujo": {
+        "huella": "a7cbf7bc3bbca249ef41e3cf04d798a942af3496b3d849ab57992bc49808d922",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-8"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Se incorpora Volver a sugerir como reactivación manual por producto y plataforma, sin cambiar stock ni publicar; queda por decidir cuándo nace la primera tarea tras reactivar.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 11,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:18:49+00:00",
+      "flujo": {
+        "huella": "ff593b7d45c21832a7261d18d4839a715b31ac5b82e856fdcaf3fd5abcc51ca1",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-8"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Volver a sugerir reactiva el producto y plataforma y crea inmediatamente una tarea si hay stock disponible y no existe un anuncio activo, conservando las reglas de referencia y evitando duplicados.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 12,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:24:37+00:00",
+      "flujo": {
+        "huella": "760b9a2832f1410c792bb02771440132b6f56894a0977bd3fe6cc0394a67d32a",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-9"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Recordar más tarde conserva la tarea de publicación y la vuelve a presentar al día siguiente sin alterar stock ni publicación; queda pendiente la hora concreta.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 13,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:28:20+00:00",
+      "flujo": {
+        "huella": "049f770044ffb8d5080b59f8a7eb4dbce25bc08346baad79e408c32e578220a1",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-9"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Recordar más tarde vuelve a presentar la tarea de publicación a las 18:00 del día siguiente según la hora local de SANIA, sin alterar stock ni publicación.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 14,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:38:40+00:00",
+      "flujo": {
+        "huella": "1a10488a258248b002ca1db2835c39f2df1ffb7e6dcd5a7afd3c5a061fc92772",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-10"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Víctor crea personalmente el anuncio; Anuncio creado solicita su enlace y SANIA solo marca la publicación cuando lo recibe. Una pulsación sin enlace mantiene la tarea pendiente.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 15,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:47:14+00:00",
+      "flujo": {
+        "huella": "b939fd144e1214f663fe1609968520e999a98d7d5b21552b9e17b52361194168",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-10"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "El enlace de un anuncio puede corregirse desde su ficha en SANIA o mediante una acción de Telegram; ambos canales actualizan el mismo anuncio sin modificar producto, plataforma, referencia ni stock.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 16,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:51:54+00:00",
+      "flujo": {
+        "huella": "5870940000d15ab5494d58d5e3c6a6336f7cb4cd4b9da0f2fb34562fee873b3a",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-10"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Al corregir el enlace desde SANIA o Telegram, SANIA conserva solo el nuevo y elimina completamente el anterior sin mantenerlo en el historial.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 17,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T16:59:59+00:00",
+      "flujo": {
+        "huella": "82277da444b694fd52ee556d0fc5bb817357949d0e2aac1cdb47097886e8e096",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-10"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Si SANIA cuestiona un enlace, Víctor puede enviar el correcto por mensaje o pulsar El enlace es correcto; ambas acciones lo aceptan definitivamente y SANIA no vuelve a pedir confirmación para ese enlace.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 18,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T17:06:33+00:00",
+      "flujo": {
+        "huella": "3260d98e0bf08c349a77669e09b99b757ed7f0c647423a2cd2e150730d2ee097",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-10"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Al recibir por segunda vez el mismo enlace para la misma tarea, SANIA avisa y pide confirmación; un sí equivale a El enlace es correcto y evita nuevas preguntas para ese enlace.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 19,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T17:12:33+00:00",
+      "flujo": {
+        "huella": "2140fbbe127a1760677a09ef19daa8e1e31f417157ea15eeb364fcedd3daa6cd",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-11"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Cada producto guarda imágenes, descripción, precio, precio máximo y mínimo de negociación. Enviar imágenes entrega las asociadas al producto; formato y cantidad quedan para la generación futura compatible con Wallapop y Vinted.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 20,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T17:17:46+00:00",
+      "flujo": {
+        "huella": "d3867ee17538b8a3cec3adfd5d99c684a08d065253e9164b9b26ff26e41b3c55",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-12"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Wallapop y Vinted usan por defecto el mismo precio de publicación y el mismo mínimo de negociación del producto; una posible excepción de precio más alto en Vinted queda pendiente de regla explícita.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 21,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T17:30:24+00:00",
+      "flujo": {
+        "huella": "9eebeab10833530f60f6890af1730f55f4084835a13f12783607f798885d4dc0",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-13"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Vinted puede usar por producto un precio de publicación superior al común sin modificar el precio mínimo aceptable en negociación, que permanece igual que en Wallapop.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 22,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:08:34+00:00",
+      "flujo": {
+        "huella": "28b6c410ea101602833fb99cca9a274c0cd6b0bc7768f850467ffac2ab5456de",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-14"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Víctor fija arbitrariamente por producto el precio de publicación superior de Vinted; SANIA no calcula, recomienda ni aplica porcentaje o recargo automático, y el mínimo de negociación sigue siendo común.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 23,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:11:42+00:00",
+      "flujo": {
+        "huella": "5f65bb20fa870bd2d95e8c74d5318b0e100cd326174135711ac59a97ca1672c9",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-15"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Al cambiar el precio común de un producto, el precio específico de Vinted queda pendiente de revisión manual y SANIA no lo recalcula ni modifica automáticamente.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 24,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:20:06+00:00",
+      "flujo": {
+        "huella": "a16e47f5ed19bbe221a3968af083de11d7baf07991b3625f31b851f9a373af60",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-16"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Al cambiar el precio común de un producto, el precio específico de Vinted queda pendiente de revisión manual sin recalcularse y sin crear una tarea, recordatorio ni aviso inmediato.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 25,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:25:38+00:00",
+      "flujo": {
+        "huella": "8e8b7eac09aa59f2ebdfa1a35f5a965111fffa7cf8f9c7af774417b4026a9785",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-16"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Cuando cambia el precio común y el precio específico de Vinted queda pendiente de revisión, SANIA no crea una tarea ni recordatorio: avisa inmediatamente por Telegram y lo muestra en el dashboard.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 26,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:43:57+00:00",
+      "flujo": {
+        "huella": "4e5bcfc1f51513c76c2067c82acca59c65c42da058359c8854e78e9d63c8a3d5",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-17"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Las unidades idénticas sin etiqueta ni rasgo diferenciador son intercambiables: no se exige su identificación física; la referencia mantiene trazabilidad lógica y la venta descuenta la asignada al anuncio.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 27,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:51:38+00:00",
+      "flujo": {
+        "huella": "80b24d5b5078f3c717b8208a1446a3de7dde93781588a6d984e56e30b282add8",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-18"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "SANIA comienza a medir el tiempo hasta la venta cuando confirma la publicación al recibir y guardar el enlace del anuncio, no al crear la tarea ni al pulsar Anuncio creado sin enlace.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 28,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    },
+    {
+      "carril_provisional": "normal",
+      "codigo": {
+        "rutas": [
+          "README.md"
+        ],
+        "sha": "77e642ff36bbba1889ed6d52a2af3fe8d58eefab"
+      },
+      "conocimiento": [
+        "docs/05-trabajo/ESTADO.md"
+      ],
+      "fecha": "2026-08-20T18:55:22+00:00",
+      "flujo": {
+        "huella": "0e410ac63f0127d69871d40253b4fd6ba6e4993a7e01804a5390aaf183d2e90d",
+        "refs": [
+          "crear-y-mantener-anuncios/REC-18"
+        ]
+      },
+      "investigacion": {
+        "disparadores": [],
+        "motivo": "Al corregir el enlace de un anuncio publicado, SANIA conserva la fecha original de confirmación de publicación y no reinicia la medición del tiempo hasta la venta.",
+        "perfil": "ninguna",
+        "preguntas": [],
+        "sintesis_plataforma": null
+      },
+      "revision": 29,
+      "ruta_provisional": "normal",
+      "tipo_provisional": "flujos"
+    }
+  ],
+  "formato": 1,
+  "historial_aparcados": [
+    {
+      "condicion": "Reanudar cuando el usuario responda la siguiente pregunta de especificación.",
+      "fecha": "2026-08-19T18:50:39+00:00",
+      "motivo": "La aclaración actual ya quedó incorporada y validada; la entrevista continúa con el siguiente punto abierto.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T18:56:49+00:00",
+      "responsable": "usuario",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando el usuario responda qué referencia debe consumir una venta individual de un anuncio con varias unidades.",
+      "fecha": "2026-08-19T19:04:19+00:00",
+      "motivo": "La regla de anuncio único ya quedó incorporada y validada; la entrevista continúa con la selección de referencia tras una venta.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T19:08:02+00:00",
+      "responsable": "usuario",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando el usuario indique si ambos anuncios comparten referencia o usan referencias distintas.",
+      "fecha": "2026-08-19T19:14:54+00:00",
+      "motivo": "La asignación de referencia al crear el anuncio ya quedó incorporada y validada; falta decidir la relación entre las referencias de Wallapop y Vinted.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T19:16:34+00:00",
+      "responsable": "usuario",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando el usuario indique si debe crearse una nueva tarea de publicación tras vender una referencia mientras quedan unidades.",
+      "fecha": "2026-08-19T19:20:19+00:00",
+      "motivo": "La asignación de referencias entre plataformas quedó incorporada y validada; la entrevista continúa con el comportamiento tras una venta.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T19:22:30+00:00",
+      "responsable": "usuario",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando el usuario indique qué debe ocurrir al pulsar Cancelar sugerencia.",
+      "fecha": "2026-08-19T19:26:08+00:00",
+      "motivo": "La reposición automática de tareas tras una venta quedó incorporada y validada; la entrevista continúa con el efecto de cancelar una sugerencia.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T19:29:44+00:00",
+      "responsable": "usuario",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando el usuario indique si quiere una acción Volver a sugerir o una cancelación permanente.",
+      "fecha": "2026-08-19T19:35:17+00:00",
+      "motivo": "Cancelar sugerencia y la vinculación manual quedaron incorporados y validados; falta decidir si la supresión puede reactivarse manualmente.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T19:36:23+00:00",
+      "responsable": "usuario",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor confirme si se crea una tarea inmediatamente cuando hay stock y no hay anuncio activo, o si SANIA espera al siguiente hecho que normalmente genera la tarea.",
+      "fecha": "2026-08-19T19:39:55+00:00",
+      "motivo": "Esperando una decisión de negocio sobre el primer efecto de Volver a sugerir.",
+      "por": "usuario",
+      "reanudada": "2026-08-19T20:56:52+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique cuándo debe reaparecer una tarea de publicación después de pulsar Recordar más tarde.",
+      "fecha": "2026-08-20T16:18:57+00:00",
+      "motivo": "La creación inmediata tras Volver a sugerir está cerrada; la entrevista continúa con el comportamiento de Recordar más tarde.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T16:21:30+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique a qué hora del día siguiente debe reaparecer la tarea de publicación.",
+      "fecha": "2026-08-20T16:24:46+00:00",
+      "motivo": "El día de reaparición de Recordar más tarde está cerrado; falta concretar la hora.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T16:26:04+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique qué debe ocurrir si pulsa Anuncio creado por error.",
+      "fecha": "2026-08-20T16:28:30+00:00",
+      "motivo": "La cadencia y hora de Recordar más tarde están cerradas; continúa pendiente la corrección de una confirmación errónea.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T16:35:11+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique qué debe hacer SANIA si después necesita sustituir el enlace asociado a un anuncio.",
+      "fecha": "2026-08-20T16:38:48+00:00",
+      "motivo": "La confirmación mediante enlace está cerrada; falta definir la corrección de un enlace equivocado.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T16:43:57+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique si el enlace anterior debe conservarse en el historial o eliminarse al corregirlo.",
+      "fecha": "2026-08-20T16:47:20+00:00",
+      "motivo": "Los canales de corrección del enlace están cerrados; falta decidir el tratamiento del enlace sustituido.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T16:49:46+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique qué debe hacer SANIA si el enlace nuevo no tiene un formato válido para la plataforma.",
+      "fecha": "2026-08-20T16:52:01+00:00",
+      "motivo": "La eliminación del enlace anterior está cerrada; falta definir la validación del enlace nuevo.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T16:56:00+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique qué debe hacer SANIA si recibe dos veces exactamente el mismo enlace para la misma tarea.",
+      "fecha": "2026-08-20T17:00:07+00:00",
+      "motivo": "La aceptación definitiva de enlaces cuestionados está cerrada; falta definir la recepción repetida del mismo enlace.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T17:03:39+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique qué formato y cuántas imágenes debe enviar SANIA al pulsar Enviar imágenes.",
+      "fecha": "2026-08-20T17:06:40+00:00",
+      "motivo": "El tratamiento de enlaces repetidos está cerrado; continúa pendiente concretar el envío de imágenes para publicar.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T17:09:42+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique si Wallapop y Vinted comparten el mismo precio del producto o pueden tener precios distintos.",
+      "fecha": "2026-08-20T17:12:41+00:00",
+      "motivo": "Los datos de producto y el envío bajo demanda de imágenes están cerrados; continúa pendiente la regla de precios por plataforma.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T17:15:33+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique si quiere permitir un precio de publicación mayor en Vinted y cómo debe decidirse.",
+      "fecha": "2026-08-20T17:17:55+00:00",
+      "motivo": "La regla de precios comunes está cerrada; queda pendiente decidir si se permite una excepción de precio más alto en Vinted.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T17:27:55+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique cómo debe decidirse el importe superior de Vinted para cada producto.",
+      "fecha": "2026-08-20T17:30:32+00:00",
+      "motivo": "La excepción de precio superior en Vinted está cerrada; falta definir cómo se fija su importe.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:06:22+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique si el precio específico de Vinted se conserva o debe revisarse al cambiar el precio común del producto.",
+      "fecha": "2026-08-20T18:08:42+00:00",
+      "motivo": "La fijación manual del precio superior de Vinted está cerrada; falta definir qué ocurre si cambia luego el precio común del producto.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:09:30+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique si SANIA debe crear una tarea o aviso inmediato al quedar pendiente la revisión del precio de Vinted.",
+      "fecha": "2026-08-20T18:11:49+00:00",
+      "motivo": "La revisión manual del precio de Vinted está cerrada; falta definir cómo y cuándo se avisa a Víctor.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:16:45+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor indique en qué lugar de SANIA debe ver el precio específico de Vinted pendiente de revisión.",
+      "fecha": "2026-08-20T18:20:07+00:00",
+      "motivo": "La ausencia de aviso inmediato está cerrada; falta decidir dónde se muestra el pendiente de revisión del precio de Vinted.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:23:42+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor explique cómo distingue físicamente una unidad concreta entre varias idénticas sin etiqueta.",
+      "fecha": "2026-08-20T18:25:38+00:00",
+      "motivo": "El aviso por Telegram y dashboard está cerrado; falta definir cómo identifica Víctor unidades idénticas cuando no llevan etiqueta ni rasgo diferenciador.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:41:50+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor decida el formato y la cantidad de imágenes de anuncio compatibles con Wallapop y Vinted.",
+      "fecha": "2026-08-20T18:43:57+00:00",
+      "motivo": "La identidad física de unidades idénticas está cerrada; el formato y la cantidad de imágenes de anuncio siguen pendientes de definir.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:48:22+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    },
+    {
+      "condicion": "Reanudar cuando Víctor quiera definir el formato y la cantidad de imágenes compatibles con Wallapop y Vinted.",
+      "fecha": "2026-08-20T18:51:38+00:00",
+      "motivo": "El inicio de medición está cerrado; el formato y la cantidad de imágenes de anuncio siguen pendientes por decisión de Víctor.",
+      "por": "usuario",
+      "reanudada": "2026-08-20T18:53:01+00:00",
+      "responsable": "agente",
+      "revisar_el": null
+    }
+  ],
+  "id": "P-20260819-78c872b8",
+  "original": {
+    "autor": "usuario",
+    "resumen": "Cerrar especificaciones de los puntos claros del flujo",
+    "texto": "quiero cerrar especificaciones para los puntos del flujo que ya estan claros"
+  },
+  "procesos": [],
+  "reclamos": [],
+  "relaciones": [],
+  "responsable": "usuario",
+  "revision": 29
+}

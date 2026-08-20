@@ -48,11 +48,11 @@
     },
     {
       "termino": "anuncio",
-      "significado": "publicación manual de Wallapop o Vinted vinculada en la base de datos con sus unidades y su venta. Normalmente parte de una unidad, pero una venta de varias unidades iguales conserva todas sus referencias en el título y las relaciona con el mismo anuncio y enlace; el título ayuda a conciliar, pero nunca es la única fuente de verdad. SANIA conserva el enlace para navegar y, si la investigación lo permite de forma sencilla y fiable, comprobar públicamente su estado sin iniciar sesión"
+      "significado": "publicación manual de un producto en Wallapop o Vinted. Solo puede existir un anuncio activo del mismo producto en cada plataforma. Si hay al menos dos unidades disponibles, Wallapop y Vinted reciben referencias distintas; si solo hay una, ambos anuncios comparten esa referencia. El orden de elección no importa y la venta descuenta la referencia ya asignada, sin decidirla de nuevo"
     },
     {
       "termino": "tarea de publicación",
-      "significado": "propuesta incluida en una notificación agrupada de Telegram cuando llegan varias unidades. La notificación se desglosa por plataforma o publicación y ofrece una confirmación independiente para cada publicación; al pulsar Ya he publicado, SANIA pide su enlace. También permite cancelar la propuesta"
+      "significado": "propuesta de publicar un producto en una plataforma. Tras una venta con stock puede regenerarse automáticamente, salvo que Víctor haya pulsado Cancelar sugerencia para ese producto y plataforma. En ese caso SANIA deja de sugerir hasta que Víctor pulse Volver a sugerir, acción que crea inmediatamente una tarea si hay stock y no existe un anuncio activo allí; mientras tanto, cualquier anuncio posterior se vincula manualmente con el producto y la referencia"
     },
     {
       "termino": "unidad reservada",
@@ -116,11 +116,15 @@
     },
     {
       "termino": "botón ligado a tarea",
-      "significado": "acción que identifica la tarea concreta y, cuando corresponde a un anuncio, la unidad y plataforma resueltas; Víctor no debe volver a introducir esa identidad, aunque la granularidad de generación de tareas siga pendiente"
+      "significado": "acción que identifica la tarea concreta y, cuando corresponde a un anuncio, el producto, la plataforma y la referencia asignada al crearlo; Víctor no debe volver a introducir esa identidad"
     },
     {
       "termino": "No volver a recordar",
       "significado": "botón que silencia los recordatorios de recepción; sigue pendiente decidir si además pausa, mantiene visible o cierra la tarea y nunca equivale a Todo correcto"
+    },
+    {
+      "termino": "El enlace es correcto",
+      "significado": "acción con la que Víctor acepta definitivamente un enlace cuestionado para la tarea o el anuncio ligado; SANIA no vuelve a solicitar confirmación para ese enlace"
     },
     {
       "termino": "texto libre",
@@ -128,7 +132,7 @@
     },
     {
       "termino": "publicado declarado",
-      "significado": "estado persistido al pulsar Anuncio creado para una tarea ligada a una unidad y plataforma; no prueba por sí solo que el anuncio continúe visible"
+      "significado": "estado persistido al pulsar Anuncio creado para una tarea ligada a un producto, una plataforma y la referencia asignada al anuncio; no prueba por sí solo que el anuncio continúe visible"
     },
     {
       "termino": "visibilidad real no verificable",
@@ -156,11 +160,11 @@
     },
     {
       "termino": "identidad física exacta",
-      "significado": "correspondencia entre una referencia lógica y un ejemplar material concreto; no está resuelta para unidades idénticas sin etiquetas ni diferencias visibles"
+      "significado": "correspondencia entre una referencia lógica y un ejemplar material concreto; solo es necesaria cuando las unidades están etiquetadas individualmente, no para ejemplares idénticos sin etiqueta ni diferencias visibles"
     },
     {
       "termino": "Anuncio creado",
-      "significado": "confirmación humana que persiste que la unidad quedó publicada en la plataforma de la tarea concreta"
+      "significado": "confirmación humana que persiste que el producto quedó publicado en la plataforma con la referencia que SANIA asignó al crear el anuncio"
     },
     {
       "termino": "Stock para venta",
@@ -168,15 +172,15 @@
     },
     {
       "termino": "Compra personal",
-      "significado": "clasificación de producto que excluye la compra del inventario y de las tareas de anuncio"
+      "significado": "clasificación de producto que no cuenta como stock para venta ni genera nuevas tareas de anuncio; si un pedido ya confirmado pasa a Compra personal, SANIA avisa qué productos se borrarán del stock y solo los retira después de una confirmación expresa. En la misma operación borra automáticamente las tareas de anuncio relacionadas"
     },
     {
       "termino": "unidad física",
-      "significado": "ejemplar concreto creado en inventario después de Todo correcto; un anuncio representa una sola unidad"
+      "significado": "ejemplar concreto creado en inventario después de Todo correcto; conserva su propia referencia y puede ser la unidad asignada a un anuncio cuando SANIA lo crea"
     },
     {
       "termino": "identidad física de unidades idénticas",
-      "significado": "problema abierto: unidades visualmente idénticas, sin etiqueta ni rasgo diferenciador, no permiten demostrar todavía qué ejemplar material corresponde a cada referencia lógica"
+      "significado": "las unidades visualmente idénticas, sin etiqueta ni rasgo diferenciador, son intercambiables: no hace falta demostrar qué ejemplar material corresponde a cada referencia lógica"
     },
     {
       "termino": "corrección auditable",
@@ -200,7 +204,7 @@
     },
     {
       "termino": "anuncio alternativo",
-      "significado": "anuncio de la otra plataforma que apunta a la misma unidad física ya reservada"
+      "significado": "único anuncio activo del mismo producto en la otra plataforma; debe retirarse si tenía asignada la referencia vendida o si la reserva deja el producto sin unidades disponibles"
     },
     {
       "termino": "pendiente de retirada",
@@ -286,7 +290,7 @@
       "id": "confirmar-recepcion-de-pedidos",
       "nombre": "confirmar la recepción de pedidos",
       "area": "Compra y aprovisionamiento",
-      "resumen": "Primera versión: el seguimiento entregado deja el paquete pendiente de comprobación física. Telegram muestra el contenido esperado y ofrece Todo correcto o No OK. Si la incidencia es parcial, las cantidades correctas continúan y solo se bloquea la parte afectada; si todo el pedido está en incidencia, no se crean unidades hasta una resolución positiva con mercancía válida para la venta. La cadencia específica de recepción sigue pendiente.",
+      "resumen": "Primera versión: el seguimiento entregado deja el paquete pendiente de comprobación física. Telegram muestra el contenido esperado y ofrece Todo correcto o No OK. Desde el mismo pedido, Víctor puede cambiar después la clasificación a Compra personal; SANIA enumera los productos que se borrarán del stock y exige confirmación antes de retirar las unidades y eliminar automáticamente sus tareas de anuncio. Si la incidencia es parcial, las cantidades correctas continúan y solo se bloquea la parte afectada. La cadencia específica de recepción sigue pendiente.",
       "estado": "en entrevista",
       "depende_de": [
         "seguir-pedidos-aliexpress"
@@ -303,7 +307,7 @@
       "id": "dar-entrada-al-almacen",
       "nombre": "dar entrada a las unidades recibidas",
       "area": "Almacén",
-      "resumen": "Primera versión: crear una unidad y una referencia no reutilizable por cada cantidad físicamente recibida, empezando en ZZZ y ampliando la longitud cuando se agoten las combinaciones. En una incidencia parcial, las unidades correctas continúan y las problemáticas quedan bloqueadas. Las propuestas de publicación se agrupan en una notificación y se confirman por publicación; los costes y los resultados económicos de incidencias siguen pendientes.",
+      "resumen": "Primera versión: crear una unidad y una referencia no reutilizable por cada cantidad físicamente recibida, empezando en ZZZ y ampliando la longitud cuando se agoten las combinaciones. Si Víctor cambia después el pedido a Compra personal y confirma el aviso, las unidades generadas se borran del stock activo y las tareas de anuncio relacionadas se eliminan automáticamente. En una incidencia parcial, las unidades correctas continúan y las problemáticas quedan bloqueadas.",
       "estado": "en entrevista",
       "depende_de": [
         "confirmar-recepcion-de-pedidos"
@@ -320,7 +324,7 @@
       "id": "controlar-stock-y-trazabilidad",
       "nombre": "controlar el stock y la trazabilidad",
       "area": "Almacén",
-      "resumen": "Primera versión: conocer el estado y el lote de cada unidad, su referencia visible de longitud inicial tres y sus anuncios y ventas. Sin etiquetas físicas, ejemplares idénticos son intercambiables; con etiquetas, la referencia identifica la unidad exacta y una falta exige que Víctor cambie manualmente el anuncio. Si dos plataformas disputan casi a la vez la última unidad, SANIA no elige ganador, evita stock negativo y avisa por Telegram para que Víctor decida y cancele una venta.",
+      "resumen": "Primera versión: conocer el estado y el lote de cada unidad, su referencia visible de longitud inicial tres y sus anuncios y ventas. Una unidad retirada al cambiar su pedido a Compra personal deja de existir en el stock activo, aunque el cambio queda en el historial. Sin etiquetas físicas, ejemplares idénticos son intercambiables; con etiquetas, la referencia identifica la unidad exacta. Si dos plataformas disputan casi a la vez la última unidad, SANIA evita stock negativo y avisa para que Víctor decida.",
       "estado": "en entrevista",
       "depende_de": [
         "dar-entrada-al-almacen"
@@ -348,7 +352,7 @@
       "id": "crear-y-mantener-anuncios",
       "nombre": "crear y mantener anuncios",
       "area": "Anuncios y ventas",
-      "resumen": "SANIA agrupa las propuestas en una notificación y las desglosa por plataforma o publicación. Cada publicación tiene su botón Ya he publicado; al pulsarlo SANIA solicita el enlace, y también permite cancelar la propuesta. El título y la base de datos conservan todas las referencias incluidas; falta precisar el formato cuando son varias y el alcance de cancelar dentro de la agrupación.",
+      "resumen": "SANIA crea una tarea y un único anuncio activo por producto y plataforma, sin duplicados. Cada producto reúne sus imágenes, descripción, precio, precio máximo y mínimo de negociación; por defecto el precio y mínimo son iguales en Wallapop y Vinted, pero Vinted puede tener un precio de publicación superior sin cambiar ese mínimo. Víctor fija libremente ese importe de Vinted por producto, sin fórmula ni recargo automático; si cambia el precio común, queda pendiente de revisión manual sin recalcularse ni generar tarea o recordatorio, SANIA avisa inmediatamente por Telegram y lo muestra en el dashboard. Enviar imágenes entrega las asociadas al producto. El formato y la cantidad se decidirán al definir su generación, con compatibilidad para Wallapop y Vinted. Con dos o más unidades asigna referencias distintas a Wallapop y Vinted; con una sola, ambos anuncios comparten referencia. Víctor crea personalmente cada anuncio y SANIA solo lo marca como publicado después de recibir su enlace, que Víctor puede corregir después desde SANIA o Telegram; al corregirlo, el anterior se elimina completamente y no queda en el historial, y la fecha original de confirmación de publicación se conserva para medir el tiempo hasta la venta. Si SANIA cuestiona un enlace, Víctor puede enviar el correcto por mensaje o pulsar El enlace es correcto; en ambos casos se acepta definitivamente y no vuelve a preguntarse. Si recibe el mismo enlace por segunda vez, avisa y pide confirmación; un sí equivale a El enlace es correcto. Tras una venta con stock crea una nueva tarea para la plataforma, salvo que Víctor haya pulsado Cancelar sugerencia: entonces deja de proponer ese producto allí hasta que pulse Volver a sugerir, que crea inmediatamente una tarea si hay stock y no existe un anuncio activo. Si Víctor publica por su cuenta mientras están desactivadas, vincula manualmente el anuncio con el producto y la referencia. Al pasar un pedido a Compra personal, SANIA borra las tareas relacionadas.",
       "estado": "en entrevista",
       "depende_de": [
         "controlar-stock-y-trazabilidad"
@@ -416,7 +420,7 @@
       "id": "registrar-venta-confirmada",
       "nombre": "registrar una venta confirmada",
       "area": "Anuncios y ventas",
-      "resumen": "Primera versión: extraer una o varias referencias del título, contrastarlas con la base de datos y relacionar venta, anuncio y unidades sin depender solo del texto público. En los enlaces de Wallapop, SANIA conserva juntos los valores b, i y r y prueba a usarlos como pista provisional para relacionar correos de una misma venta, sin atribuir significado a cada letra ni unir automáticamente operaciones cuando falten, cambien o se contradigan. Una referencia ausente, cortada o alterada deja la venta sin aplicar al stock, crea un ticket de revisión y avisa por Telegram, sin abrir automáticamente una incidencia. En ventas de varias unidades iguales, todas comparten enlace y el total se divide entre sus referencias. Un conflicto casi simultáneo por la última unidad espera la decisión manual de Víctor.",
+      "resumen": "Primera versión: extraer la referencia asignada al anuncio, contrastarla con la base de datos y reservarla sin elegir otra al vender. Si quedan unidades del producto, SANIA crea automáticamente una nueva tarea para la misma plataforma con otra referencia disponible. En los enlaces de Wallapop conserva juntos b, i y r solo como pista provisional. Una referencia ausente, cortada o alterada deja la venta sin aplicar al stock, crea un ticket de revisión y avisa por Telegram. Un conflicto casi simultáneo por la misma o la última unidad espera la decisión manual de Víctor.",
       "estado": "en entrevista",
       "depende_de": [
         "controlar-stock-y-trazabilidad"
@@ -433,7 +437,7 @@
       "id": "analizar-rendimiento-de-anuncios",
       "nombre": "analizar cuánto tardan los anuncios en venderse",
       "area": "Anuncios y ventas",
-      "resumen": "Fase posterior: medir el tiempo de venta desde que el anuncio se añade a la base de datos hasta su cierre y comparar tendencias por producto y plataforma. SANIA conserva ambos instantes y el texto completo del anuncio, sin automatizar acciones dentro de Wallapop o Vinted.",
+      "resumen": "Fase posterior: medir el tiempo de venta desde que SANIA confirma la publicación al recibir y guardar el enlace del anuncio hasta su cierre y comparar tendencias por producto y plataforma. SANIA conserva ambos instantes y el texto completo del anuncio, sin automatizar acciones dentro de Wallapop o Vinted.",
       "estado": "sin empezar",
       "depende_de": [
         "crear-y-mantener-anuncios",
@@ -445,7 +449,7 @@
       "id": "retirar-anuncios-sin-stock",
       "nombre": "retirar anuncios cuando se agota el stock",
       "area": "Anuncios y ventas",
-      "resumen": "Cuando una venta inequívoca agote las referencias compartidas por otras publicaciones, Telegram pide a Víctor retirar manualmente los anuncios alternativos. Si dos plataformas disputan casi a la vez la última unidad, SANIA no inicia la retirada ni elige ganador hasta que Víctor decida cuál cancelar. La URL guardada podrá servir como comprobación adicional si la investigación autoriza su lectura pública.",
+      "resumen": "Cuando una venta inequívoca reserve la referencia asignada a un anuncio, Telegram pide retirar manualmente el anuncio de la otra plataforma si tenía esa misma referencia o si ya no queda stock del producto. Si dos plataformas disputan casi a la vez la misma o la última unidad, SANIA no inicia la retirada ni elige ganador hasta que Víctor decida cuál cancelar. La URL guardada podrá servir como comprobación adicional si la investigación autoriza su lectura pública.",
       "estado": "en entrevista",
       "depende_de": [
         "registrar-venta-confirmada",
@@ -612,7 +616,7 @@
       "id": "atender-alertas-y-confirmaciones",
       "nombre": "atender alertas y confirmaciones",
       "area": "Dirección y control",
-      "resumen": "Primera versión: Telegram muestra decisiones, tareas físicas y excepciones ligadas a su operación. Las incidencias avisan diariamente por defecto y cada una permite fijar otra frecuencia persistente hasta cambiarla o cerrarla. Las cadencias de otros avisos, las respuestas contradictorias y las segundas confirmaciones permanecen pendientes.",
+      "resumen": "Primera versión: Telegram muestra decisiones, tareas físicas y excepciones ligadas a su operación. Recordar más tarde vuelve a presentar las tareas de publicación a las 18:00 del día siguiente según la hora local de SANIA. Las incidencias avisan diariamente por defecto y cada una permite fijar otra frecuencia persistente hasta cambiarla o cerrarla. Las cadencias de otros avisos, las respuestas contradictorias y las segundas confirmaciones permanecen pendientes.",
       "estado": "en entrevista",
       "carpeta": "actividades/atender-alertas-y-confirmaciones",
       "origen": "usuario",
@@ -741,7 +745,7 @@
         "nombre y código interno",
         "variante relevante",
         "clasificación aprendida Stock para venta o Compra personal y su historial de corrección",
-        "datos editoriales vigentes para anuncios",
+        "imágenes, descripción, precio común por defecto para Wallapop y Vinted, posible precio de publicación superior específico de Vinted fijado arbitrariamente por Víctor y marcado pendiente de revisión al cambiar el precio común sin crear tarea ni recordatorio, notificado inmediatamente por Telegram y mostrado en el dashboard, precio máximo y precio mínimo aceptable en negociación común como datos editoriales vigentes; el formato y la cantidad de imágenes se decidirán al definir su generación, con compatibilidad para Wallapop y Vinted",
         "enlaces y vendedores de compra separados de la identidad del producto"
       ],
       "origen": "correos de AliExpress y datos confirmados por Víctor"
@@ -761,19 +765,19 @@
       "cosa": "anuncio",
       "guarda": [
         "plataforma",
-        "URL e identificador observable del anuncio",
+        "URL vigente e identificador observable del anuncio; al corregir la URL se elimina completamente la anterior y no se conserva en el historial, pero se mantiene la fecha original de confirmación de publicación que inicia la medición; aceptación definitiva si Víctor pulsó El enlace es correcto",
         "producto y variante",
         "lista de referencias de las unidades vinculadas",
         "título, descripción y texto completo finales usados; la base de datos, no el título, conserva la relación canónica",
         "estado independiente por plataforma: abierto, vendido, retirado o no verificable",
         "tarea y confirmación Ya he publicado que originaron el estado",
-        "fecha y hora de alta en la base de datos, que inicia la medición de tiempo",
-        "fecha de publicación cuando se confirme",
+        "fecha y hora de alta en la base de datos",
+        "fecha y hora de publicación confirmada al recibir y guardar el enlace, que inicia la medición de tiempo",
         "fecha y hora de cierre, venta o retirada y su motivo",
         "fecha y resultado de la última comprobación pública válida cuando la función esté habilitada",
         "errores, CAPTCHA, bloqueos y estado habilitado o pausado de la comprobación",
         "frecuencia configurable de comprobación, semanal por defecto",
-        "tiempo hasta la venta calculado desde el alta en la base de datos"
+        "tiempo hasta la venta calculado desde la confirmación de publicación"
       ],
       "origen": "tarea de publicación y confirmación humana Ya he publicado con su enlace; correo de venta, confirmación humana de retirada y, solo si la investigación lo permite, lectura pública sin sesión del enlace guardado"
     },
@@ -899,7 +903,7 @@
     },
     {
       "con": "Telegram",
-      "para": "pedir comprobaciones físicas, agrupar propuestas de publicación con una confirmación por publicación y solicitud posterior del enlace, y avisar de tickets, incidencias, referencias anómalas, duplicados y conflictos de venta que debe resolver Víctor; las incidencias se recuerdan diariamente por defecto y admiten una frecuencia persistente configurable"
+      "para": "pedir comprobaciones físicas, agrupar propuestas de publicación con una confirmación por publicación y solicitud posterior del enlace, permitir corregir ese enlace, aceptar mediante El enlace es correcto un enlace cuestionado y pedir confirmación si se repite, y avisar de tickets, incidencias, referencias anómalas, duplicados y conflictos de venta que debe resolver Víctor; las incidencias se recuerdan diariamente por defecto y admiten una frecuencia persistente configurable"
     },
     {
       "con": "lectura pública sin sesión de enlaces de anuncios (condicionada a investigación)",
@@ -929,6 +933,9 @@
           "resolver una decisión estructurada",
           "pedir las imágenes de una tarea de publicación",
           "confirmar Ya he publicado para una publicación y aportar su enlace",
+          "corregir el enlace de un anuncio",
+          "confirmar que un enlace cuestionado es correcto",
+          "confirmar el uso de un enlace repetido",
           "aplazar o cancelar una sugerencia de publicación",
           "abrir o completar un ticket de revisión o una incidencia",
           "cambiar la frecuencia o pausar el escalado de una incidencia",
@@ -968,6 +975,9 @@
         "resolver una decisión estructurada",
         "pedir las imágenes de una tarea de publicación",
         "confirmar Ya he publicado para una publicación y aportar su enlace",
+        "corregir el enlace de un anuncio",
+        "confirmar que un enlace cuestionado es correcto",
+        "confirmar el uso de un enlace repetido",
         "aplazar o cancelar una sugerencia de publicación",
         "abrir o completar un ticket de revisión o una incidencia",
         "cambiar la frecuencia o pausar el escalado de una incidencia",
@@ -986,6 +996,9 @@
             "resolver una decisión estructurada",
             "pedir las imágenes de una tarea de publicación",
             "confirmar Ya he publicado para una publicación y aportar su enlace",
+            "corregir el enlace de un anuncio",
+            "confirmar que un enlace cuestionado es correcto",
+            "confirmar el uso de un enlace repetido",
             "aplazar o cancelar una sugerencia de publicación",
             "abrir o completar un ticket de revisión o una incidencia",
             "cambiar la frecuencia o pausar el escalado de una incidencia",
@@ -1004,7 +1017,7 @@
         "quien": "Víctor",
         "que": "una confirmación, decisión o excepción necesitó su intervención",
         "canal": "Telegram",
-        "cuando": "cuando un hecho concreto requirió intervención; las incidencias repiten diariamente por defecto o con el intervalo persistente elegido, y las demás cadencias siguen pendientes por actividad"
+        "cuando": "cuando un hecho concreto requirió intervención; las tareas de publicación aplazadas reaparecen a las 18:00 del día siguiente según la hora local de SANIA, las incidencias repiten diariamente por defecto o con el intervalo persistente elegido, y las demás cadencias siguen pendientes por actividad"
       }
     ],
     "condiciones": [
@@ -1035,7 +1048,7 @@
     },
     {
       "id": "Q-9",
-      "criterio": "Toda publicación conservó en el título y en la base de datos la lista completa de referencias incluidas, y cada confirmación Ya he publicado quedó ligada a una publicación y solicitó su enlace."
+      "criterio": "Toda publicación conservó en el título y en la base de datos la referencia que SANIA le asignó al crearla, y cada confirmación Ya he publicado quedó ligada a esa publicación y solicitó su enlace."
     },
     {
       "id": "Q-10",
@@ -1106,7 +1119,6 @@
     "[T01-Q04 / T01-Q09] ¿Qué correo o hecho demuestra una cancelación real en Wallapop o Vinted y qué ocurre con la reserva, las unidades y los anuncios antes o después del envío?",
     "[T01-Q05] ¿Cuál es la finalidad funcional exacta de conservar el nombre mostrado del comprador y el enlace de la venta o anuncio?",
     "[T01-Q06] ¿Cómo se representa un anuncio con productos diferentes y cómo se reparten sus costes? En unidades iguales ya está decidido que comparten enlace y que el total se divide entre referencias.",
-    "¿Qué formato, separador y orden usa el título cuando contiene varias referencias, y qué pasa si una de ellas no está disponible?",
     "¿Cómo indica Víctor a SANIA que un producto o lote pasó de unidades físicamente intercambiables a unidades etiquetadas individualmente?",
     "[T04-Q01] ¿Cuál será el próximo ajuste real de stock, con cantidad anterior, cantidad posterior, motivo y efecto económico?",
     "¿Qué correos, estados y movimientos económicos produce la primera devolución real de un comprador?",

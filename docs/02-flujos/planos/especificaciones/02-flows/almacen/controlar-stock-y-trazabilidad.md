@@ -40,9 +40,9 @@ La versión gráfica vive en el visor local del paquete (visor/servir.py).
 - [automático: código] SANIA vinculó la unidad con pedido, paquete, producto, variante y confirmación física, cuando esos datos estuvieron demostrados.
 - [automático: código] SANIA asignó una referencia alfanumérica única de tres caracteres y la dejó disponible sin ubicación física detallada.
 
-### SANIA mantuvo disponibilidad, anuncios y reserva de una unidad [con la app · origen: usuario]
+### SANIA mantuvo disponibilidad, anuncios y reservas de un producto [con la app · origen: usuario]
 
-- [automático: código] SANIA relacionó la unidad con sus anuncios por plataforma; cada anuncio representó una unidad y su título terminó con la referencia pública.
+- [automático: código] SANIA mantuvo como máximo un anuncio activo del producto en Wallapop y otro en Vinted. Al crear cada anuncio le asignó una referencia disponible sin un orden obligatorio y no creó anuncios duplicados.
 - ⚑ Regla: ¿La unidad estaba físicamente disponible y no reservada?
     - si no:
         - [automático: código] SANIA excluyó la unidad del recuento disponible sin crear stock negativo.
@@ -54,25 +54,31 @@ La versión gráfica vive en el visor local del paquete (visor/servir.py).
         - [automático: código] SANIA conservó el evento existente y no duplicó la reserva, la venta ni el movimiento de stock.
         - aquí termina este camino
     - camino normal: no, SANIA continuó
-- ⚠ Excepción: ¿El título conservó un sufijo válido de tres caracteres que identificaba una unidad exacta disponible?
-    - si no: referencia ausente, alterada, desconocida o unidad no disponible:
-        - [automático: código] SANIA abrió una conciliación, no cambió el stock y no eligió otra unidad por FIFO. T01-Q02 y X-LIVE-010 exigen validar el sufijo en correos y movimientos reales.
+- ⚠ Excepción: ¿El anuncio tenía una referencia válida que SANIA le había asignado al crearlo y esa referencia seguía disponible?
+    - si no: anuncio no conciliado, referencia desconocida o unidad no disponible:
+        - [automático: código] SANIA abrió una conciliación y no cambió el stock. T01-Q02 y X-LIVE-010 exigen validar las referencias en correos y movimientos reales.
         - aquí termina este camino
-    - camino normal: sí, SANIA pudo reservar esa referencia
-- [automático: código] SANIA reservó la unidad exacta del anuncio. Si la misma última unidad estaba anunciada en la otra plataforma, creó el aviso para que Víctor retirara manualmente el anuncio alternativo.
+    - camino normal: sí, SANIA pudo reservar exactamente esa referencia
+- [automático: código] SANIA reservó la referencia asignada. Si quedaba stock y las sugerencias seguían activas, creó una nueva tarea para la plataforma vendida. Si el otro anuncio compartía la referencia vendida o ya no quedaba stock, creó el aviso para retirarlo.
 - [automático: código] La concurrencia de dos correos casi simultáneos sobre la última unidad sigue sin regla completa; SANIA nunca puede inventar stock ni dejarlo negativo.
 
 ### Víctor corrigió un dato de stock sin borrar la historia [con la app · origen: usuario]
 
 - [persona] Víctor indicó el dato erróneo, el valor correcto y el motivo. · Víctor
 - [automático: código] SANIA añadió un evento con valor anterior, valor nuevo, actor, fecha y hora y motivo, conservando el evento original.
-- [automático: código] El flujo concreto para deshacer Todo correcto, corregir la clasificación de pedidos existentes o resolver efectos económicos sigue pendiente.
+- [automático: código] Cuando un pedido con Todo correcto pasó a Compra personal, SANIA mostró los productos afectados, pidió confirmación y, tras el sí, los borró del stock activo junto con todas las tareas de anuncio relacionadas. Los efectos económicos siguen pendientes.
 
 ## 4. Recorridos, requisitos y criterios de aceptación
 
 El orden es el orden de entrega. El primero es el esqueleto: recorre el camino feliz de punta a punta.
 
-(Pendiente.)
+### REC-5: Asignar una referencia pública no reutilizable (pendiente · 1ª entrega)
+
+Identificar cada unidad con una referencia breve, pública y estable.
+
+- **R-15**: Cada referencia empieza en ZZZ, sigue la secuencia Z a A y z a a, nunca se reutiliza y añade una letra al agotar una longitud. · regla G-27 · origen: usuario · código actual: no verificado
+
+- **C-15**: Dado un conjunto de unidades que necesitan referencia / Cuando SANIA asignó sus referencias / Entonces empezó en ZZZ, respetó el orden acordado, no repitió ningún valor usado y aumentó la longitud al agotarse · cubre R-15
 
 ### Episodios reales que sustentan los requisitos
 
@@ -94,21 +100,21 @@ El tracking entregado no crea una unidad disponible; se exige Todo correcto. [Mi
 
 Solo después de comprobar producto y cantidades se registran unidades de Stock para venta y se lanzan sus tareas de anuncio. [Migración: identificador histórico G-LIVE-003; referencias históricas: D-LIVE-017, D-LIVE-020]
 
-### G-26: Un anuncio por unidad
+### G-26: Un anuncio activo por producto y plataforma
 
-Cada anuncio representa una única unidad física. [Migración: identificador histórico G-LIVE-005; referencias históricas: D-LIVE-007]
+Solo existe un anuncio activo del mismo producto en cada plataforma. Con dos o más unidades disponibles, Wallapop y Vinted reciben referencias distintas; con una sola unidad, ambos anuncios comparten esa referencia. La asignación queda fijada antes de la venta. [Migración: sustituye el antecedente histórico G-LIVE-005 y D-LIVE-007 por decisión del usuario]
 
 ### G-27: Referencia pública de tres caracteres
 
-La referencia alfanumérica de tres caracteres identifica la unidad en SANIA y aparece como sufijo del título. [Migración: identificador histórico G-LIVE-006; estado histórico: alfabeto y colisiones pendientes; referencias históricas: D-LIVE-006, T03-Q08, X-LIVE-001]
+La referencia pública identifica la unidad en SANIA y aparece como sufijo del título. Empieza en ZZZ, usa la secuencia Z, Y, ..., A, z, y, ..., a, nunca reutiliza un valor y añade una letra al agotar una longitud. [Migración: identificador histórico G-LIVE-006; referencias históricas: D-LIVE-006, T03-Q08, X-LIVE-001]
 
-### G-28: Reserva de la unidad exacta
+### G-28: La venta reserva la referencia asignada al anuncio
 
-El correo de venta reserva la referencia contenida en el anuncio; no se aplica FIFO automático. [Migración: identificador histórico G-LIVE-007; estado histórico: la identidad material de unidades idénticas sigue pendiente; referencias históricas: D-LIVE-001, T01-Q11, X-LIVE-004]
+El correo de venta se relaciona con el único anuncio del producto y reserva exactamente la referencia que SANIA le asignó al crearlo. La selección ocurre al crear el anuncio y puede usar cualquier referencia disponible; no se decide de nuevo al vender. [Migración: antecedente histórico G-LIVE-007; referencias históricas: D-LIVE-001, T01-Q11, X-LIVE-004]
 
-### G-29: Primer correo sobre una unidad compartida
+### G-29: Primer correo que agota el producto
 
-Si una unidad está publicada en dos plataformas, el primer correo la reserva y genera el aviso de retirada manual del otro anuncio. [Migración: identificador histórico G-LIVE-008; estado histórico: concurrencia simultánea pendiente; referencias históricas: D-LIVE-008, D-LIVE-009, T04-Q04]
+El primer correo reserva la referencia asignada. Si queda stock y las sugerencias siguen activas, SANIA crea una nueva tarea para la plataforma vendida. Retira el otro anuncio si compartía la referencia vendida o ya no queda stock. [Migración: identificador histórico G-LIVE-008]
 
 ### G-30: Compra personal fuera del stock
 
@@ -116,7 +122,7 @@ Las compras personales no entran en el inventario de venta. [Migración: identif
 
 ### G-31: Clasificación corregible
 
-La clasificación recordada por producto puede cambiarse manualmente. [Migración: identificador histórico G-LIVE-017; estado histórico: efecto sobre pedidos existentes pendiente; referencias históricas: D-LIVE-023]
+La clasificación recordada por producto puede cambiarse manualmente desde el pedido. Si ya tenía Todo correcto y pasa a Compra personal, SANIA muestra qué productos se borrarán del stock y exige confirmación antes de retirarlos, conservando el cambio en el historial. [Migración: identificador histórico G-LIVE-017; referencias históricas: D-LIVE-023]
 
 ### G-32: Sin ubicación detallada
 
@@ -147,7 +153,7 @@ Toda corrección conserva antes, después, actor, fecha y hora y motivo sin sobr
 
 ## 9. Calidad y límites
 
-(Pendiente.)
+- **Q-30**: Cero referencias reutilizadas y ninguna referencia generada fuera de la secuencia Z…A, z…a; al agotar una longitud se añadió una letra.
 
 ## 10. Fuera de alcance
 
@@ -167,8 +173,4 @@ Buzón del constructor: sus dudas se apuntan aquí, nunca se responden de palabr
 - [T04-Q02 / T04-Q05 / X-LIVE-004] ¿Cómo se distingue físicamente una unidad concreta entre ejemplares idénticos sin etiquetas?
 - [T04-Q03] ¿Qué cambios pertenecen al stock, cuáles a un ajuste y cuáles a movimientos económicos?
 - [T04-Q04] ¿Qué regla resuelve dos correos casi simultáneos sobre la última unidad?
-- [T04-Q06 / X-LIVE-011] ¿Cómo se generan y secuencian las tareas para varias unidades iguales?
-- [T03-Q08 / G-LIVE-006] ¿Qué alfabeto y política de colisiones, reutilización y agotamiento tendrá la referencia de tres caracteres?
-- [T03-Q04] ¿Cómo se revierte una entrada incorrecta y sus efectos derivados sin perder la historia?
-- [D-LIVE-023 / G-LIVE-017] ¿Cambiar la clasificación aprendida afecta solo a compras futuras o también a pedidos existentes?
 

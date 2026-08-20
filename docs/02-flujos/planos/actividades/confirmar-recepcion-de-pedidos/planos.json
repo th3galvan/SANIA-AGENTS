@@ -13,7 +13,13 @@
     "pruebas": []
   },
   "contrato": {
-    "frase": "Cuando el seguimiento indicó que un paquete había llegado, Víctor necesitó comprobar en mano productos y cantidades y responder por Telegram antes de que SANIA creara stock."
+    "frase": "Cuando el seguimiento indicó que un paquete había llegado, Víctor necesitó comprobar en mano productos y cantidades y responder antes de que SANIA creara stock; si después cambió un pedido con Todo correcto a Compra personal, necesitó ver qué productos se borrarían y confirmarlo expresamente.",
+    "exito": [
+      "Ningún tracking creó stock sin Todo correcto.",
+      "Cambiar a Compra personal desde un pedido con Todo correcto mostró todos los productos que se borrarían del stock.",
+      "Ninguna unidad se borró del stock activo hasta que Víctor confirmó expresamente el cambio.",
+      "Tras la confirmación, las unidades afectadas desaparecieron del stock activo y el cambio quedó en el historial."
+    ]
   },
   "actores": [
     {
@@ -55,6 +61,65 @@
       "id": "G-22",
       "nombre": "Recordatorios de recepción sin cadencia fijada",
       "texto": "SANIA recuerda una comprobación sin respuesta y ofrece No volver a recordar, que silencia nuevos avisos; la frecuencia previa y el efecto del silenciamiento sobre el estado de la tarea no están definidos. [Migración: identificador histórico D-LIVE-019; referencias históricas: T03-Q03, T07-Q04, T07-Q05]"
+    },
+    {
+      "id": "G-92",
+      "nombre": "Retirada confirmada desde el pedido",
+      "texto": "Desde un pedido con Todo correcto, cambiar la clasificación a Compra personal muestra los productos que se borrarán del stock y exige confirmación. Solo tras el sí se retiran del stock activo y SANIA borra automáticamente las tareas de anuncio relacionadas."
+    }
+  ],
+  "recorridos": [
+    {
+      "id": "REC-3",
+      "nombre": "Cambiar un pedido confirmado a Compra personal",
+      "objetivo": "Permitir corregir la clasificación desde el propio pedido sin borrar stock por accidente.",
+      "estado": "pendiente",
+      "requisitos": [
+        {
+          "id": "R-10",
+          "texto": "Víctor puede cambiar a Compra personal desde el mismo pedido que aparece como Todo correcto.",
+          "origen": "usuario",
+          "implementacion": { "estado": "no verificado", "evidencias": [], "pruebas": [] },
+          "regla": "G-92"
+        },
+        {
+          "id": "R-11",
+          "texto": "Antes de aplicar el cambio, SANIA enumera los productos que se borrarán del stock y pide confirmación expresa.",
+          "origen": "usuario",
+          "implementacion": { "estado": "no verificado", "evidencias": [], "pruebas": [] },
+          "regla": "G-92"
+        },
+        {
+          "id": "R-12",
+          "texto": "Solo tras la confirmación, SANIA borra del stock activo las unidades generadas y elimina automáticamente las tareas de anuncio relacionadas.",
+          "origen": "usuario",
+          "implementacion": { "estado": "no verificado", "evidencias": [], "pruebas": [] },
+          "regla": "G-92"
+        }
+      ],
+      "criterios": [
+        {
+          "id": "C-10",
+          "dado": "un pedido marcado Todo correcto con varias unidades ya creadas",
+          "cuando": "Víctor cambió su clasificación a Compra personal",
+          "entonces": "SANIA mostró todos los productos que se borrarían y no cambió el stock antes de recibir una confirmación",
+          "cubre": "R-10"
+        },
+        {
+          "id": "C-11",
+          "dado": "el aviso con los productos afectados",
+          "cuando": "Víctor confirmó que sí quería cambiar a Compra personal",
+          "entonces": "SANIA borró del stock activo todas las unidades generadas por ese pedido y eliminó automáticamente las tareas de anuncio relacionadas",
+          "cubre": "R-12"
+        },
+        {
+          "id": "C-12",
+          "dado": "el aviso con los productos afectados",
+          "cuando": "Víctor no confirmó el cambio",
+          "entonces": "SANIA mantuvo sin cambios la clasificación y el stock",
+          "cubre": "R-11"
+        }
+      ]
     }
   ],
   "flujos": [
@@ -152,22 +217,27 @@
     },
     {
       "id": "corregir-confirmacion-fisica",
-      "titulo": "Víctor corrigió una confirmación equivocada",
+      "titulo": "Víctor cambió un pedido con Todo correcto a Compra personal",
       "momento": "futuro",
       "origen": "usuario",
       "pasos": [
         {
           "tipo": "humano",
-          "texto": "Víctor solicitó corregir una confirmación o un dato físico y explicó el motivo.",
+          "texto": "Desde el mismo pedido que aparecía como Todo correcto, Víctor cambió la clasificación a Compra personal.",
           "quien": "Víctor"
         },
         {
           "tipo": "estatico",
-          "texto": "SANIA conservó valor anterior, valor nuevo, actor, fecha y hora y motivo, sin borrar el evento original."
+          "texto": "SANIA mostró los diferentes productos generados que se borrarían del stock y preguntó si estaba seguro de querer poner el pedido como Compra personal."
+        },
+        {
+          "tipo": "humano",
+          "texto": "Víctor confirmó que sí quería realizar el cambio.",
+          "quien": "Víctor"
         },
         {
           "tipo": "estatico",
-          "texto": "El procedimiento exacto para deshacer unidades o tareas ya creadas y resolver un correo posterior contradictorio sigue pendiente."
+          "texto": "SANIA borró del stock activo las unidades generadas por ese pedido, eliminó automáticamente las tareas de anuncio relacionadas y conservó el cambio con valor anterior, valor nuevo, actor, fecha y hora."
         }
       ]
     }
@@ -246,6 +316,40 @@
       "para": "continuar únicamente después de Todo correcto"
     }
   ],
+  "superficie": {
+    "puntos": [
+      {
+        "id": "SUP-3",
+        "nombre": "Pedido recibido",
+        "quien": ["Víctor"],
+        "llega": "desde la misma parte del pedido que muestra Todo correcto",
+        "cuando": "quiso cambiar la clasificación del pedido a Compra personal",
+        "ve": "los productos generados que se borrarán del stock y la consecuencia del cambio",
+        "puede": ["confirmar el cambio a Compra personal", "cancelar el cambio"],
+        "nunca": ["borrar stock sin mostrar los productos afectados", "aplicar el cambio sin confirmación expresa"]
+      }
+    ],
+    "permisos": {
+      "acciones": ["confirmar el cambio a Compra personal", "cancelar el cambio"],
+      "roles": [
+        { "rol": "Víctor", "permitidas": ["confirmar el cambio a Compra personal", "cancelar el cambio"] }
+      ]
+    },
+    "avisos": [
+      {
+        "quien": "Víctor",
+        "que": "los productos concretos que se borrarán del stock si confirma el cambio a Compra personal",
+        "canal": "en la misma parte del pedido",
+        "cuando": "antes de aplicar el cambio"
+      }
+    ]
+  },
+  "calidad": [
+    {
+      "id": "Q-28",
+      "criterio": "Cero unidades borradas del stock al cambiar un pedido a Compra personal sin haber mostrado los productos afectados y recibido una confirmación expresa; tras confirmar, ninguna unidad ni tarea de anuncio relacionada siguió activa."
+    }
+  ],
   "fuera": [
     "Dar por recibido un paquete únicamente porque lo dijo el seguimiento.",
     "Crear unidades, referencias o tareas de anuncio antes de Todo correcto.",
@@ -258,7 +362,6 @@
     "[T03-Q01] ¿Qué debe ocurrir en el primer caso real de producto incompleto, defectuoso o con variante errónea?",
     "[T03-Q02 / T02-Q09] ¿Qué datos necesita ver Víctor para distinguir productos o líneas parecidas y cómo se muestran paquetes o pedidos parcialmente recibidos?",
     "[T03-Q03 / T07-Q04 / T07-Q05] ¿Cuándo se recuerda, con qué cadencia y qué efecto exacto tiene No volver a recordar?",
-    "[T03-Q04] ¿Cómo se deshace una confirmación equivocada y sus unidades derivadas sin perder la historia?",
     "[T05-Q06] ¿Qué prioridad tiene una confirmación manual si después llega un correo contradictorio?",
     "[D-LIVE-018] ¿El botón definitivo se llamará No OK, Abrir disputa o mostrará ambas acciones?"
   ]

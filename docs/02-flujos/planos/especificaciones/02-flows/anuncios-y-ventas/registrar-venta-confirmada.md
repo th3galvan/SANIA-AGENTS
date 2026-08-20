@@ -8,14 +8,14 @@ Proyecto `sania-registrar-venta-confirmada`. Generado desde `planos.json` (la fu
 
 ## 1. Propósito
 
-Esta actividad convierte el primer correo reconocido de venta de Wallapop o Vinted en la reserva trazable de la unidad exacta identificada por la referencia pública de tres caracteres al final del título. No aplica FIFO automáticamente, no depende de una URL ni de parámetros b, i y r no validados, y no confunde el inicio o la entrega con el cierre económico.
+Esta actividad convierte el primer correo reconocido de venta de Wallapop o Vinted en la reserva trazable de la referencia que SANIA ya asignó al anuncio. Con dos o más unidades, las plataformas usan referencias distintas; con una sola, ambas comparten esa referencia. La selección no ocurre al vender y la venta no depende de una URL ni de parámetros b, i y r no validados.
 
-Cuando llegó el primer correo de venta, Víctor necesitó que SANIA identificara y reservara una sola vez la unidad exacta del anuncio, avisara de la retirada manual de cualquier anuncio alternativo de esa misma unidad y mantuviera la venta abierta hasta la evidencia final correcta de cada plataforma.
+Cuando llegó el primer correo de venta, Víctor necesitó que SANIA reservara una sola vez la referencia que ya estaba asignada al anuncio y avisara de retirar el anuncio alternativo cuando correspondiera.
 
 Criterios de éxito:
 - Cada hecho externo reconocido se aplicó como máximo una vez.
-- El primer correo reconocido reservó la unidad exacta indicada por el sufijo del título.
-- Una referencia ausente, alterada, desconocida o no disponible no disparó FIFO, stock negativo ni una unidad inventada.
+- El primer correo reconocido reservó la referencia que SANIA había asignado al anuncio al crearlo.
+- Ninguna venta eligió por primera vez una referencia ni aplicó un orden entre las unidades disponibles.
 - La venta inicial y la entrega se distinguieron del cierre económico.
 - Toda acción en Wallapop o Vinted siguió siendo humana.
 
@@ -34,46 +34,46 @@ Criterios de éxito:
 
 La versión gráfica vive en el visor local del paquete (visor/servir.py).
 
-### El correo inicial de Vinted reservó la unidad exacta [con la app · origen: usuario]
+### El correo inicial de Vinted relacionó la venta con el anuncio del producto [con la app · origen: usuario]
 
 El correo real Has vendido un artículo en Vinted aporta comprador abreviado, título, precio y, en el ejemplo, un plazo de envío de cinco días; no es la evidencia final de cierre.
 
 - [tercero externo] Vinted envió el correo inicial Has vendido un artículo en Vinted con los campos disponibles de la operación.
-- [automático: código] SANIA conservó el correo original, extrajo solo los datos realmente presentes sin completar campos ausentes y buscó la referencia de tres caracteres al final del título; un correo o campo no reconocido quedó sin aplicar hasta revisión.
+- [automático: código] SANIA conservó el correo original, extrajo solo los datos realmente presentes sin completar campos ausentes y buscó la referencia que se había asignado al anuncio al crearlo; un correo o campo no reconocido quedó sin aplicar hasta revisión.
 - ⚠ Excepción: ¿El mismo hecho externo ya se había aplicado?
     - si sí:
         - [automático: código] SANIA conservó la operación existente sin crear otra venta, reserva ni movimiento.
         - aquí termina este camino
     - camino normal: no
-- ⚑ Regla: ¿La referencia del título identificó una unidad exacta disponible?
+- ⚑ Regla: ¿La referencia asignada al crear el anuncio seguía disponible?
     - si sí:
-        - [automático: código] SANIA reservó de forma indivisible la unidad exacta, la excluyó del stock disponible y registró el precio del correo como importe de venta, no como beneficio definitivo.
+        - [automático: código] SANIA reservó de forma indivisible la referencia ya asignada, la excluyó del stock y registró el precio del correo como importe de venta, no como beneficio definitivo.
         - …y vuelve al flujo
     - si no: referencia ausente, alterada, desconocida o unidad no disponible:
-        - [automático: código] SANIA dejó la venta pendiente de conciliación, avisó a Víctor y no eligió otra unidad por FIFO ni modificó el stock.
+        - [automático: código] SANIA dejó la venta pendiente de conciliación, avisó a Víctor y no sustituyó la referencia asignada por otra unidad ni modificó el stock.
         - aquí termina este camino
-- [automático: código] Si esa misma unidad constaba publicada también en Wallapop, SANIA creó inmediatamente una tarea para que Víctor retirara manualmente el anuncio alternativo.
+- [automático: código] Si quedaban unidades y las sugerencias seguían activas, SANIA creó una nueva tarea de Vinted con otra referencia. Si el anuncio de Wallapop compartía la referencia vendida o se agotó el producto, creó además la tarea para retirarlo.
 - [automático: código] Telegram informó a Víctor de plataforma, producto, referencia, precio y plazo disponible. Las instrucciones, el transportista, el QR o la etiqueta se obtuvieron manualmente y solo se mostraron si estaban realmente disponibles; no se inventó un recordatorio genérico de preparación.
 
-### El correo inicial de Wallapop reservó la unidad exacta [con la app · origen: usuario]
+### El correo inicial de Wallapop relacionó la venta con el anuncio del producto [con la app · origen: usuario]
 
 El correo real ¡Venta confirmada! Sigue las instrucciones para enviar tu paquete aporta comprador abreviado, título, precio, total, fecha de compra y enlace a instrucciones; inicia la reserva, pero no cierra económicamente la venta.
 
 - [tercero externo] Wallapop envió el correo ¡Venta confirmada! Sigue las instrucciones para enviar tu paquete.
-- [automático: código] SANIA conservó el correo original, extrajo solo los campos realmente presentes sin completar datos ausentes y buscó la referencia de tres caracteres al final del título; un correo o campo no reconocido quedó sin aplicar hasta revisión y no se supuso que b, i y r fueran estables ni conocidos.
+- [automático: código] SANIA conservó el correo original, extrajo solo los campos realmente presentes sin completar datos ausentes y buscó la referencia que se había asignado al anuncio al crearlo; un correo o campo no reconocido quedó sin aplicar hasta revisión y no se supuso que b, i y r fueran estables ni conocidos.
 - ⚠ Excepción: ¿El mismo hecho externo ya se había aplicado?
     - si sí:
         - [automático: código] SANIA conservó la operación existente sin crear otra venta, reserva ni movimiento.
         - aquí termina este camino
     - camino normal: no
-- ⚑ Regla: ¿La referencia del título identificó una unidad exacta disponible?
+- ⚑ Regla: ¿La referencia asignada al crear el anuncio seguía disponible?
     - si sí:
-        - [automático: código] SANIA reservó de forma indivisible la unidad exacta, la excluyó del stock disponible y registró el precio comunicado como importe de venta, no como beneficio definitivo.
+        - [automático: código] SANIA reservó de forma indivisible la referencia ya asignada, la excluyó del stock y registró el precio comunicado como importe de venta, no como beneficio definitivo.
         - …y vuelve al flujo
     - si no: referencia ausente, alterada, desconocida o unidad no disponible:
-        - [automático: código] SANIA dejó la venta pendiente de conciliación, avisó a Víctor y no eligió otra unidad por FIFO ni modificó el stock.
+        - [automático: código] SANIA dejó la venta pendiente de conciliación, avisó a Víctor y no sustituyó la referencia asignada por otra unidad ni modificó el stock.
         - aquí termina este camino
-- [automático: código] Si esa misma unidad constaba publicada también en Vinted, SANIA creó inmediatamente una tarea para que Víctor retirara manualmente el anuncio alternativo.
+- [automático: código] Si quedaban unidades y las sugerencias seguían activas, SANIA creó una nueva tarea de Wallapop con otra referencia. Si el anuncio de Vinted compartía la referencia vendida o se agotó el producto, creó además la tarea para retirarlo.
 - [automático: código] Telegram informó a Víctor de plataforma, producto, referencia, precio y datos de envío disponibles. El enlace a instrucciones fue un apoyo opcional para la acción humana, no la clave de identidad de la unidad.
 
 ### SANIA distinguió la entrega del cierre económico [con la app · origen: usuario]
@@ -107,21 +107,21 @@ El orden es el orden de entrega. El primero es el esqueleto: recorre el camino f
 
 La idempotencia evitó duplicar venta, reserva o movimiento. Es una protección confirmada por el contexto, aunque T02-Q05 no dispone todavía de un caso real de correo duplicado, tardío o desordenado. [Migración: identificador histórico G-LIVE-001]
 
-### G-68: Cada anuncio representó una unidad
+### G-68: Un anuncio activo por producto y plataforma
 
-D-LIVE-007 hizo que el anuncio identificara una sola unidad física; los extras o lotes de E-LIVE-002 requieren una relación adicional todavía no definida. [Migración: identificador histórico G-LIVE-005]
+Solo existe un anuncio activo del mismo producto en cada plataforma. Con dos o más unidades disponibles, Wallapop y Vinted reciben referencias distintas; con una sola, ambos anuncios comparten esa referencia. [Migración: sustituye el antecedente histórico G-LIVE-005 y D-LIVE-007 por decisión del usuario]
 
 ### G-69: La referencia pública vinculó correo y unidad
 
-Según D-LIVE-006 y X-LIVE-001, el título terminó con una referencia alfanumérica de tres caracteres. El título base repetido no fue suficiente por sí solo, como muestra X-LIVE-010. [Migración: identificador histórico G-LIVE-006]
+Según D-LIVE-006 y X-LIVE-001, el título terminó con la referencia pública que SANIA asignó al anuncio al crearlo. El título base repetido no fue suficiente por sí solo, como muestra X-LIVE-010. [Migración: identificador histórico G-LIVE-006]
 
-### G-70: Se reservó la unidad exacta, sin FIFO confirmado
+### G-70: La referencia se eligió al crear el anuncio
 
-La nueva referencia permitió reservar la unidad del anuncio. T01-Q11 no aporta un caso real de FIFO y por ello una unidad exacta no disponible abrió conciliación en vez de activar una sustitución automática. [Migración: identificador histórico G-LIVE-007]
+SANIA puede elegir cualquier referencia disponible al preparar el anuncio porque el orden no importa. El correo de venta reserva esa referencia ya asignada y no vuelve a seleccionar entre las existencias. [Migración: sustituye el antecedente histórico G-LIVE-007]
 
 ### G-71: El primer correo reconocido reservó una unidad compartida
 
-D-LIVE-001 y D-LIVE-009 dispusieron la reserva desde el primer correo y el aviso de retirada manual del otro anuncio; T10-Q02 mantiene abierta la colisión de correos casi simultáneos. [Migración: identificador histórico G-LIVE-008]
+El primer correo reserva la referencia asignada. Si queda stock y las sugerencias siguen activas, SANIA crea una nueva tarea para la plataforma vendida; si fueron canceladas, no la crea. El aviso de retirada del otro anuncio nace si compartía la referencia o se agotó el producto. [Migración: identificador histórico G-LIVE-008]
 
 ### G-72: Las acciones de plataforma fueron humanas
 
@@ -141,7 +141,7 @@ D-LIVE-005 mantiene abierta la venta tras el correo de entrega. X-LIVE-005 deja 
 
 ### G-76: La URL no fue una clave obligatoria
 
-La referencia del título identificó la unidad. Por X-LIVE-002, una URL se conservó solo si estaba disponible para navegación o instrucciones, sin depender de ella para reservar. [Migración: identificador histórico D-LIVE-015]
+La referencia del título relacionó el anuncio con la unidad asignada al crearlo. Por X-LIVE-002, una URL se conservó solo si estaba disponible para navegación o instrucciones, sin depender de ella para reservar. [Migración: identificador histórico D-LIVE-015]
 
 ### G-77: El importe se registró sin cerrar el beneficio
 
@@ -153,7 +153,7 @@ El precio comunicado se guardó como importe de venta; no se calculó aquí un b
 
 | Estado | Qué se puede hacer (quién, y a qué estado pasa) |
 |---|---|
-| detectada | reservar la unidad exacta identificada y disponible → pasa a 'reservada, abierta' · dejar sin aplicar al stock si la identidad o disponibilidad no es segura → pasa a 'pendiente de conciliación' |
+| detectada | reservar la referencia asignada al anuncio cuando se creó → pasa a 'reservada, abierta' · dejar sin aplicar al stock si la identidad o disponibilidad no es segura → pasa a 'pendiente de conciliación' |
 | reservada, abierta | continuar con preparación, envío y seguimiento humanos · registrar entrega logística → pasa a 'entregada, abierta' · recibir TX-COMPLETE de Vinted → pasa a 'cerrada' |
 | entregada, abierta | recibir TX-COMPLETE de Vinted → pasa a 'cerrada' · mantener Wallapop abierta hasta definir cómo registrar el movimiento final del monedero |
 | pendiente de conciliación | resolver identidad o disponibilidad sin aplicar FIFO automáticamente ni inventar stock |
@@ -166,7 +166,7 @@ El precio comunicado se guardó como importe de venta; no se calculó aquí un b
 | disponible | reservar por el primer correo reconocido de su anuncio → pasa a 'reservada' |
 | reservada | quedar fuera del stock disponible · esperar el flujo de envío y cierre |
 
-### anuncio alternativo de la misma unidad
+### anuncio alternativo del mismo producto
 
 | Estado | Qué se puede hacer (quién, y a qué estado pasa) |
 |---|---|
@@ -176,9 +176,9 @@ El precio comunicado se guardó como importe de venta; no se calculó aquí un b
 
 | Cosa | Qué se guarda | De dónde viene |
 |---|---|---|
-| venta | plataforma, identificadores externos realmente presentes, identificador y copia del correo de origen, título exacto comunicado y referencia de tres caracteres extraída, producto y variante reconocidos, unidad física reservada, precio del artículo o venta comunicado, precio de envío y transferencia solo cuando se informen, estado logístico separado del cierre económico, fechas de hechos y transiciones, nombre abreviado del comprador solo en la medida necesaria, con finalidad y retención pendientes, URL de instrucciones opcional, no usada como identidad, origen del momento inicial de tiempo hasta venta solo cuando se decida | correos transaccionales de Wallapop y Vinted y confirmaciones humanas permitidas |
+| venta | plataforma, identificadores externos realmente presentes, identificador y copia del correo de origen, título exacto comunicado y referencia asignada extraída, producto y variante reconocidos, unidad física reservada, precio del artículo o venta comunicado, precio de envío y transferencia solo cuando se informen, estado logístico separado del cierre económico, fechas de hechos y transiciones, nombre abreviado del comprador solo en la medida necesaria, con finalidad y retención pendientes, URL de instrucciones opcional, no usada como identidad, origen del momento inicial de tiempo hasta venta solo cuando se decida | correos transaccionales de Wallapop y Vinted y confirmaciones humanas permitidas |
 | evidencia de cierre | plataforma, tipo de hecho, número de transacción Vinted, fecha, título con referencia cuando esté presente, importes comunicados, copia del correo o fuente permitida | TX-COMPLETE de Vinted; fuente de monedero Wallapop todavía no conectada |
-| incidencia de conciliación | venta afectada, referencia ausente, alterada, desconocida o no disponible, datos observados, fecha de apertura, estado y resolución cuando se definan | SANIA cuando no pudo reservar la unidad exacta con seguridad |
+| incidencia de conciliación | venta afectada, referencia asignada ausente, alterada, desconocida o no disponible, datos observados, fecha de apertura, estado y resolución cuando se definan | SANIA cuando no pudo reservar con seguridad la referencia asignada al anuncio |
 
 - Habla con **Gmail**: recibir y conservar en solo lectura los correos transaccionales que disparan y actualizan la venta
 - Habla con **Telegram**: informar de la reserva, mostrar datos disponibles, crear avisos de retirada y exponer conciliaciones a Víctor
@@ -193,22 +193,22 @@ El precio comunicado se guardó como importe de venta; no se calculó aquí un b
 | Quién entra | Víctor |
 | Por dónde llega | mediante Telegram; el dispositivo real no quedó documentado en T10-Q06 |
 | Cuándo lo usa | al aplicar el primer correo reconocido o abrir una conciliación |
-| Qué ve nada más entrar | plataforma, producto, referencia exacta, precio y plazo o instrucciones solo cuando consten, además del estado abierto o bloqueado |
-| Qué puede hacer | consultar qué unidad quedó reservada · abrir una instrucción o enlace opcional disponible · revisar la conciliación · actuar manualmente en la plataforma |
+| Qué ve nada más entrar | plataforma, producto, referencias relacionadas, unidad reservada cuando ya pueda determinarse, precio y plazo o instrucciones solo cuando consten, además del estado abierto o bloqueado |
+| Qué puede hacer | consultar qué referencia asignada quedó reservada · abrir una instrucción o enlace opcional disponible · revisar la conciliación · actuar manualmente en la plataforma |
 | Qué NO debe poder jamás | forzar FIFO para ocultar una referencia no disponible · crear una unidad o stock ficticios · confundir venta detectada o entrega con cierre económico · publicar, editar, retirar o reactivar desde SANIA |
 
 ### Avisos
 
 | Quién se entera | De qué | Por dónde | Cuándo |
 |---|---|---|---|
-| Víctor | venta detectada y unidad exacta reservada | Telegram | inmediatamente después de aplicar el primer correo |
+| Víctor | venta detectada y unidad relacionada reservada cuando pudo determinarse con seguridad | Telegram | inmediatamente después de aplicar el primer correo |
 | Víctor | venta pendiente de conciliación sin cambio de stock | Telegram | cuando la referencia o disponibilidad no permitió una reserva segura |
-| Víctor | anuncio alternativo de la misma unidad pendiente de retirada manual | Telegram | al reservar una unidad compartida entre plataformas; la cadencia posterior no está fijada |
+| Víctor | anuncio alternativo del mismo producto pendiente de retirada manual | Telegram | cuando la reserva agota el stock del producto compartido entre plataformas; la cadencia posterior no está fijada |
 
 ### Condiciones de uso
 
 - Una venta no reservó dos unidades aunque el correo se reprocesara.
-- La referencia fue pública al final del título y no una clave privada.
+- Las referencias relacionadas fueron públicas al final del título y no claves privadas.
 - No se usaron automáticamente FIFO, b/i/r, URL, cancelación ni lectura web como reglas confirmadas.
 
 ## 9. Calidad y límites

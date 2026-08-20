@@ -2,7 +2,7 @@
   "version": 2,
   "proyecto": "sania-dar-entrada-al-almacen",
   "titulo": "Dar entrada a las unidades recibidas",
-  "descripcion": "Esta actividad crea inventario únicamente después de la comprobación física Todo correcto y solo para productos clasificados como Stock para venta. Cada unidad creada recibe una referencia pública alfanumérica de tres caracteres; la entrada no asigna ubicaciones y lanza inmediatamente las tareas de anuncio. Pricing detallado, disputas, sustituciones y reembolsos permanecen como evolución o hipótesis.",
+  "descripcion": "Esta actividad crea inventario únicamente después de la comprobación física Todo correcto y solo para productos clasificados como Stock para venta. Cada unidad creada recibe una referencia pública alfanumérica que empieza con tres caracteres; la entrada no asigna ubicaciones y lanza inmediatamente las tareas de anuncio. Pricing detallado, disputas, sustituciones y reembolsos permanecen fuera de esta primera versión.",
   "definicion": {
     "estado": "borrador",
     "modo": "mixto"
@@ -16,7 +16,7 @@
     "frase": "Cuando Víctor tuvo un paquete en las manos, comprobó productos y cantidades y pulsó Todo correcto, necesitó que SANIA creara exactamente las unidades de venta confirmadas, conservara su origen y preparara su publicación sin convertir el tracking en stock.",
     "exito": [
       "Ninguna unidad existió por un correo o tracking entregado sin Todo correcto.",
-      "Cada unidad de Stock para venta físicamente confirmada recibió una referencia alfanumérica única de tres caracteres destinada a aparecer al final del título del anuncio.",
+      "Cada unidad de Stock para venta físicamente confirmada recibió una referencia alfanumérica pública única que empezó con tres caracteres y apareció al final del título del anuncio.",
       "Las compras personales no entraron en inventario de venta ni generaron tareas de anuncio.",
       "Cada corrección conservó antes, después, actor, fecha y hora y motivo sin borrar el hecho original."
     ]
@@ -38,11 +38,11 @@
     },
     {
       "termino": "Compra personal",
-      "significado": "clasificación de producto que excluye la compra del inventario y de las tareas de anuncio"
+      "significado": "clasificación de producto que no cuenta como stock para venta ni genera nuevas tareas de anuncio; si el pedido ya estaba confirmado, SANIA muestra qué productos se borrarán del stock y exige confirmación antes de retirarlos, conservando el cambio en el historial"
     },
     {
       "termino": "unidad física",
-      "significado": "ejemplar concreto creado en inventario después de Todo correcto; un anuncio representa una sola unidad"
+      "significado": "ejemplar concreto creado en inventario después de Todo correcto; conserva su propia referencia y puede ser la unidad asignada a un anuncio cuando SANIA lo crea"
     },
     {
       "termino": "referencia de unidad",
@@ -85,7 +85,7 @@
     {
       "id": "G-53",
       "nombre": "Referencia pública de tres caracteres",
-      "texto": "Cada unidad creada recibe una referencia alfanumérica única de tres caracteres visible al final del título del anuncio. [Migración: identificador histórico G-LIVE-006; estado histórico: alfabeto, colisiones, reutilización y agotamiento pendientes; referencias históricas: D-LIVE-006, X-LIVE-001, T03-Q08]"
+      "texto": "Cada unidad creada recibe una referencia pública única. La secuencia usa Z, Y, ..., A, z, y, ..., a; empieza en ZZZ, nunca reutiliza un valor y, al agotar una longitud, añade una letra y reinicia desde el valor máximo. [Migración: identificador histórico G-LIVE-006; referencias históricas: D-LIVE-006, X-LIVE-001, T03-Q08]"
     },
     {
       "id": "G-54",
@@ -95,7 +95,7 @@
     {
       "id": "G-55",
       "nombre": "Clasificación recordada y corregible",
-      "texto": "SANIA recuerda por producto Stock para venta o Compra personal y Víctor puede cambiar la elección manualmente. [Migración: identificador histórico G-LIVE-017; estado histórico: efecto sobre pedidos existentes pendiente; referencias históricas: D-LIVE-022, D-LIVE-023]"
+      "texto": "SANIA recuerda por producto Stock para venta o Compra personal y Víctor puede cambiar la elección manualmente desde el pedido. Si el pedido ya tenía Todo correcto, SANIA enumera los productos que se borrarán del stock y solo los retira tras una confirmación expresa; el cambio queda en el historial. [Migración: identificador histórico G-LIVE-017; referencias históricas: D-LIVE-022, D-LIVE-023]"
     },
     {
       "id": "G-56",
@@ -103,14 +103,9 @@
       "texto": "La primera versión no registra estantería, caja ni posición física exacta. [Migración: identificador histórico G-LIVE-018; referencias históricas: D-LIVE-028]"
     },
     {
-      "id": "G-57",
-      "nombre": "Sin ubicación detallada en la primera versión",
-      "texto": "Tras Todo correcto se crea stock y se pasa a publicación sin introducir estantería, caja ni posición física exacta. [Migración: identificador histórico D-LIVE-028]"
-    },
-    {
       "id": "G-58",
       "nombre": "Correcciones sin sobrescritura",
-      "texto": "Cada corrección conserva valor anterior, valor nuevo, actor, fecha y hora y motivo; el flujo concreto de deshacer una confirmación está pendiente. [Migración: identificador histórico CORRECCION-AUDITABLE; referencias históricas: T03-Q04, T04-Q01, E-LIVE-005]"
+      "texto": "Cada corrección conserva valor anterior, valor nuevo, actor, fecha y hora y motivo. Al cambiar un pedido confirmado a Compra personal, SANIA borra sus unidades del stock y las tareas de anuncio relacionadas tras pedir confirmación. [Migración: identificador histórico CORRECCION-AUDITABLE; referencias históricas: T03-Q04, T04-Q01, E-LIVE-005]"
     }
   ],
   "recorridos": [
@@ -155,7 +150,7 @@
         },
         {
           "id": "R-4",
-          "texto": "Cada unidad creada recibe una referencia pública alfanumérica única de tres caracteres y no una referencia privada.",
+          "texto": "Cada unidad creada recibe una referencia pública única que empieza con tres caracteres, sigue la secuencia acordada, no se reutiliza y aumenta de longitud cuando se agota.",
           "origen": "usuario",
           "implementacion": {
             "estado": "no verificado",
@@ -163,6 +158,39 @@
             "pruebas": []
           },
           "regla": "G-53"
+        },
+        {
+          "id": "R-7",
+          "texto": "Todo correcto sobre una Compra personal no crea inventario de venta ni tareas de anuncio.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-54"
+        },
+        {
+          "id": "R-8",
+          "texto": "No OK o Abrir disputa crea una incidencia separada y no crea unidades ni referencias.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-52"
+        },
+        {
+          "id": "R-9",
+          "texto": "La primera versión deja cada unidad disponible sin registrar estantería, caja ni posición física exacta.",
+          "origen": "usuario",
+          "implementacion": {
+            "estado": "no verificado",
+            "evidencias": [],
+            "pruebas": []
+          },
+          "regla": "G-56"
         }
       ],
       "criterios": [
@@ -177,28 +205,43 @@
           "id": "C-2",
           "dado": "un paquete con N ejemplares de Stock para venta comprobados físicamente",
           "cuando": "Víctor pulsó Todo correcto",
-          "entonces": "SANIA creó N unidades una sola vez, con N referencias de tres caracteres, y lanzó sus tareas de publicación",
+          "entonces": "SANIA creó N unidades una sola vez, con N referencias públicas únicas, y lanzó sus tareas de publicación",
           "cubre": "R-1"
         },
         {
           "id": "C-3",
           "dado": "un paquete con N ejemplares de Stock para venta comprobados físicamente",
           "cuando": "Víctor pulsó Todo correcto",
-          "entonces": "SANIA creó N unidades una sola vez, con N referencias de tres caracteres, y lanzó sus tareas de publicación",
+          "entonces": "SANIA creó N unidades una sola vez, con N referencias públicas únicas, y lanzó sus tareas de publicación",
           "cubre": "R-3"
         },
         {
           "id": "C-4",
           "dado": "un paquete con N ejemplares de Stock para venta comprobados físicamente",
           "cuando": "Víctor pulsó Todo correcto",
-          "entonces": "SANIA creó N unidades una sola vez, con N referencias de tres caracteres, y lanzó sus tareas de publicación",
+          "entonces": "SANIA creó N unidades una sola vez; las referencias empezaron en ZZZ, siguieron el orden acordado, no se reutilizaron y aumentaron de longitud si se agotó el espacio disponible",
           "cubre": "R-4"
         },
         {
           "id": "C-5",
           "dado": "un paquete correcto clasificado como Compra personal",
           "cuando": "Víctor pulsó Todo correcto",
-          "entonces": "SANIA no creó inventario de venta ni tareas de anuncio"
+          "entonces": "SANIA no creó inventario de venta ni tareas de anuncio",
+          "cubre": "R-7"
+        },
+        {
+          "id": "C-8",
+          "dado": "un paquete incompleto, defectuoso o no confirmado",
+          "cuando": "Víctor pulsó No OK o Abrir disputa",
+          "entonces": "SANIA creó una incidencia separada y no creó unidades ni referencias",
+          "cubre": "R-8"
+        },
+        {
+          "id": "C-9",
+          "dado": "una unidad creada después de Todo correcto",
+          "cuando": "SANIA terminó la entrada de almacén",
+          "entonces": "la unidad quedó disponible sin estantería, caja ni posición física exacta",
+          "cubre": "R-9"
         }
       ]
     },
@@ -221,7 +264,7 @@
         },
         {
           "id": "R-6",
-          "texto": "La clasificación aprendida por producto puede corregirse manualmente.",
+          "texto": "La clasificación aprendida puede cambiarse desde el mismo pedido; si pasa a Compra personal después de Todo correcto, SANIA muestra los productos afectados, pide confirmación y, solo tras el sí, los borra del stock activo junto con las tareas de anuncio relacionadas.",
           "origen": "usuario",
           "implementacion": {
             "estado": "no verificado",
@@ -243,7 +286,7 @@
           "id": "C-7",
           "dado": "una regla de clasificación aprendida o una cantidad de stock registrada de forma equivocada",
           "cuando": "Víctor la corrigió y explicó el motivo",
-          "entonces": "SANIA conservó el evento original y añadió el cambio con antes, después, actor, fecha y motivo",
+          "entonces": "SANIA enumeró los productos que se borrarían del stock y pidió confirmación; tras el sí, retiró esas unidades del stock activo y borró automáticamente las tareas de anuncio relacionadas",
           "cubre": "R-6"
         }
       ]
@@ -278,7 +321,7 @@
         },
         {
           "tipo": "estatico",
-          "texto": "Víctor pudo cambiar manualmente la clasificación aprendida. SANIA registró el antes, el después, el actor, la fecha y hora y el motivo; el efecto sobre pedidos ya existentes o mixtos sigue pendiente."
+          "texto": "Víctor pudo cambiar manualmente la clasificación aprendida desde el mismo pedido. Si el pedido ya tenía Todo correcto y cambió a Compra personal, SANIA enumeró los productos afectados y pidió confirmación; solo después del sí los borró del stock activo y registró el cambio."
         }
       ]
     },
@@ -314,7 +357,7 @@
         },
         {
           "tipo": "estatico",
-          "texto": "SANIA asignó a cada unidad una referencia alfanumérica única de tres caracteres destinada a ser visible al final del título del anuncio; la política concreta de generación y colisiones quedó pendiente."
+          "texto": "SANIA asignó a cada unidad una referencia pública única. Empezó en ZZZ, siguió la secuencia Z a A y z a a, no reutilizó valores y añadió una letra al agotar una longitud."
         },
         {
           "tipo": "estatico",
@@ -326,7 +369,7 @@
         },
         {
           "tipo": "estatico",
-          "texto": "Inmediatamente después de la entrada, SANIA inició la publicación asistida. En entradas grandes presentó primero las dos acciones de plataforma de un objetivo producto/unidad y después las dos del siguiente; cada acción confirmable se resolvió a una unidad y plataforma, pero X-LIVE-011 mantiene pendiente la granularidad de generación por producto o por unidad."
+          "texto": "Inmediatamente después de la entrada, SANIA inició la publicación asistida. Para varias unidades idénticas del mismo producto creó una tarea para Wallapop y otra para Vinted, vinculadas con todas esas unidades."
         }
       ]
     },
@@ -359,18 +402,27 @@
     },
     {
       "id": "correccion-manual-en-sania",
-      "titulo": "Víctor corrigió la clasificación aprendida o un dato de stock sin perder la historia",
+      "titulo": "Víctor cambió un pedido confirmado a Compra personal y retiró sus productos del stock",
       "momento": "futuro",
       "origen": "usuario",
       "pasos": [
         {
           "tipo": "humano",
-          "texto": "Víctor solicitó corregir la clasificación aprendida para compras futuras o ajustar una cantidad o estado de stock detectados mediante recuento, y explicó el motivo.",
+          "texto": "Desde el mismo pedido que aparecía como Todo correcto, Víctor cambió la clasificación a Compra personal.",
           "quien": "Víctor"
         },
         {
           "tipo": "estatico",
-          "texto": "SANIA añadió un evento con fecha y hora, actor, origen manual, campo, valor anterior, valor nuevo y motivo sin borrar ni sobrescribir el evento previo."
+          "texto": "SANIA mostró los diferentes productos generados que se borrarían del stock y preguntó: «¿Estás seguro de que quieres ponerlo como Compra personal?»."
+        },
+        {
+          "tipo": "humano",
+          "texto": "Víctor confirmó que sí quería realizar el cambio.",
+          "quien": "Víctor"
+        },
+        {
+          "tipo": "estatico",
+          "texto": "SANIA borró del stock activo las unidades generadas por ese pedido y añadió un evento con fecha y hora, actor, valor anterior, valor nuevo y motivo, sin borrar el historial del pedido."
         },
         {
           "tipo": "estatico",
@@ -378,7 +430,7 @@
         },
         {
           "tipo": "estatico",
-          "texto": "El procedimiento concreto para deshacer una confirmación física y revertir unidades o tareas ya creadas sigue pendiente."
+          "texto": "SANIA borró automáticamente todas las tareas de anuncio relacionadas con los productos retirados del stock."
         }
       ]
     }
@@ -406,18 +458,18 @@
   ],
   "estados": [
     {
-      "entidad": "clasificación aprendida del producto para compras futuras",
+      "entidad": "clasificación aprendida del producto",
       "estados": [
         {
           "nombre": "sin regla aprendida",
           "acciones": [
             {
-              "accion": "Víctor eligió Stock para venta para futuras compras del producto",
+              "accion": "Víctor eligió Stock para venta para el producto",
               "quien": "Víctor",
               "pasa_a": "Stock para venta"
             },
             {
-              "accion": "Víctor eligió Compra personal para futuras compras del producto",
+              "accion": "Víctor confirmó cambiar el pedido a Compra personal y sus unidades se borraron del stock activo",
               "quien": "Víctor",
               "pasa_a": "Compra personal"
             }
@@ -427,7 +479,7 @@
           "nombre": "Stock para venta",
           "acciones": [
             {
-              "accion": "Víctor actualizó la regla para futuras compras",
+              "accion": "Víctor confirmó cambiar el pedido a Compra personal y sus unidades se borraron del stock activo",
               "quien": "Víctor",
               "pasa_a": "Compra personal"
             }
@@ -437,7 +489,7 @@
           "nombre": "Compra personal",
           "acciones": [
             {
-              "accion": "Víctor actualizó la regla para futuras compras",
+              "accion": "Víctor cambió la clasificación del producto a Stock para venta",
               "quien": "Víctor",
               "pasa_a": "Stock para venta"
             }
@@ -541,6 +593,12 @@
       "para": "conservarlo como fuente histórica actual, no como autorización de fórmulas de pricing no confirmadas"
     }
   ],
+  "volumen": [
+    {
+      "que": "usuarios iniciales de esta actividad",
+      "cuanto": "1, Víctor"
+    }
+  ],
   "superficie": {
     "puntos": [
       {
@@ -549,6 +607,7 @@
         "quien": [
           "Víctor"
         ],
+        "llega": "desde la confirmación Todo correcto y desde la consulta del inventario de SANIA",
         "puede": [
           "cambiar la clasificación aprendida",
           "consultar unidades y tareas derivadas",
@@ -563,7 +622,24 @@
         "cuando": "quiso revisar una entrada, unidad, clasificación o corrección",
         "ve": "origen del pedido y paquete, producto, variante, referencia pública, estado, evidencia de coste e historial"
       }
-    ]
+    ],
+    "permisos": {
+      "acciones": [
+        "cambiar la clasificación aprendida",
+        "consultar unidades y tareas derivadas",
+        "solicitar una corrección explicando el motivo"
+      ],
+      "roles": [
+        {
+          "rol": "Víctor",
+          "permitidas": [
+            "cambiar la clasificación aprendida",
+            "consultar unidades y tareas derivadas",
+            "solicitar una corrección explicando el motivo"
+          ]
+        }
+      ]
+    }
   },
   "calidad": [
     {
@@ -572,7 +648,7 @@
     },
     {
       "id": "Q-23",
-      "criterio": "Para N ejemplares físicamente confirmados y clasificados como Stock para venta existen exactamente N unidades y N referencias alfanuméricas de tres caracteres, incluso tras reprocesar el hecho."
+      "criterio": "Para N ejemplares físicamente confirmados y clasificados como Stock para venta existen exactamente N unidades y N referencias públicas únicas, incluso tras reprocesar el hecho; ninguna referencia se reutiliza."
     },
     {
       "id": "Q-24",
@@ -585,6 +661,10 @@
     {
       "id": "Q-26",
       "criterio": "Cero ubicaciones físicas detalladas registradas en la primera versión."
+    },
+    {
+      "id": "Q-27",
+      "criterio": "Al cambiar un pedido con Todo correcto a Compra personal, SANIA mostró todos los productos afectados y no borró ninguna unidad del stock activo sin una confirmación expresa; tras el sí, ninguna unidad afectada siguió en el stock, ninguna tarea de anuncio relacionada siguió activa y el cambio permaneció en el historial."
     }
   ],
   "fuera": [
@@ -598,16 +678,5 @@
     "Fijar recordatorios semanales u otra cadencia no confirmada.",
     "Automatizar negociaciones de precio con compradores de Wallapop o Vinted."
   ],
-  "preguntas": [
-    "[T02-Q02] ¿Qué identificador estable de AliExpress distingue una línea y cómo se relaciona con paquetes divididos o consolidados?",
-    "[T03-Q01 / T03-Q09] ¿Cuál es el flujo real cuando el primer paquete llegue incompleto, defectuoso o con variante errónea, y qué resultado económico produce?",
-    "[T03-Q04] ¿Cómo se deshace Todo correcto si ya creó unidades y tareas de anuncio?",
-    "[T03-Q05] ¿Con qué precisión se guarda y muestra el coste unitario?",
-    "[T03-Q06 / D-LIVE-026] ¿Cuál será la fórmula de pricing, qué costes incluye y difiere por plataforma?",
-    "[T03-Q07] ¿Debe existir un recordatorio de disputa y, en su caso, con qué cadencia confirmada?",
-    "[T03-Q08 / G-LIVE-006] ¿Qué alfabeto, política de colisiones, reutilización y agotamiento usa la referencia de tres caracteres?",
-    "[T04-Q02 / T04-Q05 / X-LIVE-004] ¿Cómo se mantiene identidad exacta entre referencia lógica y unidades físicamente idénticas sin etiquetas?",
-    "[T04-Q06 / X-LIVE-011] ¿Las tareas para varias unidades iguales se secuencian por unidad o de otro modo?",
-    "[D-LIVE-023 / G-LIVE-017] ¿Qué efecto tiene corregir la clasificación aprendida sobre pedidos ya existentes o mixtos?"
-  ]
+  "preguntas": []
 }

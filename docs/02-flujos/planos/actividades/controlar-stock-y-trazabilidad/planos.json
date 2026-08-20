@@ -57,23 +57,23 @@
     },
     {
       "id": "G-26",
-      "nombre": "Un anuncio por unidad",
-      "texto": "Cada anuncio representa una única unidad física. [Migración: identificador histórico G-LIVE-005; referencias históricas: D-LIVE-007]"
+      "nombre": "Un anuncio activo por producto y plataforma",
+      "texto": "Solo existe un anuncio activo del mismo producto en cada plataforma. Con dos o más unidades disponibles, Wallapop y Vinted reciben referencias distintas; con una sola unidad, ambos anuncios comparten esa referencia. La asignación queda fijada antes de la venta. [Migración: sustituye el antecedente histórico G-LIVE-005 y D-LIVE-007 por decisión del usuario]"
     },
     {
       "id": "G-27",
       "nombre": "Referencia pública de tres caracteres",
-      "texto": "La referencia alfanumérica de tres caracteres identifica la unidad en SANIA y aparece como sufijo del título. [Migración: identificador histórico G-LIVE-006; estado histórico: alfabeto y colisiones pendientes; referencias históricas: D-LIVE-006, T03-Q08, X-LIVE-001]"
+      "texto": "La referencia pública identifica la unidad en SANIA y aparece como sufijo del título. Empieza en ZZZ, usa la secuencia Z, Y, ..., A, z, y, ..., a, nunca reutiliza un valor y añade una letra al agotar una longitud. [Migración: identificador histórico G-LIVE-006; referencias históricas: D-LIVE-006, T03-Q08, X-LIVE-001]"
     },
     {
       "id": "G-28",
-      "nombre": "Reserva de la unidad exacta",
-      "texto": "El correo de venta reserva la referencia contenida en el anuncio; no se aplica FIFO automático. [Migración: identificador histórico G-LIVE-007; estado histórico: la identidad material de unidades idénticas sigue pendiente; referencias históricas: D-LIVE-001, T01-Q11, X-LIVE-004]"
+      "nombre": "La venta reserva la referencia asignada al anuncio",
+      "texto": "El correo de venta se relaciona con el único anuncio del producto y reserva exactamente la referencia que SANIA le asignó al crearlo. La selección ocurre al crear el anuncio y puede usar cualquier referencia disponible; no se decide de nuevo al vender. [Migración: antecedente histórico G-LIVE-007; referencias históricas: D-LIVE-001, T01-Q11, X-LIVE-004]"
     },
     {
       "id": "G-29",
-      "nombre": "Primer correo sobre una unidad compartida",
-      "texto": "Si una unidad está publicada en dos plataformas, el primer correo la reserva y genera el aviso de retirada manual del otro anuncio. [Migración: identificador histórico G-LIVE-008; estado histórico: concurrencia simultánea pendiente; referencias históricas: D-LIVE-008, D-LIVE-009, T04-Q04]"
+      "nombre": "Primer correo que agota el producto",
+      "texto": "El primer correo reserva la referencia asignada. Si queda stock y las sugerencias siguen activas, SANIA crea una nueva tarea para la plataforma vendida. Retira el otro anuncio si compartía la referencia vendida o ya no queda stock. [Migración: identificador histórico G-LIVE-008]"
     },
     {
       "id": "G-30",
@@ -83,7 +83,7 @@
     {
       "id": "G-31",
       "nombre": "Clasificación corregible",
-      "texto": "La clasificación recordada por producto puede cambiarse manualmente. [Migración: identificador histórico G-LIVE-017; estado histórico: efecto sobre pedidos existentes pendiente; referencias históricas: D-LIVE-023]"
+      "texto": "La clasificación recordada por producto puede cambiarse manualmente desde el pedido. Si ya tenía Todo correcto y pasa a Compra personal, SANIA muestra qué productos se borrarán del stock y exige confirmación antes de retirarlos, conservando el cambio en el historial. [Migración: identificador histórico G-LIVE-017; referencias históricas: D-LIVE-023]"
     },
     {
       "id": "G-32",
@@ -94,6 +94,32 @@
       "id": "G-33",
       "nombre": "Correcciones con historia",
       "texto": "Toda corrección conserva antes, después, actor, fecha y hora y motivo sin sobrescribir el historial. [Migración: identificador histórico CORRECCION-AUDITABLE; referencias históricas: T03-Q04, T04-Q01, E-LIVE-005]"
+    }
+  ],
+  "recorridos": [
+    {
+      "id": "REC-5",
+      "nombre": "Asignar una referencia pública no reutilizable",
+      "objetivo": "Identificar cada unidad con una referencia breve, pública y estable.",
+      "estado": "pendiente",
+      "requisitos": [
+        {
+          "id": "R-15",
+          "texto": "Cada referencia empieza en ZZZ, sigue la secuencia Z a A y z a a, nunca se reutiliza y añade una letra al agotar una longitud.",
+          "origen": "usuario",
+          "implementacion": { "estado": "no verificado", "evidencias": [], "pruebas": [] },
+          "regla": "G-27"
+        }
+      ],
+      "criterios": [
+        {
+          "id": "C-15",
+          "dado": "un conjunto de unidades que necesitan referencia",
+          "cuando": "SANIA asignó sus referencias",
+          "entonces": "empezó en ZZZ, respetó el orden acordado, no repitió ningún valor usado y aumentó la longitud al agotarse",
+          "cubre": "R-15"
+        }
+      ]
     }
   ],
   "flujos": [
@@ -147,13 +173,13 @@
     },
     {
       "id": "mantener-disponibilidad-y-reserva",
-      "titulo": "SANIA mantuvo disponibilidad, anuncios y reserva de una unidad",
+      "titulo": "SANIA mantuvo disponibilidad, anuncios y reservas de un producto",
       "momento": "futuro",
       "origen": "usuario",
       "pasos": [
         {
           "tipo": "estatico",
-          "texto": "SANIA relacionó la unidad con sus anuncios por plataforma; cada anuncio representó una unidad y su título terminó con la referencia pública."
+          "texto": "SANIA mantuvo como máximo un anuncio activo del producto en Wallapop y otro en Vinted. Al crear cada anuncio le asignó una referencia disponible sin un orden obligatorio y no creó anuncios duplicados."
         },
         {
           "tipo": "decision",
@@ -193,14 +219,14 @@
         {
           "tipo": "decision",
           "clase": "excepcion",
-          "condicion": "¿El título conservó un sufijo válido de tres caracteres que identificaba una unidad exacta disponible?",
-          "sigue": "sí, SANIA pudo reservar esa referencia",
+          "condicion": "¿El anuncio tenía una referencia válida que SANIA le había asignado al crearlo y esa referencia seguía disponible?",
+          "sigue": "sí, SANIA pudo reservar exactamente esa referencia",
           "rama": {
-            "etiqueta": "no: referencia ausente, alterada, desconocida o unidad no disponible",
+            "etiqueta": "no: anuncio no conciliado, referencia desconocida o unidad no disponible",
             "pasos": [
               {
                 "tipo": "estatico",
-                "texto": "SANIA abrió una conciliación, no cambió el stock y no eligió otra unidad por FIFO. T01-Q02 y X-LIVE-010 exigen validar el sufijo en correos y movimientos reales."
+                "texto": "SANIA abrió una conciliación y no cambió el stock. T01-Q02 y X-LIVE-010 exigen validar las referencias en correos y movimientos reales."
               }
             ],
             "termina": true
@@ -208,7 +234,7 @@
         },
         {
           "tipo": "estatico",
-          "texto": "SANIA reservó la unidad exacta del anuncio. Si la misma última unidad estaba anunciada en la otra plataforma, creó el aviso para que Víctor retirara manualmente el anuncio alternativo."
+          "texto": "SANIA reservó la referencia asignada. Si quedaba stock y las sugerencias seguían activas, creó una nueva tarea para la plataforma vendida. Si el otro anuncio compartía la referencia vendida o ya no quedaba stock, creó el aviso para retirarlo."
         },
         {
           "tipo": "estatico",
@@ -233,7 +259,7 @@
         },
         {
           "tipo": "estatico",
-          "texto": "El flujo concreto para deshacer Todo correcto, corregir la clasificación de pedidos existentes o resolver efectos económicos sigue pendiente."
+          "texto": "Cuando un pedido con Todo correcto pasó a Compra personal, SANIA mostró los productos afectados, pidió confirmación y, tras el sí, los borró del stock activo junto con todas las tareas de anuncio relacionadas. Los efectos económicos siguen pendientes."
         }
       ]
     }
@@ -312,14 +338,16 @@
     "Aplicar automáticamente devoluciones, sustituciones, reembolsos o fórmulas de pricing.",
     "Borrar o sobrescribir silenciosamente movimientos anteriores."
   ],
+  "calidad": [
+    {
+      "id": "Q-30",
+      "criterio": "Cero referencias reutilizadas y ninguna referencia generada fuera de la secuencia Z…A, z…a; al agotar una longitud se añadió una letra."
+    }
+  ],
   "preguntas": [
     "[T04-Q01 / E-LIVE-005] ¿Cuál fue el último ajuste real de stock, con antes, después, motivo y efecto económico?",
     "[T04-Q02 / T04-Q05 / X-LIVE-004] ¿Cómo se distingue físicamente una unidad concreta entre ejemplares idénticos sin etiquetas?",
     "[T04-Q03] ¿Qué cambios pertenecen al stock, cuáles a un ajuste y cuáles a movimientos económicos?",
-    "[T04-Q04] ¿Qué regla resuelve dos correos casi simultáneos sobre la última unidad?",
-    "[T04-Q06 / X-LIVE-011] ¿Cómo se generan y secuencian las tareas para varias unidades iguales?",
-    "[T03-Q08 / G-LIVE-006] ¿Qué alfabeto y política de colisiones, reutilización y agotamiento tendrá la referencia de tres caracteres?",
-    "[T03-Q04] ¿Cómo se revierte una entrada incorrecta y sus efectos derivados sin perder la historia?",
-    "[D-LIVE-023 / G-LIVE-017] ¿Cambiar la clasificación aprendida afecta solo a compras futuras o también a pedidos existentes?"
+    "[T04-Q04] ¿Qué regla resuelve dos correos casi simultáneos sobre la última unidad?"
   ]
 }
